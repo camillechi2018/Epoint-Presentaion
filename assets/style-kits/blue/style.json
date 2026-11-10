@@ -70,11 +70,11 @@
   "sample_records": [
     {
       "role": "cover",
-      "layout_id": "cover-02",
-      "preview": "cover-cover-02.png",
-      "source_preview": "source-previews/cover/P002.png",
-      "status": "reference_only",
-      "sha256": "b4427ecacb39cd43514dea8ed356bcf574c8086cdd51989923872eb806034926",
+      "layout_id": "cover-01",
+      "preview": "cover-cover-01.png",
+      "source_preview": "source-previews/cover/P001.png",
+      "status": "verified_draft",
+      "sha256": "f3300e97a125374403e087ff22343d4137601571dd21519d333e524479ca9464",
       "theme": "blue"
     },
     {

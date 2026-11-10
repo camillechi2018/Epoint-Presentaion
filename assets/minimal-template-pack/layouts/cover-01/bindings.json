@@ -1,0 +1,142 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    {
+      "field": "text_4",
+      "shape_id": 4,
+      "shape_name": "文本框 3",
+      "type": "text",
+      "max_chars": 12,
+      "source_sample_chars": 12,
+      "source_text": "战略定位与营销赋能分享会",
+      "bounds_pt": [
+        92.7,
+        363.0,
+        190.7,
+        24.1
+      ],
+      "semantic_role": "subtitle",
+      "semantic_path": "cover.subtitle",
+      "max_lines": 1
+    },
+    {
+      "field": "text_3",
+      "shape_id": 3,
+      "shape_name": "文本框 2",
+      "type": "text",
+      "max_chars": 9,
+      "source_sample_chars": 9,
+      "source_text": "新点软件产品发布会",
+      "bounds_pt": [
+        94.8,
+        286.9,
+        440.8,
+        46.0
+      ],
+      "semantic_role": "title",
+      "semantic_path": "cover.title",
+      "max_lines": 2
+    },
+    {
+      "field": "text_5",
+      "shape_id": 5,
+      "shape_name": "文本框 4",
+      "type": "text",
+      "max_chars": 6,
+      "source_sample_chars": 6,
+      "source_text": "EPOINT",
+      "bounds_pt": [
+        104.7,
+        165.1,
+        242.5,
+        24.5
+      ],
+      "semantic_role": "english_title",
+      "semantic_path": "cover.english_title",
+      "max_lines": 1
+    },
+    {
+      "field": "text_16",
+      "shape_id": 16,
+      "shape_name": "文本框 15",
+      "type": "text",
+      "max_chars": 20,
+      "source_sample_chars": 20,
+      "source_text": "PRODUCT LAUNCH EVENT",
+      "bounds_pt": [
+        104.7,
+        205.5,
+        440.7,
+        24.5
+      ],
+      "semantic_role": "english_subtitle",
+      "semantic_path": "cover.english_subtitle",
+      "max_lines": 2
+    },
+    {
+      "field": "text_21",
+      "shape_id": 21,
+      "shape_name": "文本框 20",
+      "type": "text",
+      "max_chars": 8,
+      "source_sample_chars": 8,
+      "source_text": "演讲人：新点软件",
+      "bounds_pt": [
+        92.7,
+        388.9,
+        190.7,
+        24.1
+      ],
+      "semantic_role": "presenter",
+      "semantic_path": "cover.presenter",
+      "max_lines": 1
+    },
+    {
+      "field": "text_6",
+      "shape_id": 6,
+      "shape_name": "文本框 5",
+      "type": "text",
+      "max_chars": 24,
+      "source_sample_chars": 11,
+      "source_text": "股票代码 688232",
+      "bounds_pt": [
+        1.2,
+        0.0,
+        0.3,
+        0.0
+      ],
+      "semantic_role": "brand_locked"
+    }
+  ],
+  "objects": {
+    "charts": [],
+    "tables": [],
+    "images": [
+      {
+        "shape_id": 12,
+        "shape_name": "图片 11",
+        "sha256": "14ee47ca3dfa314a18da25f9c89fb0b6cda79454077fbf3f895d0c0c75f74446",
+        "bounds_pt": [
+          0.0,
+          0.0,
+          960.0,
+          540.0
+        ],
+        "semantic_role": "cover_visual_layer"
+      },
+      {
+        "shape_id": 2,
+        "shape_name": "图片 1",
+        "sha256": "16a69d516122d56ba6bedea6610cbce1fc0d92becfb9a7fa737ac2f3e441b7e3",
+        "bounds_pt": [
+          0.0,
+          0.0,
+          0.1,
+          0.0
+        ],
+        "semantic_role": "source_decorative_locked"
+      }
+    ]
+  },
+  "review": "P001 image, editable fields and short-copy PowerPoint render reviewed; source examples are not project facts"
+}

@@ -106,7 +106,14 @@
         "six-step-issue-handling-loop",
         "six-step-problem-solving",
         "three-stage-data-decision",
-        "three-stage-project-logic"
+        "three-stage-project-logic",
+        "five-stage-workflow",
+        "six-step-closed-loop",
+        "four-step-planning-cycle",
+        "six-stage-serpentine-workflow",
+        "four-stage-phase-workflow",
+        "six-stage-square-loop",
+        "four-stage-vertical-arrow"
       ]
     },
     "cycle": {
@@ -158,7 +165,8 @@
         "six-month-project-roadmap",
         "six-month-work-timeline",
         "ten-year-roadmap",
-        "timeline"
+        "timeline",
+        "five-stage-event-plan"
       ]
     },
     "schedule": {

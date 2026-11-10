@@ -16,7 +16,7 @@ from pptx import Presentation
 
 SKILL = Path(__file__).resolve().parents[1]
 SELECTION = {
-    'blue': ['cover-02', 'content-blue-001', 'content-blue-002', 'supp-closing-01'],
+    'blue': ['cover-01', 'content-blue-001', 'content-blue-002', 'supp-closing-01'],
     'red': ['supp-cover-red-06', 'supp-directory-04-red-variant', 'supp-section-red-13', 'supp-closing-red-19'],
     'deep-blue-tech': ['cover-tech-001', 'directory-tech-006', 'section-tech-011', 'closing-tech-082'],
 }

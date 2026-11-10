@@ -8,7 +8,7 @@
 
 | 页面 | 蓝色系 · 蓝白简约 | 红色系 · 红白简约 | 科技风格 · 深蓝科技 |
 | --- | --- | --- | --- |
-| 封面 | ![蓝色系新点双子星封面样张](assets/style-previews/blue-cover-twin-stars.png) | ![红色系封面样张](assets/style-kits/red/cover-supp-cover-red-06.png) | ![科技风格封面样张](assets/style-kits/deep-blue-tech/cover-cover-tech-001.png) |
+| 封面 | ![蓝色系 P001 封面样张](assets/style-previews/blue-cover-P001.png) | ![红色系封面样张](assets/style-kits/red/cover-supp-cover-red-06.png) | ![科技风格封面样张](assets/style-kits/deep-blue-tech/cover-cover-tech-001.png) |
 | 目录 | ![蓝色系目录预览](assets/style-previews/blue.png) | ![红色系目录预览](assets/style-previews/red.png) | ![科技风格目录预览](assets/style-previews/tech.png) |
 | 正文 | ![蓝色系流程正文样张](assets/style-kits/blue/process-content-blue-060.png) | ![红色系对比正文样张](assets/style-kits/red/comparison-content-blue-133.png) | ![科技风格并列正文样张](assets/style-kits/deep-blue-tech/parallel-content-tech-021.png) |
 

@@ -8,57 +8,62 @@
   "relation_taxonomy": "relation-taxonomy.json",
   "layouts": [
     {
-      "id": "cover-02",
+      "id": "cover-01",
       "version": "1.0.0-draft",
       "collection": "new-template-covers",
       "role": "cover",
       "information_relation": "visual-story",
       "classification_status": "verified",
-      "family_id": "cover-002",
-      "source": "sources/blue-cover-02.pptx",
+      "family_id": "cover-001",
+      "source": "sources/blue-cover-01.pptx",
       "example": "sources/cover.pptx",
-      "bindings": "layouts/cover-02/bindings.json",
-      "spec": "layouts/cover-02/spec.md",
-      "layout_rules": "layouts/cover-02/layout_rules.json",
-      "motion": "layouts/cover-02/motion.json",
-      "preview": "source-previews/cover/P002.png",
+      "bindings": "layouts/cover-01/bindings.json",
+      "spec": "layouts/cover-01/spec.md",
+      "layout_rules": "layouts/cover-01/layout_rules.json",
+      "motion": "layouts/cover-01/motion.json",
+      "preview": "source-previews/cover/P001.png",
       "themes": [
         "blue"
       ],
       "status": "draft_pending_review",
       "capacity": {
-        "body_slots": 4,
+        "body_slots": 5,
         "item_title_slots": 0,
-        "cell_max_chars": 20,
-        "main_title_max_fullwidth_chars": 8
+        "cell_max_chars": 20
       },
       "source_page": 1,
-      "shape_count": 11,
-      "media_status": "unreviewed",
-      "html_support": "not_implemented",
+      "shape_count": 33,
+      "media_status": "verified_cover_visual_and_brand",
+      "html_support": "prototype_requires_cross_format_review",
       "motion_support": "source_static",
       "source_mapping": {
-        "cover": 2
+        "cover": 1
       },
       "color_family": "blue",
-      "style": "technology-minimal",
-      "visual_impact": "medium",
+      "style": "technology-future",
+      "visual_impact": "high",
       "title_area_hint": "left",
-      "cover_match_status": "original_only_pending_review",
+      "cover_match_status": "reviewed_editable_cover",
       "stock_code_default": "688232",
       "slogan_locked": null,
       "source_logo_present": true,
-      "background_image": "cover-images/P02.jpg",
-      "semantic_review_status": "verified",
-      "pptx_support": "static_verified_draft",
+      "background_image": "cover-images/P01.png",
+      "html_profile": {
+        "renderer": "scripts/render_html.py",
+        "format": "offline_html",
+        "text_selectable": true,
+        "background": "source_extracted_image",
+        "brand_logo": "embedded_svg_locked",
+        "validation": "browser_open_and_visual_review_only"
+      },
       "red_source": null,
       "red_source_page": null,
       "red_bindings": null,
       "red_preview": null,
       "pack_origin": {
-        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "commit": "6c5177f4c2ee1b4595c8bcdfb9d17ecb8054e48a",
         "source": "sources/cover.pptx",
-        "source_page": 2
+        "source_page": 1
       }
     },
     {
@@ -110,7 +115,7 @@
       "canonical_relation": "navigation",
       "red_preview": null,
       "pack_origin": {
-        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "commit": "6c5177f4c2ee1b4595c8bcdfb9d17ecb8054e48a",
         "source": "sources/blue.pptx",
         "source_page": 1
       }
@@ -164,7 +169,7 @@
       "canonical_relation": "chapter-divider",
       "red_preview": null,
       "pack_origin": {
-        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "commit": "6c5177f4c2ee1b4595c8bcdfb9d17ecb8054e48a",
         "source": "sources/blue.pptx",
         "source_page": 2
       }
@@ -230,7 +235,7 @@
       "title_pressure_status": "tested_short_copy_only",
       "canonical_relation": "closing-message",
       "pack_origin": {
-        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "commit": "6c5177f4c2ee1b4595c8bcdfb9d17ecb8054e48a",
         "source": "sources/blue-supplement.pptx",
         "source_page": 10
       }
@@ -295,7 +300,7 @@
       "red_bindings": null,
       "red_preview": null,
       "pack_origin": {
-        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "commit": "6c5177f4c2ee1b4595c8bcdfb9d17ecb8054e48a",
         "source": "sources/red-supplement.pptx",
         "source_page": 6
       }
@@ -353,7 +358,7 @@
       "red_bindings": null,
       "red_preview": null,
       "pack_origin": {
-        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "commit": "6c5177f4c2ee1b4595c8bcdfb9d17ecb8054e48a",
         "source": "sources/red-supplement.pptx",
         "source_page": 11
       }
@@ -410,7 +415,7 @@
       "red_bindings": null,
       "red_preview": null,
       "pack_origin": {
-        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "commit": "6c5177f4c2ee1b4595c8bcdfb9d17ecb8054e48a",
         "source": "sources/red-supplement.pptx",
         "source_page": 13
       }
@@ -474,7 +479,7 @@
       "red_bindings": null,
       "red_preview": null,
       "pack_origin": {
-        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "commit": "6c5177f4c2ee1b4595c8bcdfb9d17ecb8054e48a",
         "source": "sources/red-supplement.pptx",
         "source_page": 19
       }
@@ -574,7 +579,7 @@
       "red_bindings": null,
       "red_preview": null,
       "pack_origin": {
-        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "commit": "6c5177f4c2ee1b4595c8bcdfb9d17ecb8054e48a",
         "source": "sources/tech.pptx",
         "source_page": 1
       }
@@ -634,7 +639,7 @@
       "red_bindings": null,
       "red_preview": null,
       "pack_origin": {
-        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "commit": "6c5177f4c2ee1b4595c8bcdfb9d17ecb8054e48a",
         "source": "sources/tech.pptx",
         "source_page": 6
       }
@@ -689,7 +694,7 @@
       "red_bindings": null,
       "red_preview": null,
       "pack_origin": {
-        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "commit": "6c5177f4c2ee1b4595c8bcdfb9d17ecb8054e48a",
         "source": "sources/tech.pptx",
         "source_page": 11
       }
@@ -750,7 +755,7 @@
       "red_bindings": null,
       "red_preview": null,
       "pack_origin": {
-        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "commit": "6c5177f4c2ee1b4595c8bcdfb9d17ecb8054e48a",
         "source": "sources/tech.pptx",
         "source_page": 82
       }
