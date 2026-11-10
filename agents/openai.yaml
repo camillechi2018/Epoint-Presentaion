@@ -1,0 +1,4 @@
+interface:
+  display_name: "企业PPT新模板方案"
+  short_description: "先选蓝色、红色或科技风格，再制作品牌PPTX或HTML"
+  default_prompt: "使用 $epoint-presentation-next 制作演示文稿。若我尚未指定整套风格，先给我看三种本地预览图并让我从蓝色系、红色系、科技风格中选择；再根据材料规划逐页结论和证据，按需复用知识库模板，并完成渲染验收。"

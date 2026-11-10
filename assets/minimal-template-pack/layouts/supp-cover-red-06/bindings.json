@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    {
+      "field": "text_4",
+      "shape_id": 4,
+      "shape_name": "标题",
+      "type": "text",
+      "max_chars": 6,
+      "source_sample_chars": 14,
+      "source_text": "蓝色简约风\u000b通用工作总结汇报",
+      "bounds_pt": [
+        76.0,
+        107.3,
+        489.6,
+        214.1
+      ],
+      "semantic_role": "title",
+      "semantic_path": "cover.title",
+      "max_width_units": 12,
+      "max_lines": 1
+    },
+    {
+      "field": "text_10",
+      "shape_id": 10,
+      "shape_name": "署名",
+      "type": "text",
+      "max_chars": 8,
+      "source_sample_chars": 8,
+      "source_text": "汇报人：新点软件",
+      "bounds_pt": [
+        78.4,
+        341.8,
+        175.7,
+        39.7
+      ],
+      "semantic_role": "presenter",
+      "semantic_path": "cover.presenter",
+      "max_width_units": 16,
+      "max_lines": 1
+    }
+  ],
+  "objects": {
+    "charts": [],
+    "tables": [],
+    "images": [
+      {
+        "shape_id": 8,
+        "shape_name": "图片 7",
+        "semantic_role": "brand_logo_locked",
+        "asset_sha256": "7306baafb37406e1d6d666d68d3559622065d007ef0ff83cc6c1b9a86c147cef"
+      }
+    ]
+  },
+  "review": "semantic fields; short-copy PowerPoint render and capacity boundary verified"
+}

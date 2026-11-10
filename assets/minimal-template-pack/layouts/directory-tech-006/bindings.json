@@ -1,0 +1,354 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    {
+      "field": "text_7",
+      "shape_id": 7,
+      "shape_name": "文本框 6",
+      "type": "text",
+      "group_path": [],
+      "source_text": "Contents",
+      "source_sample_chars": 8,
+      "max_chars": 24,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        -27792,
+        1262578,
+        12247585,
+        2215991
+      ],
+      "semantic_path": "english_heading"
+    },
+    {
+      "field": "text_30",
+      "shape_id": 30,
+      "shape_name": "文本框 29",
+      "type": "text",
+      "group_path": [],
+      "source_text": "年度工作\n概述",
+      "source_sample_chars": 7,
+      "max_chars": 8,
+      "typography_role": "chinese_heading",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        788887,
+        3071841,
+        1816145,
+        830997
+      ],
+      "semantic_path": "chapter_1.title",
+      "max_width_units": 16,
+      "max_lines": 1
+    },
+    {
+      "field": "text_42",
+      "shape_id": 42,
+      "shape_name": "文本框 41",
+      "type": "text",
+      "group_path": [],
+      "source_text": "核心成果\n展示",
+      "source_sample_chars": 7,
+      "max_chars": 8,
+      "typography_role": "chinese_heading",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        2894497,
+        3071841,
+        1997616,
+        830997
+      ],
+      "semantic_path": "chapter_2.title",
+      "max_width_units": 16,
+      "max_lines": 1
+    },
+    {
+      "field": "text_49",
+      "shape_id": 49,
+      "shape_name": "文本框 48",
+      "type": "text",
+      "group_path": [],
+      "source_text": "问题与\n不足分析",
+      "source_sample_chars": 8,
+      "max_chars": 8,
+      "typography_role": "chinese_heading",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        5090842,
+        3071841,
+        1997616,
+        830997
+      ],
+      "semantic_path": "chapter_3.title",
+      "max_width_units": 16,
+      "max_lines": 1
+    },
+    {
+      "field": "text_58",
+      "shape_id": 58,
+      "shape_name": "文本框 57",
+      "type": "text",
+      "group_path": [],
+      "source_text": "经验与\n成长总结",
+      "source_sample_chars": 8,
+      "max_chars": 8,
+      "typography_role": "chinese_heading",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        7287188,
+        3071841,
+        1997616,
+        830997
+      ],
+      "semantic_path": "chapter_4.title",
+      "max_width_units": 16,
+      "max_lines": 1
+    },
+    {
+      "field": "text_66",
+      "shape_id": 66,
+      "shape_name": "文本框 65",
+      "type": "text",
+      "group_path": [],
+      "source_text": "明年\n目标与计划",
+      "source_sample_chars": 8,
+      "max_chars": 8,
+      "typography_role": "chinese_heading",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        9483533,
+        3071841,
+        1997616,
+        830997
+      ],
+      "semantic_path": "chapter_5.title",
+      "max_width_units": 16,
+      "max_lines": 1
+    },
+    {
+      "field": "text_67",
+      "shape_id": 67,
+      "shape_name": "文本框 66",
+      "type": "text",
+      "group_path": [],
+      "source_text": "01",
+      "source_sample_chars": 2,
+      "max_chars": 24,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        753022,
+        4497587,
+        1887875,
+        1107996
+      ],
+      "semantic_path": "chapter_1.number"
+    },
+    {
+      "field": "text_68",
+      "shape_id": 68,
+      "shape_name": "文本框 67",
+      "type": "text",
+      "group_path": [],
+      "source_text": "02",
+      "source_sample_chars": 2,
+      "max_chars": 24,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        2949368,
+        4497587,
+        1887875,
+        1107996
+      ],
+      "semantic_path": "chapter_2.number"
+    },
+    {
+      "field": "text_69",
+      "shape_id": 69,
+      "shape_name": "文本框 68",
+      "type": "text",
+      "group_path": [],
+      "source_text": "03",
+      "source_sample_chars": 2,
+      "max_chars": 24,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        5145713,
+        4497587,
+        1887875,
+        1107996
+      ],
+      "semantic_path": "chapter_3.number"
+    },
+    {
+      "field": "text_70",
+      "shape_id": 70,
+      "shape_name": "文本框 69",
+      "type": "text",
+      "group_path": [],
+      "source_text": "04",
+      "source_sample_chars": 2,
+      "max_chars": 24,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        7342059,
+        4497587,
+        1887875,
+        1107996
+      ],
+      "semantic_path": "chapter_4.number"
+    },
+    {
+      "field": "text_71",
+      "shape_id": 71,
+      "shape_name": "文本框 70",
+      "type": "text",
+      "group_path": [],
+      "source_text": "05",
+      "source_sample_chars": 2,
+      "max_chars": 24,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        9538404,
+        4497587,
+        1887875,
+        1107996
+      ],
+      "semantic_path": "chapter_5.number"
+    },
+    {
+      "field": "text_72",
+      "shape_id": 72,
+      "shape_name": "文本框 71",
+      "type": "text",
+      "group_path": [],
+      "source_text": "目录",
+      "source_sample_chars": 2,
+      "max_chars": 24,
+      "typography_role": "chinese_heading",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        4156688,
+        641526,
+        3878626,
+        738664
+      ],
+      "semantic_path": "heading"
+    },
+    {
+      "field": "text_73",
+      "shape_id": 73,
+      "shape_name": "文本框 72",
+      "type": "text",
+      "group_path": [],
+      "source_text": "Annual Work Overview",
+      "source_sample_chars": 20,
+      "max_chars": 12,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        1005904,
+        3912183,
+        1382110,
+        461665
+      ],
+      "semantic_path": "chapter_1.english",
+      "max_width_units": 24,
+      "max_lines": 1
+    },
+    {
+      "field": "text_74",
+      "shape_id": 74,
+      "shape_name": "文本框 73",
+      "type": "text",
+      "group_path": [],
+      "source_text": "Display of core achievements",
+      "source_sample_chars": 28,
+      "max_chars": 12,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        3043601,
+        3912183,
+        1699408,
+        461665
+      ],
+      "semantic_path": "chapter_2.english",
+      "max_width_units": 24,
+      "max_lines": 1
+    },
+    {
+      "field": "text_75",
+      "shape_id": 75,
+      "shape_name": "文本框 74",
+      "type": "text",
+      "group_path": [],
+      "source_text": "Analysis of problems \nand Deficiencies",
+      "source_sample_chars": 38,
+      "max_chars": 12,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        5090842,
+        3912183,
+        1997616,
+        461665
+      ],
+      "semantic_path": "chapter_3.english",
+      "max_width_units": 24,
+      "max_lines": 1
+    },
+    {
+      "field": "text_76",
+      "shape_id": 76,
+      "shape_name": "文本框 75",
+      "type": "text",
+      "group_path": [],
+      "source_text": "Summary of \nExperience Growth",
+      "source_sample_chars": 29,
+      "max_chars": 12,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        7342059,
+        3912183,
+        1887875,
+        461665
+      ],
+      "semantic_path": "chapter_4.english",
+      "max_width_units": 24,
+      "max_lines": 1
+    },
+    {
+      "field": "text_77",
+      "shape_id": 77,
+      "shape_name": "文本框 76",
+      "type": "text",
+      "group_path": [],
+      "source_text": "Target plan \nfor next year",
+      "source_sample_chars": 26,
+      "max_chars": 12,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        9712491,
+        3912183,
+        1539700,
+        461665
+      ],
+      "semantic_path": "chapter_5.english",
+      "max_width_units": 24,
+      "max_lines": 1
+    }
+  ],
+  "objects": {
+    "charts": [],
+    "tables": [],
+    "images": []
+  },
+  "review": "visual index only; field semantics provisional"
+}

@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "status": "draft_pending_review",
+  "preview_purpose": "视觉方向示意；选定风格后仍按内容选择具体页面，不保证使用图中的目录版式",
+  "styles": [
+    {
+      "id": "blue",
+      "label": "蓝色系",
+      "description": "蓝白简约，适合日常汇报和分析报告",
+      "theme": "blue",
+      "style_family": "legacy-blue-red",
+      "preview": "blue.png",
+      "preview_source": "source-previews/blue-supplement/P002.png"
+    },
+    {
+      "id": "red",
+      "label": "红色系",
+      "description": "红白简约，适合正式发布和重点展示",
+      "theme": "red",
+      "style_family": "legacy-blue-red",
+      "preview": "red.png",
+      "preview_source": "source-previews/red-supplement/P010.png"
+    },
+    {
+      "id": "deep-blue-tech",
+      "label": "科技风格",
+      "description": "深蓝科技，适合技术方案和产品展示",
+      "theme": "deep-blue-tech",
+      "style_family": "deep-blue-tech",
+      "preview": "tech.png",
+      "preview_source": "source-previews/tech/P006.png"
+    }
+  ]
+}

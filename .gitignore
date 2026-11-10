@@ -1,0 +1,7 @@
+assets/minimal-template-pack.previous/
+assets/rename-probe-done/
+**/__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+Thumbs.db

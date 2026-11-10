@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    {
+      "field": "text_22",
+      "shape_id": 22,
+      "shape_name": "文本框 21",
+      "type": "text",
+      "group_path": [],
+      "source_text": "感谢观看",
+      "source_sample_chars": 4,
+      "max_chars": 4,
+      "typography_role": "chinese_display",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        3142251,
+        2984319,
+        5907498,
+        1323439
+      ],
+      "max_lines": 1,
+      "capacity_status": "powerpoint_short_title_tested",
+      "semantic_path": "thanks_title"
+    },
+    {
+      "field": "text_25",
+      "shape_id": 25,
+      "shape_name": "文本框 24",
+      "type": "text",
+      "group_path": [
+        54
+      ],
+      "source_text": "Thanks",
+      "source_sample_chars": 6,
+      "max_chars": 6,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        5343144,
+        2408714,
+        1505712,
+        432413
+      ],
+      "max_lines": 1,
+      "capacity_status": "powerpoint_short_title_tested",
+      "semantic_path": "english_label"
+    }
+  ],
+  "objects": {
+    "charts": [],
+    "tables": [],
+    "images": []
+  },
+  "review": "visual index only; field semantics provisional"
+}

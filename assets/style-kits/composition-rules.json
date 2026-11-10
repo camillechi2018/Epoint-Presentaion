@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "status": "draft_pending_review",
+  "derivation": "Induced from verified source previews; visual examples are references, not slide backgrounds",
+  "examples": {
+    "blue": ["content-blue-060", "content-blue-036", "content-blue-133"],
+    "red": ["content-blue-060", "content-blue-036", "content-blue-133"],
+    "deep-blue-tech": ["content-tech-021", "content-tech-028", "data-chart-tech-071"]
+  },
+  "relationship_recipes": {
+    "parallel": "Equal weight items share a common baseline. Three short items use one row; never leave a lone tile in a 2x2 grid.",
+    "process": "Steps form one directional sequence; connector and step count change together.",
+    "comparison": "Use paired aligned dimensions. Unequal content uses a narrative layout instead of empty opposing cards.",
+    "data": "Show value, unit, period and source; do not inflate short values into large empty cards.",
+    "hierarchy": "Place a single conclusion above or beside supporting items; do not imply equal weight."
+  },
+  "card_grid": {
+    "2": [2], "3": [3], "4": [2, 2], "5": [3, 2], "6": [3, 3]
+  },
+  "geometry_inches": {
+    "left": 0.70, "right": 12.62, "content_top": 1.72,
+    "row_gap": 0.24, "column_gap": 0.24,
+    "short_card_height": 1.45, "normal_card_height": 1.84,
+    "long_card_height": 2.23, "max_row_height": 2.23,
+    "title_body_gap": 0.14
+  },
+  "density_thresholds": {
+    "short_body_units": 36, "normal_body_units": 74
+  },
+  "body_variants": {
+    "cards": {
+      "auto": "2–3 项同权内容用无衬底开放分栏；其他项数默认网格；六项连续重复网格时，可由整稿选版改为开放式两行分组",
+      "allowed": ["auto", "grid", "columns", "stat_rows"],
+      "columns_count": [2, 3],
+      "stat_rows_count": 6
+    },
+    "process": {
+      "auto": "3–5 步且每步说明不超过 22 显示宽度单位时用开放轨道；较长说明用有衬底的阶段卡",
+      "allowed": ["auto", "cards", "rail"]
+    },
+    "priority_grid": {
+      "auto": "4 条短支撑信息用上方主结论＋下方四栏；其他情况用左主右辅",
+      "allowed": ["auto", "side", "top"]
+    },
+    "milestone_timeline": {
+      "auto": "3–4 个里程碑用横向时间轴；5–6 个用纵向列表避免横向拥挤",
+      "allowed": ["auto", "horizontal", "vertical"]
+    },
+    "bullets": {
+      "auto": "2–3 项且内容较短用 spacious；5–6 项或有长项用 compact；其余用 balanced；有 featured_index 用 lead",
+      "spacious_max_items": 3,
+      "compact_min_items": 5,
+      "compact_long_item_units": 70,
+      "allowed": ["auto", "balanced", "compact", "spacious", "lead"]
+    },
+    "metrics": {
+      "auto": "单项用 hero；有 featured_index 且至少两项用 lead_support；其余用 grid",
+      "allowed": ["auto", "grid", "hero", "lead_support"]
+    },
+    "comparison": {
+      "allowed": ["standard", "before_after"],
+      "before_after": "两侧同一对象的改造前后，并提供材料中的变化结论"
+    },
+    "data_table": {
+      "allowed": ["standard", "action_tracker"],
+      "action_tracker": "每行包含问题、措施、责任人、期限和状态；固定五列直角表格"
+    },
+    "image_case": {
+      "allowed": ["standard", "annotated"],
+      "annotated": "来源截图上标注一至三个点，并在右侧逐点解释"
+    }
+  },
+  "style_specific": {
+    "blue": "Light background, flat blue divider and restrained borders; source examples keep aligned content groups.",
+    "red": "White background, restrained red emphasis and flat dividers; avoid broad filled blocks.",
+    "deep-blue-tech": "Dark layered background and blue-cyan accents; no white simple-style cards."
+  }
+}

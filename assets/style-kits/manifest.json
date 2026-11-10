@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "version": "1.0.0-draft",
+  "status": "draft_pending_review",
+  "styles": {
+    "blue": {
+      "profile": "blue/style.json",
+      "previews": [
+        "assets/style-kits/blue/cover-cover-02.png",
+        "assets/style-kits/blue/directory-content-blue-001.png",
+        "assets/style-kits/blue/section-content-blue-002.png",
+        "assets/style-kits/blue/process-content-blue-060.png",
+        "assets/style-kits/blue/data-content-blue-036.png",
+        "assets/style-kits/blue/comparison-content-blue-133.png",
+        "assets/style-kits/blue/closing-supp-closing-01.png"
+      ]
+    },
+    "red": {
+      "profile": "red/style.json",
+      "previews": [
+        "assets/style-kits/red/cover-supp-cover-red-06.png",
+        "assets/style-kits/red/directory-supp-directory-04-red-variant.png",
+        "assets/style-kits/red/section-supp-section-red-13.png",
+        "assets/style-kits/red/process-content-blue-060.png",
+        "assets/style-kits/red/data-content-blue-036.png",
+        "assets/style-kits/red/comparison-content-blue-133.png",
+        "assets/style-kits/red/closing-supp-closing-red-19.png"
+      ]
+    },
+    "deep-blue-tech": {
+      "profile": "deep-blue-tech/style.json",
+      "previews": [
+        "assets/style-kits/deep-blue-tech/cover-cover-tech-001.png",
+        "assets/style-kits/deep-blue-tech/directory-directory-tech-006.png",
+        "assets/style-kits/deep-blue-tech/section-section-tech-011.png",
+        "assets/style-kits/deep-blue-tech/parallel-content-tech-021.png",
+        "assets/style-kits/deep-blue-tech/process-content-tech-028.png",
+        "assets/style-kits/deep-blue-tech/data-data-chart-tech-071.png",
+        "assets/style-kits/deep-blue-tech/closing-closing-tech-082.png"
+      ]
+    }
+  }
+}

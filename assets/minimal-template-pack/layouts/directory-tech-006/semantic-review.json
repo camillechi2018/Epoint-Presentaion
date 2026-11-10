@@ -1,0 +1,13 @@
+{
+  "source_page": 6,
+  "component_id": "directory-tech-006",
+  "information_relation": "navigation",
+  "source_item_count": 5,
+  "component_parts": "五个章节入口，中文短标题、英文辅助行与编号一一对应",
+  "content_fit_limit": "章节数量变化仍需目录卡及底部光纹重排",
+  "review_status": "static_pptx_verified",
+  "field_binding_status": "reviewed",
+  "normal_use_status": "static_pptx_verified_draft",
+  "source_text_policy": "源稿中的业务、数字、人名均为示例，不得作为输出事实",
+  "verification_note": "虚构内容实填、PowerPoint 渲染、文字边界、单 Logo 与图片 fallback 已核对；HTML、动效和扩展色分别验收。"
+}

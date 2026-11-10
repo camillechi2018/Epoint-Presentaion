@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "id": "offline-core",
+  "status": "draft_pending_review",
+  "purpose": "Skill 离线通用页面结构；与 brand-baseline.json 的品牌身份独立",
+  "visual_effects": {"shadows": "none"},
+  "canvas": {
+    "width_inches": 13.333333,
+    "height_inches": 7.5,
+    "margin_inches": 0.58,
+    "logo_clearance_inches": 1.9
+  },
+  "logo_anchor": {"top_inches": 0.32, "position": "top_right"},
+  "content_header": {
+    "source": "蓝红简约知识库正文页页眉；横线起点按标题可见左边缘对齐，适用于技能排版与自由编排",
+    "title_box_inches": [0.487, 0.338, 8.424, 0.505],
+    "title_size_pt": 24,
+    "title_color_role": "primary",
+    "rule_inches": [0.487, 0.843, 12.246, 0.0],
+    "rule_width_pt": 1.5,
+    "logo_box_inches": [11.5, 0.44, 1.233, 0.265]
+  },
+  "tech_content_header": {
+    "source": "科技风知识库 content-tech-021 的顶部原生图形组；仅用于技能排版和自由编排正文页",
+    "asset": "assets/layouts/tech-content-header.pptx",
+    "title_box_inches": [3.98, 0.46, 5.38, 0.47],
+    "title_size_pt": 28,
+    "title_color_role": "white",
+    "logo_box_inches": [11.98, 0.20, 0.98, 0.21],
+    "canvas_color_role": "canvas",
+    "minimum_body_top_inches": 1.55
+  },
+  "content_atmosphere": {
+    "enabled": true,
+    "themes": ["blue", "red"],
+    "applies_to": ["guided_composition", "free_composition"],
+    "description": "仅蓝红简约新绘正文页使用；两个可编辑椭圆位于底层，以锁定主题色、透明度和柔化边缘形成轻微弥散；科技风使用原稿标题栏，不叠加椭圆",
+    "blur_pt": 220,
+    "circles_by_theme": {
+      "blue": [
+        {"box_inches": [-3.9, 1.2, 11.0, 10.0], "color_role": "primary", "opacity": 0.11},
+        {"box_inches": [6.8, -3.45, 10.0, 9.4], "color_role": "secondary", "opacity": 0.07}
+      ],
+      "red": [
+        {"box_inches": [-3.9, 1.2, 11.0, 10.0], "color_role": "primary", "opacity": 0.08},
+        {"box_inches": [6.8, -3.45, 10.0, 9.4], "color_role": "secondary", "opacity": 0.05}
+      ]
+    }
+  },
+  "cover": {
+    "stripe": [0.0, 0.0, 0.20, 7.5],
+    "title": [0.85, 2.10, 11.3, 1.35],
+    "title_rule": [0.86, 3.56, 3.1, 0.06],
+    "subtitle": [0.87, 3.94, 10.7, 0.9],
+    "slogan": [0.87, 5.78, 9.6, 0.38],
+    "stock_code": [0.87, 6.18, 5.0, 0.28],
+    "meta": [0.87, 6.52, 10.0, 0.42]
+  },
+  "closing": {
+    "accent_rule": [0.86, 2.20, 3.1, 0.06],
+    "title": [0.85, 2.55, 11.3, 1.3],
+    "subtitle": [0.87, 4.10, 10.7, 0.8],
+    "contact": [0.87, 6.40, 10.0, 0.4]
+  },
+  "page_roster": ["cover", "section", "bullets", "cards", "process", "comparison", "metrics", "closing"]
+}

@@ -1,0 +1,20 @@
+{
+  "cardinality_mode": "fixed_until_validated",
+  "supported_counts": [],
+  "source_count": null,
+  "candidate_counts": [],
+  "reflow_status": "not_implemented",
+  "grouping_status": "provisional_requires_manual_object_review",
+  "title_pressure_test": {
+    "tested_cjk_lengths": [
+      8,
+      16,
+      24
+    ],
+    "safe_title_chars": 8,
+    "status": "conservative_short_copy_only",
+    "overflow_policy": "reject_and_select_another_layout_or_split_title"
+  },
+  "static_pptx_status": "verified_short_copy_draft",
+  "static_pptx_source_count": null
+}

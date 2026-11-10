@@ -1,0 +1,148 @@
+{
+  "cardinality_mode": "directory_reflow",
+  "supported_counts": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "source_count": 6,
+  "reflow_status": "verified_short_copy_draft",
+  "validation_status": "verified",
+  "count_evidence": "Blue/red simple and deep-blue tech directory variants: all supported item counts filled; 102 PowerPoint PPTX opened and passed text-fit audit; endpoint layouts visually reviewed. Chinese title/subtitle pressure copy verified within the registered profile; draft pending review.",
+  "verified_counts": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "title_pressure_test": {
+    "safe_title_chars": 2,
+    "status": "tested_short_copy_only"
+  },
+  "directory_layout": "two_column_cards",
+  "directory_units": [
+    {
+      "shape_ids": [
+        5,
+        8,
+        12
+      ],
+      "anchor_shape_id": 5,
+      "text_shape_ids": {
+        "title": 12,
+        "number": 8
+      },
+      "number_shape_id": 8
+    },
+    {
+      "shape_ids": [
+        16,
+        20,
+        21
+      ],
+      "anchor_shape_id": 16,
+      "text_shape_ids": {
+        "title": 21,
+        "number": 20
+      },
+      "number_shape_id": 20
+    },
+    {
+      "shape_ids": [
+        22,
+        23,
+        24
+      ],
+      "anchor_shape_id": 22,
+      "text_shape_ids": {
+        "title": 24,
+        "number": 23
+      },
+      "number_shape_id": 23
+    },
+    {
+      "shape_ids": [
+        25,
+        26,
+        27
+      ],
+      "anchor_shape_id": 25,
+      "text_shape_ids": {
+        "title": 27,
+        "number": 26
+      },
+      "number_shape_id": 26
+    },
+    {
+      "shape_ids": [
+        28,
+        29,
+        30
+      ],
+      "anchor_shape_id": 28,
+      "text_shape_ids": {
+        "title": 30,
+        "number": 29
+      },
+      "number_shape_id": 29
+    },
+    {
+      "shape_ids": [
+        31,
+        32,
+        33
+      ],
+      "anchor_shape_id": 31,
+      "text_shape_ids": {
+        "title": 33,
+        "number": 32
+      },
+      "number_shape_id": 32
+    }
+  ],
+  "directory_item_fields": [
+    {
+      "title": "text_12"
+    },
+    {
+      "title": "text_21"
+    },
+    {
+      "title": "text_24"
+    },
+    {
+      "title": "text_27"
+    },
+    {
+      "title": "text_30"
+    },
+    {
+      "title": "text_33"
+    }
+  ],
+  "directory_heading_fields": {
+    "text_4": "目录"
+  },
+  "directory_long_copy_profile": {
+    "status": "verified_static_pptx_draft",
+    "item_title_max_cjk_chars": 8,
+    "item_subtitle_max_cjk_chars": 0,
+    "validated_counts": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "validation_note": "All 102 style/theme/count combinations passed PowerPoint open and text-fit checks with Chinese pressure copy. Character limits are conservative per layout; text meaning and visual density still require review."
+  }
+}

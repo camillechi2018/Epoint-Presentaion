@@ -1,0 +1,10 @@
+{
+  "cardinality_mode": "fixed",
+  "supported_counts": [
+    1
+  ],
+  "source_count": 1,
+  "reflow_status": "not_applicable",
+  "count_evidence": "blue/red source geometry equal; fixed count visually reviewed",
+  "validation_status": "verified_fixed_count"
+}

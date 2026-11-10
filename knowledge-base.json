@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "version": "1.0.0-draft",
+  "mode": "git",
+  "git_url": "https://github.com/camillechi2018/EpointPresentaion-PPT-skills.git",
+  "git_branch": "main",
+  "git_checkout_path": "../github-knowledge-next",
+  "git_repository_directory": ".",
+  "manifest": "knowledge-manifest.json",
+  "cache_path": "../.epoint-presentation-next-cache",
+  "offline_pack_path": "assets/minimal-template-pack",
+  "offline_brand_profile": "assets/brand/brand-baseline.json",
+  "offline_layout_profile": "assets/layouts/offline-core.json",
+  "offline_brand_renderer": "scripts/render_offline_brand.py"
+}

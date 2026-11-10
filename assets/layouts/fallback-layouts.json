@@ -1,0 +1,130 @@
+{
+  "schema_version": "1.0",
+  "status": "draft_pending_review",
+  "purpose": "正文模板无合格匹配时的品牌内排版结构；不代替封面、目录、章节、封底",
+  "inspiration": "借鉴 huashu-design 的信息结构；仅由本 Skill 使用锁定品牌变量重绘可编辑对象",
+  "brand_policy": "只使用 brand-palette-lock.json 和 brand-baseline.json 的所选主题变量、字体及默认 Logo；无阴影",
+  "layouts": [
+    {
+      "id": "assertion_evidence",
+      "relation": ["trend", "change", "data", "proof"],
+      "use_when": "一条可核实的结论需要用按时间或顺序排列的连续数值证明",
+      "required": ["title", "series", "data_source"],
+      "capacity": {"series_min": 3, "series_max": 6, "title_units_max": 42},
+      "visual_grammar": "上方完整陈述结论；左侧大图表，右侧关键变化；标明单位、时期和数据来源",
+      "source_example": "huashu-design/assets/style-specimens/ppt/15-assertion-evidence.html"
+    },
+    {
+      "id": "priority_grid",
+      "variants": ["side", "top"],
+      "relation": ["hierarchy", "key_point", "summary"],
+      "use_when": "一个最重要的结论或指标，配二至四条支撑信息",
+      "required": ["title", "lead", "support"],
+      "capacity": {"support_min": 2, "support_max": 4, "title_units_max": 42},
+      "visual_grammar": "主信息占左侧大区；辅助信息在右侧有序排列，不以等面积卡片冒充等权重",
+      "source_example": "huashu-design/assets/style-specimens/ppt/09-bento-grid.html"
+    },
+    {
+      "id": "evidence_matrix",
+      "relation": ["analysis", "evidence", "multi_dimension"],
+      "use_when": "三至四个证据维度共同支撑同一个页面结论",
+      "required": ["title", "sections"],
+      "capacity": {"sections_min": 3, "sections_max": 4, "title_units_max": 42},
+      "visual_grammar": "一个主证据区配右侧分层次证据区；每区明确标题、事实和单位，拒绝空占位",
+      "source_example": "huashu-design/assets/style-specimens/ppt/19-dense-research-report.html"
+    },
+    {
+      "id": "problem_solution_outcome",
+      "relation": ["problem_solution", "proposal", "result"],
+      "use_when": "一个问题、一项对应方案和有依据的预期或已实现结果构成清晰因果链",
+      "required": ["title", "problem", "solution", "outcome"],
+      "capacity": {"title_units_max": 42, "stage_body_units_max": 72},
+      "visual_grammar": "三栏按问题、方案、结果依次排列；结果状态必须由原文说明，不自动写成已实现",
+      "source_example": "huashu-design/assets/style-specimens/ppt/16-institutional-swiss.html"
+    },
+    {
+      "id": "layered_architecture",
+      "relation": ["architecture", "hierarchy", "layered_system"],
+      "use_when": "材料确有从上到下的层级、承载或依赖关系",
+      "required": ["title", "layers"],
+      "capacity": {"title_units_max": 42, "layers_min": 2, "layers_max": 4, "items_per_layer_max": 4},
+      "visual_grammar": "层级按输入顺序自上而下排列，每层由标签与一至四个同级对象组成；连接线表达层间关系",
+      "source_example": "huashu-design/assets/style-specimens/ppt/12-diagram-isotype.html"
+    },
+    {
+      "id": "longform_metric",
+      "relation": ["narrative", "longform", "analysis"],
+      "use_when": "需要保留两至三段完整论述，同时有一项有来源的关键数字",
+      "required": ["title", "paragraphs", "metric"],
+      "capacity": {"title_units_max": 42, "paragraphs_min": 2, "paragraphs_max": 3, "paragraph_units_max": 140},
+      "visual_grammar": "左侧连贯正文，右侧单个大数字及口径；不拆散段落，也不伪造指标",
+      "source_example": "huashu-design/assets/style-specimens/ppt/17-editorial-longform.html"
+    },
+    {
+      "id": "data_table",
+      "variants": ["standard", "action_tracker"],
+      "relation": ["table", "precise_values", "multi_dimension_data"],
+      "use_when": "多行多列的精确数据需要逐项保留，图形化会隐藏原始数值",
+      "required": ["title", "columns", "rows"],
+      "capacity": {"title_units_max": 42, "columns_min": 2, "columns_max": 6, "rows_min": 1, "rows_max": 8, "cell_units_max": 24},
+      "visual_grammar": "原生可编辑网格；表头突出，数值按列对齐，来源与单位明确；不把表格渲染为截图",
+      "source_example": "huashu-design/assets/style-specimens/ppt/19-dense-research-report.html"
+    },
+    {
+      "id": "milestone_timeline",
+      "variants": ["horizontal", "vertical"],
+      "relation": ["timeline", "milestone", "project_progress"],
+      "use_when": "存在真实日期或时期与对应阶段成果；强调发生时间而非纯步骤顺序",
+      "required": ["title", "milestones"],
+      "capacity": {"title_units_max": 42, "milestones_min": 3, "milestones_max": 6, "date_units_max": 14, "item_title_units_max": 16, "body_units_max": 36},
+      "visual_grammar": "横向时间轴；日期与事件一一对应，节点数变化时等距重排",
+      "source_example": "huashu-design/assets/style-specimens/ppt/14-narrative-sparkline.html"
+    },
+    {
+      "id": "image_case",
+      "variants": ["standard", "annotated"],
+      "relation": ["case", "image_text", "product_screenshot"],
+      "use_when": "用户材料含可用图片或截图，图片本身是说明案例的重要证据",
+      "required": ["title", "image_path", "case_title", "body", "takeaway"],
+      "capacity": {"title_units_max": 42, "case_title_units_max": 28, "body_units_max": 120, "takeaway_units_max": 70, "caption_units_max": 60},
+      "visual_grammar": "左侧嵌入来源图片，右侧说明案例与结论；不生成空白图片占位或挪用无关素材",
+      "source_example": "huashu-design/assets/style-specimens/ppt/11-two-font-consulting.html"
+    },
+    {
+      "id": "comparison_chart",
+      "relation": ["comparison_data", "bar_chart", "category_difference"],
+      "use_when": "至少两个对象或时期需要按同一口径比较数值",
+      "required": ["title", "categories", "series", "data_source"],
+      "capacity": {"title_units_max": 42, "categories_min": 2, "categories_max": 5, "series_min": 1, "series_max": 2, "label_units_max": 16},
+      "visual_grammar": "原生可编辑横向条形图；同组共用刻度、标注数值和来源；不以假数据补图",
+      "source_example": "huashu-design/assets/style-specimens/ppt/13-diagrammatic-minimalism.html"
+    },
+    {
+      "id": "target_actual_gap",
+      "relation": ["target_actual", "variance", "attainment"],
+      "use_when": "同一指标有真实目标值、实际值、单位、时期和偏差解释",
+      "required": ["title", "target", "actual", "unit", "period", "gap_reason", "data_source"],
+      "capacity": {"title_units_max": 42, "reason_units_max": 105, "period_units_max": 20, "unit_units_max": 12, "source_units_max": 90},
+      "visual_grammar": "并列展示目标与实际；偏差由数值自动计算，解释来自材料；同口径同单位，不自行判定好坏",
+      "source_example": "knowledge-base content relation: target versus actual"
+    },
+    {
+      "id": "decision_matrix",
+      "relation": ["decision", "option_evaluation", "multi_criteria"],
+      "use_when": "2–4 个备选方案按相同的 2–4 项标准评估；分数和依据来自材料",
+      "required": ["title", "criteria", "options", "data_source"],
+      "capacity": {"title_units_max": 42, "criteria_min": 2, "criteria_max": 4, "options_min": 2, "options_max": 4, "label_units_max": 18, "source_units_max": 90},
+      "visual_grammar": "列为方案，行为评价标准；每格 1–5 分，总分由输入自动计算；建议方案仅在材料明确指定时标注",
+      "source_example": "knowledge-base content relation: option comparison"
+    },
+    {
+      "id": "responsibility_swimlane",
+      "relation": ["swimlane", "cross_team_process", "handoff"],
+      "use_when": "2–4 个角色在 2–5 个有序阶段承担不同任务，交接关系需要同时看清",
+      "required": ["title", "phases", "lanes"],
+      "capacity": {"title_units_max": 42, "phases_min": 2, "phases_max": 5, "lanes_min": 2, "lanes_max": 4, "label_units_max": 18, "task_units_max": 44},
+      "visual_grammar": "阶段自左向右，角色自上而下；仅为确有任务的交叉单元格绘制内容，空位保持留白",
+      "source_example": "knowledge-base content relation: multi-role process"
+    }
+  ]
+}

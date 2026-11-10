@@ -1,0 +1,759 @@
+{
+  "schema_version": "1.0",
+  "version": "1.0.0-draft",
+  "status": "draft_pending_review",
+  "pairing_method": "exact top-level shape signatures; provisional",
+  "physical_pages": 696,
+  "component_entries": 12,
+  "relation_taxonomy": "relation-taxonomy.json",
+  "layouts": [
+    {
+      "id": "cover-02",
+      "version": "1.0.0-draft",
+      "collection": "new-template-covers",
+      "role": "cover",
+      "information_relation": "visual-story",
+      "classification_status": "verified",
+      "family_id": "cover-002",
+      "source": "sources/blue-cover-02.pptx",
+      "example": "sources/cover.pptx",
+      "bindings": "layouts/cover-02/bindings.json",
+      "spec": "layouts/cover-02/spec.md",
+      "layout_rules": "layouts/cover-02/layout_rules.json",
+      "motion": "layouts/cover-02/motion.json",
+      "preview": "source-previews/cover/P002.png",
+      "themes": [
+        "blue"
+      ],
+      "status": "draft_pending_review",
+      "capacity": {
+        "body_slots": 4,
+        "item_title_slots": 0,
+        "cell_max_chars": 20,
+        "main_title_max_fullwidth_chars": 8
+      },
+      "source_page": 1,
+      "shape_count": 11,
+      "media_status": "unreviewed",
+      "html_support": "not_implemented",
+      "motion_support": "source_static",
+      "source_mapping": {
+        "cover": 2
+      },
+      "color_family": "blue",
+      "style": "technology-minimal",
+      "visual_impact": "medium",
+      "title_area_hint": "left",
+      "cover_match_status": "original_only_pending_review",
+      "stock_code_default": "688232",
+      "slogan_locked": null,
+      "source_logo_present": true,
+      "background_image": "cover-images/P02.jpg",
+      "semantic_review_status": "verified",
+      "pptx_support": "static_verified_draft",
+      "red_source": null,
+      "red_source_page": null,
+      "red_bindings": null,
+      "red_preview": null,
+      "pack_origin": {
+        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "source": "sources/cover.pptx",
+        "source_page": 2
+      }
+    },
+    {
+      "id": "content-blue-001",
+      "version": "1.0.0-draft",
+      "collection": "new-template-content",
+      "role": "directory",
+      "information_relation": "navigation",
+      "classification_status": "verified",
+      "family_id": "directory-flex-grid",
+      "source": "sources/blue-content-blue-001.pptx",
+      "example": "sources/blue.pptx",
+      "bindings": "layouts/content-blue-001/bindings.json",
+      "spec": "layouts/content-blue-001/spec.md",
+      "layout_rules": "layouts/content-blue-001/layout_rules.json",
+      "motion": "layouts/content-blue-001/motion.json",
+      "preview": "source-previews/blue/P001.png",
+      "themes": [
+        "blue"
+      ],
+      "status": "draft_pending_review",
+      "capacity": {
+        "body_slots": 13,
+        "item_title_slots": 8,
+        "cell_max_chars": 20
+      },
+      "source_page": 1,
+      "shape_count": 35,
+      "media_status": "verified_no_source_images",
+      "html_support": "not_implemented",
+      "motion_support": "source_static",
+      "source_mapping": {
+        "blue": 1,
+        "red": 1
+      },
+      "red_bindings": null,
+      "red_source": null,
+      "red_source_page": null,
+      "composition_tags": [
+        "adaptive-grid",
+        "chapter-navigation",
+        "two-to-eight-items",
+        "directory"
+      ],
+      "density": "sparse",
+      "pptx_support": "verified_static",
+      "semantic_review_status": "verified_blue_red",
+      "directory_long_copy_status": "verified_static_pptx_draft",
+      "canonical_relation": "navigation",
+      "red_preview": null,
+      "pack_origin": {
+        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "source": "sources/blue.pptx",
+        "source_page": 1
+      }
+    },
+    {
+      "id": "content-blue-002",
+      "version": "1.0.0-draft",
+      "collection": "new-template-content",
+      "role": "section",
+      "information_relation": "chapter-divider",
+      "classification_status": "verified",
+      "family_id": "section-number-hero",
+      "source": "sources/blue-content-blue-002.pptx",
+      "example": "sources/blue.pptx",
+      "bindings": "layouts/content-blue-002/bindings.json",
+      "spec": "layouts/content-blue-002/spec.md",
+      "layout_rules": "layouts/content-blue-002/layout_rules.json",
+      "motion": "layouts/content-blue-002/motion.json",
+      "preview": "source-previews/blue/P002.png",
+      "themes": [
+        "blue"
+      ],
+      "status": "draft_pending_review",
+      "capacity": {
+        "body_slots": 4,
+        "item_title_slots": 1,
+        "cell_max_chars": 20
+      },
+      "source_page": 1,
+      "shape_count": 12,
+      "media_status": "verified_no_source_images",
+      "html_support": "not_implemented",
+      "motion_support": "source_static",
+      "source_mapping": {
+        "blue": 2,
+        "red": 2
+      },
+      "red_bindings": null,
+      "red_source": null,
+      "red_source_page": null,
+      "composition_tags": [
+        "large-number",
+        "section-title"
+      ],
+      "density": "sparse",
+      "pptx_support": "verified_static",
+      "semantic_review_status": "verified_blue_red",
+      "chapter_number_scope": [
+        1
+      ],
+      "canonical_relation": "chapter-divider",
+      "red_preview": null,
+      "pack_origin": {
+        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "source": "sources/blue.pptx",
+        "source_page": 2
+      }
+    },
+    {
+      "id": "supp-closing-01",
+      "version": "1.0.0-draft",
+      "collection": "new-template-supplement",
+      "role": "closing",
+      "information_relation": "closing-message",
+      "classification_status": "verified",
+      "family_id": "closing-triangle",
+      "source": "sources/blue-supp-closing-01.pptx",
+      "example": "sources/blue-supplement.pptx",
+      "source_page": 1,
+      "source_mapping": {
+        "blue-supplement": 10,
+        "red-supplement": 20
+      },
+      "bindings": "layouts/supp-closing-01/bindings.json",
+      "spec": "layouts/supp-closing-01/spec.md",
+      "layout_rules": "layouts/supp-closing-01/layout_rules.json",
+      "motion": "layouts/supp-closing-01/motion.json",
+      "preview": "source-previews/blue-supplement/P010.png",
+      "themes": [
+        "blue"
+      ],
+      "status": "draft_pending_review",
+      "capacity": {
+        "body_slots": 3,
+        "item_title_slots": 0,
+        "cell_max_chars": 20
+      },
+      "shape_count": 4,
+      "media_status": "verified_source_media",
+      "html_support": "not_implemented",
+      "motion_support": "source_static",
+      "pptx_support": "verified_static_draft",
+      "brand_policy": "default_logo; preserve source brand; no duplicate",
+      "cardinality_status": "verified_fixed_count",
+      "composition_tags": [
+        "closing",
+        "closing-triangle"
+      ],
+      "color_family": "blue",
+      "style": "triangle-corporate",
+      "visual_impact": "medium",
+      "closing_match_status": "verified_original",
+      "subject_tags": [
+        "enterprise-report",
+        "closing"
+      ],
+      "color_binding_status": "native_blue_red_palette; supplemental token audit pending",
+      "red_source": null,
+      "red_source_page": null,
+      "red_bindings": null,
+      "red_preview": null,
+      "semantic_review_status": "verified_short_copy",
+      "source_logo_shape_id": 7,
+      "source_logo_asset_sha256": "35a430df238f5df5c3bf2b97c8a4e12a9c7681eb1b53602f184b3c9f6c35a81c",
+      "red_source_logo_shape_id": 3,
+      "visual_review_status": "powerpoint_render_checked",
+      "title_pressure_status": "tested_short_copy_only",
+      "canonical_relation": "closing-message",
+      "pack_origin": {
+        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "source": "sources/blue-supplement.pptx",
+        "source_page": 10
+      }
+    },
+    {
+      "id": "supp-cover-red-06",
+      "version": "1.0.0-draft",
+      "collection": "new-template-supplement",
+      "role": "cover",
+      "information_relation": "visual-story",
+      "classification_status": "verified",
+      "family_id": "cover-red-06",
+      "source": "sources/red-supp-cover-red-06.pptx",
+      "example": "sources/red-supplement.pptx",
+      "source_page": 1,
+      "source_mapping": {
+        "red-supplement": 6
+      },
+      "bindings": "layouts/supp-cover-red-06/bindings.json",
+      "spec": "layouts/supp-cover-red-06/spec.md",
+      "layout_rules": "layouts/supp-cover-red-06/layout_rules.json",
+      "motion": "layouts/supp-cover-red-06/motion.json",
+      "preview": "source-previews/red-supplement/P006.png",
+      "themes": [
+        "red"
+      ],
+      "status": "draft_pending_review",
+      "capacity": {
+        "body_slots": 3,
+        "item_title_slots": 0,
+        "cell_max_chars": 20
+      },
+      "shape_count": 3,
+      "media_status": "verified_source_media",
+      "html_support": "not_implemented",
+      "motion_support": "source_static",
+      "pptx_support": "verified_static_draft",
+      "brand_policy": "default_logo; preserve source brand; no duplicate",
+      "cardinality_status": "verified_fixed_count",
+      "composition_tags": [
+        "cover",
+        "cover-red-06"
+      ],
+      "color_family": "red",
+      "style": "full-red",
+      "visual_impact": "high",
+      "cover_match_status": "verified_original",
+      "title_area_hint": "left",
+      "subject_tags": [
+        "enterprise-report",
+        "minimal-red"
+      ],
+      "color_binding_status": "native_blue_red_palette; supplemental token audit pending",
+      "source_logo_shape_id": 8,
+      "source_logo_asset_sha256": "7306baafb37406e1d6d666d68d3559622065d007ef0ff83cc6c1b9a86c147cef",
+      "semantic_review_status": "verified_short_copy",
+      "visual_review_status": "powerpoint_render_checked",
+      "title_pressure_status": "tested_short_copy_only",
+      "canonical_relation": "visual-story",
+      "red_source": null,
+      "red_source_page": null,
+      "red_bindings": null,
+      "red_preview": null,
+      "pack_origin": {
+        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "source": "sources/red-supplement.pptx",
+        "source_page": 6
+      }
+    },
+    {
+      "id": "supp-directory-04-red-variant",
+      "version": "1.0.0-draft",
+      "collection": "new-template-supplement",
+      "role": "directory",
+      "information_relation": "navigation",
+      "classification_status": "verified",
+      "family_id": "directory-six-double-cards",
+      "source": "sources/red-supp-directory-04-red-variant.pptx",
+      "example": "sources/red-supplement.pptx",
+      "source_page": 1,
+      "source_mapping": {
+        "red-supplement": 11
+      },
+      "bindings": "layouts/supp-directory-04-red-variant/bindings.json",
+      "spec": "layouts/supp-directory-04-red-variant/spec.md",
+      "layout_rules": "layouts/supp-directory-04-red-variant/layout_rules.json",
+      "motion": "layouts/supp-directory-04-red-variant/motion.json",
+      "preview": "source-previews/red-supplement/P011.png",
+      "themes": [
+        "red"
+      ],
+      "status": "draft_pending_review",
+      "capacity": {
+        "body_slots": 7,
+        "item_title_slots": 8,
+        "cell_max_chars": 20
+      },
+      "shape_count": 20,
+      "media_status": "verified_source_media",
+      "html_support": "not_implemented",
+      "motion_support": "source_static",
+      "pptx_support": "verified_static_draft",
+      "brand_policy": "default_logo; preserve source brand; no duplicate",
+      "cardinality_status": "verified_fixed_count",
+      "composition_tags": [
+        "directory",
+        "two-to-eight-items"
+      ],
+      "color_family": "red",
+      "style": "blue-red-minimal",
+      "visual_impact": "medium",
+      "color_binding_status": "native_blue_red_palette; supplemental token audit pending",
+      "semantic_review_status": "verified_short_copy",
+      "visual_review_status": "powerpoint_render_checked",
+      "title_pressure_status": "tested_short_copy_only",
+      "directory_long_copy_status": "verified_static_pptx_draft",
+      "canonical_relation": "navigation",
+      "red_source": null,
+      "red_source_page": null,
+      "red_bindings": null,
+      "red_preview": null,
+      "pack_origin": {
+        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "source": "sources/red-supplement.pptx",
+        "source_page": 11
+      }
+    },
+    {
+      "id": "supp-section-red-13",
+      "version": "1.0.0-draft",
+      "collection": "new-template-supplement",
+      "role": "section",
+      "information_relation": "chapter-divider",
+      "classification_status": "verified",
+      "family_id": "section-report-red",
+      "source": "sources/red-supp-section-red-13.pptx",
+      "example": "sources/red-supplement.pptx",
+      "source_page": 1,
+      "source_mapping": {
+        "red-supplement": 13
+      },
+      "bindings": "layouts/supp-section-red-13/bindings.json",
+      "spec": "layouts/supp-section-red-13/spec.md",
+      "layout_rules": "layouts/supp-section-red-13/layout_rules.json",
+      "motion": "layouts/supp-section-red-13/motion.json",
+      "preview": "source-previews/red-supplement/P013.png",
+      "themes": [
+        "red"
+      ],
+      "status": "draft_pending_review",
+      "capacity": {
+        "body_slots": 3,
+        "item_title_slots": 0,
+        "cell_max_chars": 20
+      },
+      "shape_count": 8,
+      "media_status": "verified_source_media",
+      "html_support": "not_implemented",
+      "motion_support": "source_static",
+      "pptx_support": "verified_static_draft",
+      "brand_policy": "default_logo; preserve source brand; no duplicate",
+      "cardinality_status": "verified_fixed_count",
+      "composition_tags": [
+        "section",
+        "section-report-red"
+      ],
+      "color_family": "red",
+      "style": "blue-red-minimal",
+      "visual_impact": "medium",
+      "color_binding_status": "native_blue_red_palette; supplemental token audit pending",
+      "semantic_review_status": "verified_short_copy",
+      "visual_review_status": "powerpoint_render_checked",
+      "title_pressure_status": "tested_short_copy_only",
+      "canonical_relation": "chapter-divider",
+      "red_source": null,
+      "red_source_page": null,
+      "red_bindings": null,
+      "red_preview": null,
+      "pack_origin": {
+        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "source": "sources/red-supplement.pptx",
+        "source_page": 13
+      }
+    },
+    {
+      "id": "supp-closing-red-19",
+      "version": "1.0.0-draft",
+      "collection": "new-template-supplement",
+      "role": "closing",
+      "information_relation": "closing-message",
+      "classification_status": "verified",
+      "family_id": "closing-product-red",
+      "source": "sources/red-supp-closing-red-19.pptx",
+      "example": "sources/red-supplement.pptx",
+      "source_page": 1,
+      "source_mapping": {
+        "red-supplement": 19
+      },
+      "bindings": "layouts/supp-closing-red-19/bindings.json",
+      "spec": "layouts/supp-closing-red-19/spec.md",
+      "layout_rules": "layouts/supp-closing-red-19/layout_rules.json",
+      "motion": "layouts/supp-closing-red-19/motion.json",
+      "preview": "source-previews/red-supplement/P019.png",
+      "themes": [
+        "red"
+      ],
+      "status": "draft_pending_review",
+      "capacity": {
+        "body_slots": 3,
+        "item_title_slots": 0,
+        "cell_max_chars": 20
+      },
+      "shape_count": 11,
+      "media_status": "verified_source_media",
+      "html_support": "not_implemented",
+      "motion_support": "source_static",
+      "pptx_support": "verified_static_draft",
+      "brand_policy": "default_logo; preserve source brand; no duplicate",
+      "cardinality_status": "verified_fixed_count",
+      "composition_tags": [
+        "closing",
+        "closing-product-red"
+      ],
+      "color_family": "red",
+      "style": "product-launch",
+      "visual_impact": "medium",
+      "closing_match_status": "verified_original",
+      "subject_tags": [
+        "enterprise-report",
+        "closing"
+      ],
+      "color_binding_status": "native_blue_red_palette; supplemental token audit pending",
+      "source_logo_shape_id": 7,
+      "source_logo_asset_sha256": "8b7526dd7d11f48fc4bbe88514d086744d0ff0936f9acd2103160ee5e06c5270",
+      "semantic_review_status": "verified_short_copy",
+      "visual_review_status": "powerpoint_render_checked",
+      "title_pressure_status": "tested_short_copy_only",
+      "canonical_relation": "closing-message",
+      "red_source": null,
+      "red_source_page": null,
+      "red_bindings": null,
+      "red_preview": null,
+      "pack_origin": {
+        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "source": "sources/red-supplement.pptx",
+        "source_page": 19
+      }
+    },
+    {
+      "id": "cover-tech-001",
+      "version": "1.0.0-draft",
+      "collection": "new-template-covers",
+      "style_family": "deep-blue-tech",
+      "color_family": "deep-blue",
+      "role": "cover",
+      "information_relation": "visual-story",
+      "classification_status": "verified",
+      "family_id": "tech-visual-story-001",
+      "source": "sources/deep-blue-tech-cover-tech-001.pptx",
+      "example": "sources/tech.pptx",
+      "source_page": 1,
+      "source_mapping": {
+        "tech": 1
+      },
+      "bindings": "layouts/cover-tech-001/bindings.json",
+      "spec": "layouts/cover-tech-001/spec.md",
+      "layout_rules": "layouts/cover-tech-001/layout_rules.json",
+      "motion": "layouts/cover-tech-001/motion.json",
+      "shape_tree": "layouts/cover-tech-001/shape-tree.json",
+      "item_groups": "layouts/cover-tech-001/item-groups.json",
+      "preview": "source-previews/tech/P001.png",
+      "themes": [
+        "deep-blue-tech"
+      ],
+      "status": "draft_pending_review",
+      "capacity": {
+        "body_slots": 4,
+        "item_title_slots": 0,
+        "cell_max_chars": 20
+      },
+      "shape_count": 15,
+      "media_status": "unreviewed",
+      "html_support": "prototype_requires_cross_format_review",
+      "motion_support": "source_static",
+      "motion_suitability": "B",
+      "cardinality_status": "not_implemented",
+      "brand_policy": "default_logo; source asset locked",
+      "source_logo_present": true,
+      "source_logo_shape_id": 3,
+      "source_logo_asset_sha256": "7306baafb37406e1d6d666d68d3559622065d007ef0ff83cc6c1b9a86c147cef",
+      "style": "tech-ai",
+      "visual_impact": "high",
+      "title_area_hint": "center-right",
+      "subject_tags": [
+        "AI",
+        "digital",
+        "crystal"
+      ],
+      "background_image": "cover-assets/tech/P001-layer01.jpg",
+      "background_layers": [
+        {
+          "shape_id": 34,
+          "source_group_path": [],
+          "z_order_recursive": 0,
+          "image": "cover-assets/tech/P001-layer01.jpg",
+          "sha256": "05fc780f44682e7bec8ff93011f062183a743aeae60f43a0ade766d290e0399b",
+          "bounds_emu_local": [
+            -1,
+            0,
+            12192002,
+            6858000
+          ],
+          "full_bleed": true
+        },
+        {
+          "shape_id": 8,
+          "source_group_path": [],
+          "z_order_recursive": 3,
+          "image": "cover-assets/tech/P001-layer02.jpg",
+          "sha256": "e547dafaef29cbda8b5577ddd39123047458c47dc513022a90b9bbc5e18127a1",
+          "bounds_emu_local": [
+            0,
+            1927225,
+            4540250,
+            2667000
+          ],
+          "full_bleed": false
+        }
+      ],
+      "cover_match_status": "original_only_pending_review",
+      "stock_code_default": null,
+      "slogan_locked": null,
+      "composite_required": true,
+      "title_pressure_status": "tested_short_copy_only",
+      "pptx_support": "verified_static_draft",
+      "visual_review_status": "powerpoint_render_checked",
+      "html_prototype": "review/tech-cover-001-html-prototype.png",
+      "canonical_relation": "visual-story",
+      "red_source": null,
+      "red_source_page": null,
+      "red_bindings": null,
+      "red_preview": null,
+      "pack_origin": {
+        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "source": "sources/tech.pptx",
+        "source_page": 1
+      }
+    },
+    {
+      "id": "directory-tech-006",
+      "version": "1.0.0-draft",
+      "collection": "new-template-content",
+      "style_family": "deep-blue-tech",
+      "color_family": "deep-blue",
+      "role": "directory",
+      "information_relation": "navigation",
+      "classification_status": "verified",
+      "family_id": "tech-navigation-006",
+      "source": "sources/deep-blue-tech-directory-tech-006.pptx",
+      "example": "sources/tech.pptx",
+      "source_page": 1,
+      "source_mapping": {
+        "tech": 6
+      },
+      "bindings": "layouts/directory-tech-006/bindings.json",
+      "spec": "layouts/directory-tech-006/spec.md",
+      "layout_rules": "layouts/directory-tech-006/layout_rules.json",
+      "motion": "layouts/directory-tech-006/motion.json",
+      "shape_tree": "layouts/directory-tech-006/shape-tree.json",
+      "item_groups": "layouts/directory-tech-006/item-groups.json",
+      "preview": "source-previews/tech/P006.png",
+      "themes": [
+        "deep-blue-tech"
+      ],
+      "status": "draft_pending_review",
+      "capacity": {
+        "body_slots": 17,
+        "item_title_slots": 6,
+        "cell_max_chars": 20
+      },
+      "shape_count": 27,
+      "media_status": "unreviewed",
+      "html_support": "not_implemented",
+      "motion_support": "source_static",
+      "motion_suitability": "A",
+      "cardinality_status": "not_implemented",
+      "brand_policy": "default_logo; source asset locked",
+      "source_logo_present": false,
+      "semantic_review": "layouts/directory-tech-006/semantic-review.json",
+      "semantic_review_status": "static_pptx_verified",
+      "pptx_support": "verified_static_draft",
+      "visual_review_status": "powerpoint_render_checked",
+      "composition_tags": [
+        "two-to-six-items",
+        "directory"
+      ],
+      "directory_long_copy_status": "verified_static_pptx_draft",
+      "canonical_relation": "navigation",
+      "red_source": null,
+      "red_source_page": null,
+      "red_bindings": null,
+      "red_preview": null,
+      "pack_origin": {
+        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "source": "sources/tech.pptx",
+        "source_page": 6
+      }
+    },
+    {
+      "id": "section-tech-011",
+      "version": "1.0.0-draft",
+      "collection": "new-template-content",
+      "style_family": "deep-blue-tech",
+      "color_family": "deep-blue",
+      "role": "section",
+      "information_relation": "section",
+      "classification_status": "verified",
+      "family_id": "tech-section-011",
+      "source": "sources/deep-blue-tech-section-tech-011.pptx",
+      "example": "sources/tech.pptx",
+      "source_page": 1,
+      "source_mapping": {
+        "tech": 11
+      },
+      "bindings": "layouts/section-tech-011/bindings.json",
+      "spec": "layouts/section-tech-011/spec.md",
+      "layout_rules": "layouts/section-tech-011/layout_rules.json",
+      "motion": "layouts/section-tech-011/motion.json",
+      "shape_tree": "layouts/section-tech-011/shape-tree.json",
+      "item_groups": "layouts/section-tech-011/item-groups.json",
+      "preview": "source-previews/tech/P011.png",
+      "themes": [
+        "deep-blue-tech"
+      ],
+      "status": "draft_pending_review",
+      "capacity": {
+        "body_slots": 3,
+        "item_title_slots": 0,
+        "cell_max_chars": 20
+      },
+      "shape_count": 23,
+      "media_status": "unreviewed",
+      "html_support": "not_implemented",
+      "motion_support": "source_static",
+      "motion_suitability": "B",
+      "cardinality_status": "not_implemented",
+      "brand_policy": "default_logo; source asset locked",
+      "source_logo_present": false,
+      "semantic_review": "layouts/section-tech-011/semantic-review.json",
+      "semantic_review_status": "static_pptx_verified",
+      "pptx_support": "verified_static_draft",
+      "visual_review_status": "powerpoint_render_checked",
+      "canonical_relation": "chapter-divider",
+      "red_source": null,
+      "red_source_page": null,
+      "red_bindings": null,
+      "red_preview": null,
+      "pack_origin": {
+        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "source": "sources/tech.pptx",
+        "source_page": 11
+      }
+    },
+    {
+      "id": "closing-tech-082",
+      "version": "1.0.0-draft",
+      "collection": "new-template-closing",
+      "style_family": "deep-blue-tech",
+      "color_family": "deep-blue",
+      "role": "closing",
+      "information_relation": "closing-message",
+      "classification_status": "verified",
+      "family_id": "tech-closing-message-082",
+      "source": "sources/deep-blue-tech-closing-tech-082.pptx",
+      "example": "sources/tech.pptx",
+      "source_page": 1,
+      "source_mapping": {
+        "tech": 82
+      },
+      "bindings": "layouts/closing-tech-082/bindings.json",
+      "spec": "layouts/closing-tech-082/spec.md",
+      "layout_rules": "layouts/closing-tech-082/layout_rules.json",
+      "motion": "layouts/closing-tech-082/motion.json",
+      "shape_tree": "layouts/closing-tech-082/shape-tree.json",
+      "item_groups": "layouts/closing-tech-082/item-groups.json",
+      "preview": "source-previews/tech/P082.png",
+      "themes": [
+        "deep-blue-tech"
+      ],
+      "status": "draft_pending_review",
+      "capacity": {
+        "body_slots": 2,
+        "item_title_slots": 0,
+        "cell_max_chars": 20
+      },
+      "shape_count": 23,
+      "media_status": "unreviewed",
+      "html_support": "not_implemented",
+      "motion_support": "source_static",
+      "motion_suitability": "B",
+      "cardinality_status": "not_implemented",
+      "brand_policy": "default_logo; source asset locked",
+      "source_logo_present": false,
+      "style": "orbit-ring",
+      "visual_impact": "medium",
+      "subject_tags": [
+        "vision",
+        "calm"
+      ],
+      "closing_match_status": "original_plus_logo_pending_review",
+      "title_pressure_status": "tested_short_copy_only",
+      "pptx_support": "verified_static_draft",
+      "visual_review_status": "powerpoint_render_checked",
+      "canonical_relation": "closing-message",
+      "red_source": null,
+      "red_source_page": null,
+      "red_bindings": null,
+      "red_preview": null,
+      "pack_origin": {
+        "commit": "26fcb67db4b984f60d59c2bb131bdff1df083f11",
+        "source": "sources/tech.pptx",
+        "source_page": 82
+      }
+    }
+  ]
+}

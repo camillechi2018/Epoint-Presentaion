@@ -1,0 +1,156 @@
+{
+  "cardinality_mode": "directory_reflow",
+  "supported_counts": [
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "source_count": 5,
+  "candidate_counts": [
+    3,
+    4,
+    5
+  ],
+  "reflow_status": "verified_short_copy_draft",
+  "grouping_status": "provisional_requires_manual_object_review",
+  "static_pptx_status": "verified_short_copy_draft",
+  "static_pptx_source_count": 5,
+  "verified_counts": [
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "validation_status": "verified",
+  "directory_layout": "tech_five_cards",
+  "directory_units": [
+    {
+      "shape_ids": [
+        8,
+        30,
+        67,
+        73,
+        6
+      ],
+      "anchor_shape_id": 8,
+      "text_shape_ids": {
+        "title": 30,
+        "subtitle": 73,
+        "number": 67
+      },
+      "number_shape_id": 67
+    },
+    {
+      "shape_ids": [
+        5,
+        42,
+        68,
+        74,
+        9
+      ],
+      "anchor_shape_id": 5,
+      "text_shape_ids": {
+        "title": 42,
+        "subtitle": 74,
+        "number": 68
+      },
+      "number_shape_id": 68
+    },
+    {
+      "shape_ids": [
+        4,
+        49,
+        69,
+        75,
+        10
+      ],
+      "anchor_shape_id": 4,
+      "text_shape_ids": {
+        "title": 49,
+        "subtitle": 75,
+        "number": 69
+      },
+      "number_shape_id": 69
+    },
+    {
+      "shape_ids": [
+        3,
+        58,
+        70,
+        76,
+        12
+      ],
+      "anchor_shape_id": 3,
+      "text_shape_ids": {
+        "title": 58,
+        "subtitle": 76,
+        "number": 70
+      },
+      "number_shape_id": 70
+    },
+    {
+      "shape_ids": [
+        2,
+        66,
+        71,
+        77,
+        15
+      ],
+      "anchor_shape_id": 2,
+      "text_shape_ids": {
+        "title": 66,
+        "subtitle": 77,
+        "number": 71
+      },
+      "number_shape_id": 71
+    }
+  ],
+  "directory_item_fields": [
+    {
+      "title": "text_30",
+      "subtitle": "text_73",
+      "number": "text_67"
+    },
+    {
+      "title": "text_42",
+      "subtitle": "text_74",
+      "number": "text_68"
+    },
+    {
+      "title": "text_49",
+      "subtitle": "text_75",
+      "number": "text_69"
+    },
+    {
+      "title": "text_58",
+      "subtitle": "text_76",
+      "number": "text_70"
+    },
+    {
+      "title": "text_66",
+      "subtitle": "text_77",
+      "number": "text_71"
+    }
+  ],
+  "directory_heading_fields": {
+    "text_72": "目录",
+    "text_7": "CONTENTS"
+  },
+  "count_evidence": "Blue/red simple and deep-blue tech directory variants: all supported item counts filled; 102 PowerPoint PPTX opened and passed text-fit audit; endpoint layouts visually reviewed. Chinese title/subtitle pressure copy verified within the registered profile; draft pending review.",
+  "directory_long_copy_profile": {
+    "status": "verified_static_pptx_draft",
+    "item_title_max_cjk_chars": 8,
+    "item_subtitle_max_cjk_chars": 12,
+    "validated_counts": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "validation_note": "All 102 style/theme/count combinations passed PowerPoint open and text-fit checks with Chinese pressure copy. Character limits are conservative per layout; text meaning and visual density still require review."
+  }
+}

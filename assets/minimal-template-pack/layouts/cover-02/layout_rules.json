@@ -1,0 +1,6 @@
+{
+  "cardinality_mode": "fixed_until_validated",
+  "supported_counts": [],
+  "source_count": null,
+  "reflow_status": "not_implemented"
+}

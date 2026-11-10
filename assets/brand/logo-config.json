@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "source": "用户提供的模板/logo SVG 原件",
+  "status": "provided_brand_assets_usage_rules_pending_review",
+  "colors": {
+    "brand_blue": "#0068B7",
+    "brand_red": "#E60012",
+    "mono_dark": "#040000",
+    "mono_light": "#FFFFFF"
+  },
+  "assets": {
+    "full": {
+      "color": "logo.svg",
+      "white": "logo-white.svg",
+      "black": "logo-black.svg"
+    },
+    "epoint": {
+      "color": "logo-epoint.svg",
+      "white": "logo-epoint-white.svg",
+      "black": "logo-epoint-black.svg"
+    }
+  },
+  "default": {
+    "enabled": true,
+    "variant": "full",
+    "appearance": "auto",
+    "position": "auto",
+    "width_pt": 106,
+    "margin_pt": 20,
+    "plate": false,
+    "embedding": "png"
+  },
+  "position_priority": ["top_right", "bottom_right", "top_left", "bottom_left"],
+  "notes": "蓝色风格浅底使用原色 Logo；红色风格浅底使用黑色、深底使用白色，来源已有灰色单色标识可保留；科技风深底使用白色。默认使用独立 PNG 图片对象以兼容整套合并与常见查看器，SVG 原件保留在素材库。照片与渐变页需在成稿中复核标识所在区域。"
+}

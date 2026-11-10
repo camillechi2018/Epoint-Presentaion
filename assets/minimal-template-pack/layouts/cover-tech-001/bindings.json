@@ -1,0 +1,135 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    {
+      "field": "text_4",
+      "shape_id": 4,
+      "shape_name": "文本框 3",
+      "type": "text",
+      "group_path": [],
+      "source_text": "Exploring the Ecological Revolution under the Integration of 5G",
+      "source_sample_chars": 63,
+      "max_chars": 30,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        4455364,
+        3352051,
+        7158786,
+        245901
+      ],
+      "max_lines": 1,
+      "capacity_status": "powerpoint_short_title_tested",
+      "semantic_path": "english_title"
+    },
+    {
+      "field": "text_6",
+      "shape_id": 6,
+      "shape_name": "文本框 5",
+      "type": "text",
+      "group_path": [],
+      "source_text": "探索AI融合下的生态革命",
+      "source_sample_chars": 12,
+      "max_chars": 8,
+      "typography_role": "chinese_display",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        4372814,
+        2544348,
+        7819186,
+        738664
+      ],
+      "max_lines": 1,
+      "capacity_status": "powerpoint_short_title_tested",
+      "semantic_path": "title"
+    },
+    {
+      "field": "text_15",
+      "shape_id": 15,
+      "shape_name": "文本框 14",
+      "type": "text",
+      "group_path": [
+        14
+      ],
+      "source_text": "汇报人：毛球盒PPT",
+      "source_sample_chars": 10,
+      "max_chars": 24,
+      "typography_role": "chinese_body",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        4220152,
+        5310503,
+        2021086,
+        338554
+      ],
+      "semantic_path": "presenter"
+    },
+    {
+      "field": "text_16",
+      "shape_id": 16,
+      "shape_name": "文本框 15",
+      "type": "text",
+      "group_path": [
+        14
+      ],
+      "source_text": "时间：2025.04.05",
+      "source_sample_chars": 13,
+      "max_chars": 24,
+      "typography_role": "chinese_body",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        6731683,
+        5310503,
+        1927403,
+        338554
+      ],
+      "semantic_path": "date"
+    }
+  ],
+  "objects": {
+    "charts": [],
+    "tables": [],
+    "images": [
+      {
+        "shape_id": 34,
+        "shape_name": "图片 33",
+        "sha256": "05fc780f44682e7bec8ff93011f062183a743aeae60f43a0ade766d290e0399b",
+        "semantic_role": "cover_visual_layer",
+        "group_path": [],
+        "bounds_emu_local": [
+          -1,
+          0,
+          12192002,
+          6858000
+        ]
+      },
+      {
+        "shape_id": 8,
+        "shape_name": "图片占位符 46",
+        "sha256": "e547dafaef29cbda8b5577ddd39123047458c47dc513022a90b9bbc5e18127a1",
+        "semantic_role": "cover_visual_layer",
+        "group_path": [],
+        "bounds_emu_local": [
+          0,
+          1927225,
+          4540250,
+          2667000
+        ]
+      },
+      {
+        "shape_id": 3,
+        "shape_name": "图片 2",
+        "sha256": "7306baafb37406e1d6d666d68d3559622065d007ef0ff83cc6c1b9a86c147cef",
+        "semantic_role": "brand_logo_locked",
+        "group_path": [],
+        "bounds_emu_local": [
+          10955020,
+          178435,
+          893445,
+          191770
+        ]
+      }
+    ]
+  },
+  "review": "visual index only; field semantics provisional"
+}

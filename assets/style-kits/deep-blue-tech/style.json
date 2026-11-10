@@ -1,0 +1,135 @@
+{
+  "schema_version": "1.0",
+  "theme": "deep-blue-tech",
+  "style_family": "deep-blue-tech",
+  "brand_profile": "../../brand/brand-baseline.json",
+  "palette_lock": "../../brand/brand-palette-lock.json",
+  "typography": {
+    "heading": "Microsoft YaHei",
+    "body": "Microsoft YaHei",
+    "latin_numeric": "Arial",
+    "fallback": "Microsoft YaHei",
+    "title_pt": 28,
+    "body_pt": 19,
+    "caption_pt": 13,
+    "min_body_pt": 16
+  },
+  "colors": {
+    "source": "new-template-deep-blue-tech.json",
+    "canvas": "05193A",
+    "surface": "031634",
+    "text": "FFFFFF",
+    "muted": "D4DBE4",
+    "primary": "0F96FF",
+    "secondary": "70D9FF",
+    "tertiary": "0FFFE8",
+    "soft": "031F44",
+    "border": "65B4D5",
+    "closing_canvas": "05193A",
+    "neutral": {
+      "black": "000000",
+      "white": "FFFFFF",
+      "light_gray": "E7E6E6",
+      "mid_gray": "5E5E5E",
+      "dark_gray": "151C2D",
+      "on_dark_muted": "D4DBE4"
+    },
+    "logo_appearance": "white"
+  },
+  "visual_rules": {
+    "name": "深蓝科技",
+    "background": "新绘正文固定使用 #05193A 画布；顶部使用本地知识库提取的科技标题栏图形组，不叠加弥散椭圆",
+    "title": "正文页采用 content-tech-021 原稿顶部标题栏，28 pt 白色可编辑标题居中，右上角白色 Logo；不绘制简约版横线",
+    "structure": "用原稿中的发光线、几何网格、科技感层级作为参考；新绘正文使用可编辑矢量图形",
+    "visual_rhythm": "深底保持连贯，以蓝青强调关键数据和路径；避免简约版白卡直接混入",
+    "image": "图片与光效必须来自已登记科技风素材；不得自行生成锁外霓虹色"
+  },
+  "layout_principles": {
+    "canvas": "16:9；科技风新绘正文使用 #05193A 画布及 offline-core.json.tech_content_header 原稿图形组，正文关系排版沿用现有规则",
+    "logo": "浅底彩色、深底白色；避开标题和图形，不改变 Logo 内部色",
+    "shadows": "none",
+    "background_effect": "科技风新绘正文不叠加弥散椭圆；顶部图形组来自技能本地已提取的知识库原稿",
+    "editable": "正文文本与图形保持可编辑；预览图只作参考，不得整张贴为成稿",
+    "counts": "依据真实信息量调整分栏和间距，不通过清空旧图形模拟减项",
+    "text": "正文优先短句，字体低于 16pt 时重排或拆页"
+  },
+  "composition_recipes": {
+    "parallel": "按真实条目数分栏；项数过多时换两行或拆页，标题和正文保持对齐",
+    "process": "步骤与连接线同步增减；每步只保留阶段、动作和结果的必要信息",
+    "comparison": "同维度左右对齐；不对称材料改用上下叙事，不强塞双列",
+    "timeline": "日期顺序严格递增，节点与对应文字一起移动",
+    "data": "图表注明单位、周期和来源；系列与摘要数值一致"
+  },
+  "prohibitions": [
+    "锁外 RGB 或从图片抽取新主题色",
+    "默认阴影",
+    "混入其他风格背景或组件",
+    "复制预览里的示例文字或数字",
+    "Logo 与标题/图形重叠"
+  ],
+  "sample_records": [
+    {
+      "role": "cover",
+      "layout_id": "cover-tech-001",
+      "preview": "cover-cover-tech-001.png",
+      "source_preview": "source-previews/tech/P001.png",
+      "status": "verified_draft",
+      "sha256": "a5f3184e972066eb2040828c4f972da7c56993adff02b5125768b1be377defba",
+      "theme": "deep-blue-tech"
+    },
+    {
+      "role": "directory",
+      "layout_id": "directory-tech-006",
+      "preview": "directory-directory-tech-006.png",
+      "source_preview": "source-previews/tech/P006.png",
+      "status": "verified_draft",
+      "sha256": "6c18b46690ddd8be52f0744f0fd1b9a93dab4d3297df64ed70a20c34352dd4d7",
+      "theme": "deep-blue-tech"
+    },
+    {
+      "role": "section",
+      "layout_id": "section-tech-011",
+      "preview": "section-section-tech-011.png",
+      "source_preview": "source-previews/tech/P011.png",
+      "status": "verified_draft",
+      "sha256": "64630a25336e8cb2975f7c080451bd765338e2520bb204ce6c69ea0428406f64",
+      "theme": "deep-blue-tech"
+    },
+    {
+      "role": "parallel",
+      "layout_id": "content-tech-021",
+      "preview": "parallel-content-tech-021.png",
+      "source_preview": "source-previews/tech/P021.png",
+      "status": "verified_draft",
+      "sha256": "f69b59d48acdbaa9accd9ed018e8fe5a5e47a8a85ff9d99160878a595c3d3856",
+      "theme": "deep-blue-tech"
+    },
+    {
+      "role": "process",
+      "layout_id": "content-tech-028",
+      "preview": "process-content-tech-028.png",
+      "source_preview": "source-previews/tech/P028.png",
+      "status": "verified_draft",
+      "sha256": "f76ab7264d364d3ffc719bcaa93a7c40b70d7928cf513ea064cffe2e77c22913",
+      "theme": "deep-blue-tech"
+    },
+    {
+      "role": "data",
+      "layout_id": "data-chart-tech-071",
+      "preview": "data-data-chart-tech-071.png",
+      "source_preview": "source-previews/tech/P071.png",
+      "status": "verified_draft",
+      "sha256": "7c3460b8042af7e58a67d24b97dc3241ba8693ccabb4694bb0586ed9f2a84bff",
+      "theme": "deep-blue-tech"
+    },
+    {
+      "role": "closing",
+      "layout_id": "closing-tech-082",
+      "preview": "closing-closing-tech-082.png",
+      "source_preview": "source-previews/tech/P082.png",
+      "status": "verified_draft",
+      "sha256": "20dfc609c992d1bb58d2891514ffcdfb8aca15ea4f3b7c16b8dece40bfad4c32",
+      "theme": "deep-blue-tech"
+    }
+  ]
+}

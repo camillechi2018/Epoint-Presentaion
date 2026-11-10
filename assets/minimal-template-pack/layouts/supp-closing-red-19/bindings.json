@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    {
+      "field": "text_19",
+      "shape_id": 19,
+      "shape_name": "文本框 18",
+      "type": "text",
+      "max_chars": 6,
+      "source_sample_chars": 6,
+      "source_text": "THANKS",
+      "bounds_pt": [
+        80.4,
+        219.5,
+        660.1,
+        43.5
+      ],
+      "semantic_role": "subtitle",
+      "semantic_path": "closing.subtitle",
+      "max_width_units": 6,
+      "max_lines": 1
+    },
+    {
+      "field": "text_16",
+      "shape_id": 16,
+      "shape_name": "文本框 15",
+      "type": "text",
+      "max_chars": 4,
+      "source_sample_chars": 10,
+      "source_text": "感谢观看 期待未来.",
+      "bounds_pt": [
+        80.4,
+        148.1,
+        744.1,
+        70.2
+      ],
+      "semantic_role": "title",
+      "semantic_path": "closing.title",
+      "max_width_units": 8,
+      "max_lines": 1
+    },
+    {
+      "field": "text_8",
+      "shape_id": 8,
+      "shape_name": "文本框 7",
+      "type": "text",
+      "max_chars": 9,
+      "source_sample_chars": 9,
+      "source_text": "战略定位与营销赋能",
+      "bounds_pt": [
+        80.4,
+        279.0,
+        660.1,
+        55.6
+      ],
+      "semantic_role": "note",
+      "semantic_path": "closing.note",
+      "max_width_units": 18,
+      "max_lines": 1
+    }
+  ],
+  "objects": {
+    "charts": [],
+    "tables": [],
+    "images": [
+      {
+        "shape_id": 2,
+        "shape_name": "图片 1",
+        "semantic_role": "source_visual_locked",
+        "asset_sha256": "b59f7d99d584ad7a6fc336307daa9c46d26b23339880376834abbffc8d3304ba"
+      },
+      {
+        "shape_id": 7,
+        "shape_name": "图片 6",
+        "semantic_role": "brand_logo_locked",
+        "asset_sha256": "8b7526dd7d11f48fc4bbe88514d086744d0ff0936f9acd2103160ee5e06c5270"
+      }
+    ]
+  },
+  "review": "semantic fields; short-copy PowerPoint render and capacity boundary verified"
+}

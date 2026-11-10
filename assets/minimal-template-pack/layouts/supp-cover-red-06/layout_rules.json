@@ -1,0 +1,17 @@
+{
+  "cardinality_mode": "fixed",
+  "supported_counts": [
+    1
+  ],
+  "source_count": 1,
+  "reflow_status": "not_applicable",
+  "validation_status": "verified_fixed_count",
+  "count_evidence": "native count; semantic fill and 1600x900 PowerPoint render checked",
+  "verified_counts": [
+    1
+  ],
+  "title_pressure_test": {
+    "safe_title_chars": 6,
+    "status": "tested_short_copy_only"
+  }
+}

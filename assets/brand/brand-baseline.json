@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "status": "draft_pending_review",
+  "purpose": "Skill 内置的离线品牌底座；可用于新绘制页面，不代表旧模板所有对象已完成语义换色",
+  "logo_config": "logo-config.json",
+  "typography": {
+    "heading": "Microsoft YaHei",
+    "body": "Microsoft YaHei",
+    "latin_numeric": "Arial",
+    "fallback": "Microsoft YaHei",
+    "title_pt": 30,
+    "body_pt": 19,
+    "caption_pt": 13,
+    "min_body_pt": 16
+  },
+  "themes": {
+    "blue": {
+      "source": "new-template-blue.json",
+      "canvas": "F6F9FF",
+      "surface": "FFFFFF",
+      "text": "041D4B",
+      "muted": "435D74",
+      "primary": "0154DD",
+      "secondary": "00BDDE",
+      "tertiary": "24D3BA",
+      "soft": "E1ECFF",
+      "border": "E1ECFF",
+      "closing_canvas": "0154DD",
+      "neutral": {"black": "000000", "white": "FFFFFF", "light_gray": "F6F9FF", "mid_gray": "8BA1C4", "dark_gray": "24292F", "on_dark_muted": "79A6FF"},
+      "logo_appearance": "color"
+    },
+    "red": {
+      "source": "new-template-red.json",
+      "canvas": "FFFFFF",
+      "surface": "FFFFFF",
+      "text": "3E0000",
+      "muted": "525455",
+      "primary": "930000",
+      "secondary": "AC2C00",
+      "tertiary": "D18755",
+      "soft": "F4E5E5",
+      "border": "F4E5E5",
+      "closing_canvas": "930000",
+      "neutral": {"black": "000000", "white": "FFFFFF", "light_gray": "F4E5E5", "mid_gray": "E7E6E6", "dark_gray": "24292F", "on_dark_muted": "FEE3CF"},
+      "logo_appearance": "black"
+    },
+    "deep-blue-tech": {
+      "source": "new-template-deep-blue-tech.json",
+      "canvas": "05193A",
+      "surface": "031634",
+      "text": "FFFFFF",
+      "muted": "D4DBE4",
+      "primary": "0F96FF",
+      "secondary": "70D9FF",
+      "tertiary": "0FFFE8",
+      "soft": "031F44",
+      "border": "65B4D5",
+      "closing_canvas": "05193A",
+      "neutral": {"black": "000000", "white": "FFFFFF", "light_gray": "E7E6E6", "mid_gray": "5E5E5E", "dark_gray": "151C2D", "on_dark_muted": "D4DBE4"},
+      "logo_appearance": "white"
+    }
+  },
+  "brand_copy": {
+    "slogan": "成为行业数字化领航者",
+    "stock_code": "688232",
+    "rule": "仅在适用的新点品牌场景按封面规则使用；普通内容页不自动重复"
+  }
+}

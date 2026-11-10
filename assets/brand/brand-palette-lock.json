@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0",
+  "status": "template_derived_locked",
+  "purpose": "离线配色锁定值；由用户模板的主题、可编辑对象或科技风来源页渲染图取色，禁止生成时添加新RGB",
+  "themes": {
+    "blue": {
+      "theme_json": "themes/new-template-blue.json",
+      "source_pptx": [
+        "sources/blue.pptx",
+        "sources/blue-supplement.pptx"
+      ],
+      "roles": {
+        "canvas": "F6F9FF",
+        "surface": "FFFFFF",
+        "text": "041D4B",
+        "muted": "435D74",
+        "primary": "0154DD",
+        "secondary": "00BDDE",
+        "tertiary": "24D3BA",
+        "soft": "E1ECFF",
+        "border": "E1ECFF",
+        "closing_canvas": "0154DD"
+      },
+      "neutral": {
+        "black": "000000",
+        "white": "FFFFFF",
+        "light_gray": "F6F9FF",
+        "mid_gray": "8BA1C4",
+        "dark_gray": "24292F",
+        "on_dark_muted": "79A6FF"
+      }
+    },
+    "red": {
+      "theme_json": "themes/new-template-red.json",
+      "source_pptx": [
+        "sources/red.pptx",
+        "sources/red-supplement.pptx"
+      ],
+      "roles": {
+        "canvas": "FFFFFF",
+        "surface": "FFFFFF",
+        "text": "3E0000",
+        "muted": "525455",
+        "primary": "930000",
+        "secondary": "AC2C00",
+        "tertiary": "D18755",
+        "soft": "F4E5E5",
+        "border": "F4E5E5",
+        "closing_canvas": "930000"
+      },
+      "neutral": {
+        "black": "000000",
+        "white": "FFFFFF",
+        "light_gray": "F4E5E5",
+        "mid_gray": "E7E6E6",
+        "dark_gray": "24292F",
+        "on_dark_muted": "FEE3CF"
+      }
+    },
+    "deep-blue-tech": {
+      "theme_json": "themes/new-template-deep-blue-tech.json",
+      "source_pptx": [
+        "sources/tech.pptx"
+      ],
+      "source_preview": [
+        "source-previews/tech/P001.png"
+      ],
+      "roles": {
+        "canvas": "05193A",
+        "surface": "031634",
+        "text": "FFFFFF",
+        "muted": "D4DBE4",
+        "primary": "0F96FF",
+        "secondary": "70D9FF",
+        "tertiary": "0FFFE8",
+        "soft": "031F44",
+        "border": "65B4D5",
+        "closing_canvas": "05193A"
+      },
+      "neutral": {
+        "black": "000000",
+        "white": "FFFFFF",
+        "light_gray": "E7E6E6",
+        "mid_gray": "5E5E5E",
+        "dark_gray": "151C2D",
+        "on_dark_muted": "D4DBE4"
+      }
+    }
+  }
+}

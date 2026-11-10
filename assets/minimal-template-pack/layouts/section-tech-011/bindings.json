@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    {
+      "field": "text_10",
+      "shape_id": 10,
+      "shape_name": "文本框 9",
+      "type": "text",
+      "group_path": [],
+      "source_text": "01",
+      "source_sample_chars": 2,
+      "max_chars": 24,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        3663618,
+        733201,
+        4864765,
+        3969198
+      ],
+      "semantic_path": "section_number"
+    },
+    {
+      "field": "text_11",
+      "shape_id": 11,
+      "shape_name": "文本框 10",
+      "type": "text",
+      "group_path": [],
+      "source_text": "市场背景",
+      "source_sample_chars": 4,
+      "max_chars": 24,
+      "typography_role": "chinese_heading",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        2613254,
+        3502029,
+        6965492,
+        997196
+      ],
+      "semantic_path": "heading"
+    },
+    {
+      "field": "text_12",
+      "shape_id": 12,
+      "shape_name": "文本占位符 6",
+      "type": "text",
+      "group_path": [],
+      "source_text": "market background",
+      "source_sample_chars": 17,
+      "max_chars": 25,
+      "typography_role": "latin_numeric",
+      "semantic_role": "reviewed_text",
+      "bounds_emu_local": [
+        4254726,
+        4579573,
+        3813175,
+        327603
+      ],
+      "semantic_path": "english_subtitle"
+    }
+  ],
+  "objects": {
+    "charts": [],
+    "tables": [],
+    "images": []
+  },
+  "review": "visual index only; field semantics provisional"
+}

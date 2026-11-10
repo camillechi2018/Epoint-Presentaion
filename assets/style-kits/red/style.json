@@ -1,0 +1,135 @@
+{
+  "schema_version": "1.0",
+  "theme": "red",
+  "style_family": "legacy-blue-red",
+  "brand_profile": "../../brand/brand-baseline.json",
+  "palette_lock": "../../brand/brand-palette-lock.json",
+  "typography": {
+    "heading": "Microsoft YaHei",
+    "body": "Microsoft YaHei",
+    "latin_numeric": "Arial",
+    "fallback": "Microsoft YaHei",
+    "title_pt": 24,
+    "body_pt": 19,
+    "caption_pt": 13,
+    "min_body_pt": 16
+  },
+  "colors": {
+    "source": "new-template-red.json",
+    "canvas": "FFFFFF",
+    "surface": "FFFFFF",
+    "text": "3E0000",
+    "muted": "525455",
+    "primary": "930000",
+    "secondary": "AC2C00",
+    "tertiary": "D18755",
+    "soft": "F4E5E5",
+    "border": "F4E5E5",
+    "closing_canvas": "930000",
+    "neutral": {
+      "black": "000000",
+      "white": "FFFFFF",
+      "light_gray": "F4E5E5",
+      "mid_gray": "E7E6E6",
+      "dark_gray": "24292F",
+      "on_dark_muted": "FEE3CF"
+    },
+    "logo_appearance": "black"
+  },
+  "visual_rules": {
+    "name": "红白简约",
+    "background": "白底、深红主强调与少量浅红信息面；新绘正文底层使用两枚锁定主题色的低透明度柔边椭圆",
+    "title": "正文页左上角 24 pt 主题红标题，右上角使用黑色单色 Logo，标题下方使用同知识库正文页的红色细分隔线",
+    "structure": "沿用蓝红简约系列的平面流程、并列、对比和图表结构，图形主色取红色主题变量",
+    "visual_rhythm": "重点结论使用深红，正文保持白底留白，避免红色模块连续满屏",
+    "image": "只使用红色系标签及已验证的来源图片，不把暖金或蓝色素材当作红色背景；来源样本图仅展示版式，若含旧彩色 Logo，实际出稿仍按黑白灰规则替换"
+  },
+  "layout_principles": {
+    "canvas": "16:9；正文标题、分隔线和 Logo 固定读取 offline-core.json.content_header，仅横线下方的内容按信息关系弹性排布",
+    "logo": "浅底黑色、深底白色；源页已有灰色单色 Logo 可保留。红色风格禁用蓝红彩色 Logo；避开标题和图形",
+    "shadows": "none",
+    "background_effect": "新绘正文统一读取 offline-core.json.content_atmosphere；可编辑椭圆、主题锁色、预设透明度、220 pt 柔边，知识库来源页不叠加",
+    "editable": "正文文本与图形保持可编辑；预览图只作参考，不得整张贴为成稿",
+    "counts": "依据真实信息量调整分栏和间距，不通过清空旧图形模拟减项",
+    "text": "正文优先短句，字体低于 16pt 时重排或拆页"
+  },
+  "composition_recipes": {
+    "parallel": "按真实条目数分栏；项数过多时换两行或拆页，标题和正文保持对齐",
+    "process": "步骤与连接线同步增减；每步只保留阶段、动作和结果的必要信息",
+    "comparison": "同维度左右对齐；不对称材料改用上下叙事，不强塞双列",
+    "timeline": "日期顺序严格递增，节点与对应文字一起移动",
+    "data": "图表注明单位、周期和来源；系列与摘要数值一致"
+  },
+  "prohibitions": [
+    "锁外 RGB 或从图片抽取新主题色",
+    "默认阴影",
+    "混入其他风格背景或组件",
+    "复制预览里的示例文字或数字",
+    "Logo 与标题/图形重叠"
+  ],
+  "sample_records": [
+    {
+      "role": "cover",
+      "layout_id": "supp-cover-red-06",
+      "preview": "cover-supp-cover-red-06.png",
+      "source_preview": "source-previews/red-supplement/P006.png",
+      "status": "verified_draft",
+      "sha256": "b7fd23f7973900b7d5b7e6a9c869939c50166076f3ff2f5624877f546d766e27",
+      "theme": "red"
+    },
+    {
+      "role": "directory",
+      "layout_id": "supp-directory-04-red-variant",
+      "preview": "directory-supp-directory-04-red-variant.png",
+      "source_preview": "source-previews/red-supplement/P011.png",
+      "status": "verified_draft",
+      "sha256": "f46eb551aa2bcb6d52b07c70788c2e6758cdcbe8362c77efed57f5e80ce693ae",
+      "theme": "red"
+    },
+    {
+      "role": "section",
+      "layout_id": "supp-section-red-13",
+      "preview": "section-supp-section-red-13.png",
+      "source_preview": "source-previews/red-supplement/P013.png",
+      "status": "verified_draft",
+      "sha256": "afe946371b8af31e0a7f7e6ca0f1a6ac066454ec38a2b0dcf9b9797020b05fa9",
+      "theme": "red"
+    },
+    {
+      "role": "process",
+      "layout_id": "content-blue-060",
+      "preview": "process-content-blue-060.png",
+      "source_preview": "source-previews/red/P060.png",
+      "status": "verified_draft",
+      "sha256": "e73bbc3f3c8ead300e4241636b36abdb641b853694fc295db7bc377825df021e",
+      "theme": "red"
+    },
+    {
+      "role": "data",
+      "layout_id": "content-blue-036",
+      "preview": "data-content-blue-036.png",
+      "source_preview": "source-previews/red/P036.png",
+      "status": "verified_draft",
+      "sha256": "911802a87b36e2f67d1ea799b87ce15d4ab1da758e2cbe8cf53eb75e3255903a",
+      "theme": "red"
+    },
+    {
+      "role": "comparison",
+      "layout_id": "content-blue-133",
+      "preview": "comparison-content-blue-133.png",
+      "source_preview": "source-previews/red/P133.png",
+      "status": "verified_draft",
+      "sha256": "486043ccfbce68282e29f939e110163323cc469d552847fff37a0004bdf938a4",
+      "theme": "red"
+    },
+    {
+      "role": "closing",
+      "layout_id": "supp-closing-red-19",
+      "preview": "closing-supp-closing-red-19.png",
+      "source_preview": "source-previews/red-supplement/P019.png",
+      "status": "verified_draft",
+      "sha256": "09fa18de53a8ffede905ff3af6b030d83b4b0aca42364619aef8a34c10f25c0e",
+      "theme": "red"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "source_page": 11,
+  "component_id": "section-tech-011",
+  "information_relation": "section",
+  "source_item_count": 1,
+  "component_parts": "章节序号、中文标题、英文副题三层",
+  "content_fit_limit": "只适合章节过渡，不能承载正文",
+  "review_status": "static_pptx_verified",
+  "field_binding_status": "reviewed",
+  "normal_use_status": "static_pptx_verified_draft",
+  "source_text_policy": "源稿中的业务、数字、人名均为示例，不得作为输出事实",
+  "verification_note": "虚构内容实填、PowerPoint 渲染、文字边界、单 Logo 与图片 fallback 已核对；HTML、动效和扩展色分别验收。"
+}

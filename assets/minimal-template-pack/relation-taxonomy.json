@@ -1,0 +1,249 @@
+{
+  "schema_version": "1.0",
+  "description": "仅对 classification_status=verified 的组件建立检索同义关系；原始 information_relation 保留为精确子类型。",
+  "relations": {
+    "visual-story": {
+      "aliases": [
+        "封面",
+        "视觉封面"
+      ],
+      "specific_relations": [
+        "visual-story"
+      ]
+    },
+    "navigation": {
+      "aliases": [
+        "目录",
+        "导航"
+      ],
+      "specific_relations": [
+        "navigation"
+      ]
+    },
+    "chapter-divider": {
+      "aliases": [
+        "章节",
+        "章节页"
+      ],
+      "specific_relations": [
+        "chapter-divider",
+        "section"
+      ]
+    },
+    "closing-message": {
+      "aliases": [
+        "封底",
+        "结束页"
+      ],
+      "specific_relations": [
+        "closing-message"
+      ]
+    },
+    "framework": {
+      "aliases": [
+        "框架",
+        "模型",
+        "体系"
+      ],
+      "specific_relations": [
+        "five-capability-development-columns",
+        "five-direction-outlook",
+        "four-capability-improvement",
+        "four-career-development-directions",
+        "four-improvement-practices",
+        "four-layer-brand-value",
+        "four-layer-capability-growth",
+        "four-management-abilities",
+        "four-method-execution-quadrants",
+        "four-work-execution-methods",
+        "four-work-goals",
+        "six-priority-work-ring",
+        "smart-goal-framework",
+        "three-goal-target"
+      ]
+    },
+    "hierarchy": {
+      "aliases": [
+        "层级",
+        "分层",
+        "架构"
+      ],
+      "specific_relations": [
+        "hierarchy"
+      ]
+    },
+    "parallel-points": {
+      "aliases": [
+        "并列",
+        "要点",
+        "多点说明"
+      ],
+      "specific_relations": [
+        "four-direction-outlook",
+        "key-points",
+        "parallel-items",
+        "parallel-points"
+      ]
+    },
+    "process": {
+      "aliases": [
+        "流程",
+        "步骤",
+        "阶段",
+        "工作流",
+        "workflow"
+      ],
+      "specific_relations": [
+        "five-stage-process",
+        "five-step-brand-plan",
+        "five-step-project-delivery",
+        "four-project-milestones",
+        "four-step-approval-process",
+        "four-step-execution",
+        "four-step-workflow-path",
+        "ordered-steps",
+        "process",
+        "six-step-issue-handling-loop",
+        "six-step-problem-solving",
+        "three-stage-data-decision",
+        "three-stage-project-logic"
+      ]
+    },
+    "cycle": {
+      "aliases": [
+        "循环",
+        "闭环",
+        "环形流程"
+      ],
+      "specific_relations": [
+        "cycle",
+        "cyclical-process"
+      ]
+    },
+    "comparison": {
+      "aliases": [
+        "对比",
+        "比较",
+        "问题措施",
+        "问题解决",
+        "差异"
+      ],
+      "specific_relations": [
+        "comparison",
+        "five-change-outcome-columns",
+        "four-innovation-methods",
+        "four-issue-solution-columns",
+        "issue-action-two-pairs",
+        "problem-solution",
+        "risk-response",
+        "three-risk-response-pairs",
+        "two-dimension-four-quadrant-balance"
+      ]
+    },
+    "timeline": {
+      "aliases": [
+        "时间线",
+        "里程碑",
+        "路线图",
+        "时间轴"
+      ],
+      "specific_relations": [
+        "five-milestone-roadmap",
+        "five-skill-growth-milestones",
+        "five-stage-ten-year-roadmap",
+        "five-year-roadmap",
+        "four-quarter-capability-plan",
+        "four-quarter-plan",
+        "quarter-milestone-matrix",
+        "six-month-project-roadmap",
+        "six-month-work-timeline",
+        "ten-year-roadmap",
+        "timeline"
+      ]
+    },
+    "schedule": {
+      "aliases": [
+        "计划",
+        "排期",
+        "甘特图",
+        "任务安排"
+      ],
+      "specific_relations": [
+        "four-quarter-alternating-plan",
+        "four-task-quarter-plan",
+        "schedule",
+        "six-project-year-schedule",
+        "three-phase-six-task-plan"
+      ]
+    },
+    "metrics": {
+      "aliases": [
+        "指标",
+        "关键指标",
+        "数据卡片"
+      ],
+      "specific_relations": [
+        "metrics"
+      ]
+    },
+    "data-chart": {
+      "aliases": [
+        "图表",
+        "趋势图",
+        "数据图"
+      ],
+      "specific_relations": [
+        "annual-revenue-cost-profit",
+        "data-chart",
+        "multi-metric-finance-dashboard",
+        "quarter-revenue-cost-analysis",
+        "two-metric-period-trend"
+      ]
+    },
+    "data-table": {
+      "aliases": [
+        "表格",
+        "明细表",
+        "数据表"
+      ],
+      "specific_relations": [
+        "quarterly-detail",
+        "six-task-gantt"
+      ]
+    },
+    "summary": {
+      "aliases": [
+        "总结",
+        "成果",
+        "工作总结"
+      ],
+      "specific_relations": [
+        "five-achievement-rows",
+        "four-achievement-list",
+        "four-area-two-highlight-grid",
+        "four-area-work-summary",
+        "six-dimension-stage-summary",
+        "three-goal-achievement"
+      ]
+    },
+    "progress": {
+      "aliases": [
+        "进度",
+        "完成度",
+        "项目进展"
+      ],
+      "specific_relations": [
+        "five-project-progress"
+      ]
+    },
+    "single-focus": {
+      "aliases": [
+        "单一重点",
+        "核心观点"
+      ],
+      "specific_relations": [
+        "single-focus"
+      ]
+    }
+  }
+}

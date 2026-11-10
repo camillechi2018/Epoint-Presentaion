@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    {
+      "field": "text_4",
+      "shape_id": 4,
+      "shape_name": "小李PPT22",
+      "type": "text",
+      "max_chars": 4,
+      "source_sample_chars": 4,
+      "source_text": "目标回顾",
+      "bounds_pt": [
+        46.7,
+        270.0,
+        379.5,
+        94.5
+      ],
+      "semantic_role": "title",
+      "semantic_path": "section.title",
+      "max_width_units": 8,
+      "max_lines": 1
+    },
+    {
+      "field": "text_7",
+      "shape_id": 7,
+      "shape_name": "文本框 6",
+      "type": "text",
+      "max_chars": 9,
+      "source_sample_chars": 10,
+      "source_text": "2026年终述职汇报",
+      "bounds_pt": [
+        69.1,
+        26.6,
+        312.7,
+        50.9
+      ],
+      "semantic_role": "header",
+      "semantic_path": "section.header",
+      "max_width_units": 14,
+      "max_lines": 1
+    },
+    {
+      "field": "text_15",
+      "shape_id": 15,
+      "shape_name": "文本框 14",
+      "type": "text",
+      "max_chars": 6,
+      "source_sample_chars": 6,
+      "source_text": "PART.1",
+      "bounds_pt": [
+        63.7,
+        205.7,
+        169.2,
+        60.6
+      ],
+      "semantic_role": "part",
+      "semantic_path": "section.part",
+      "max_width_units": 6,
+      "max_lines": 1
+    }
+  ],
+  "objects": {
+    "charts": [],
+    "tables": [],
+    "images": []
+  },
+  "review": "semantic fields; short-copy PowerPoint render and capacity boundary verified"
+}
