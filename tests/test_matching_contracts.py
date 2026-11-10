@@ -160,6 +160,46 @@ class MatchingContracts(unittest.TestCase):
             self.assertEqual([shapes[sid].text for sid in (31, 32, 33, 34)],
                              ['01', '02', '03', '04'])
 
+    def test_nested_four_layers_requires_explicit_inside_out_order(self):
+        content = {'type': 'hierarchy', 'order': 'inner_to_outer',
+                   'items': [{'title': f'层级{i}', 'body': f'第{i}层的真实职责'}
+                             for i in range(1, 5)]}
+        page = {'layout_id': 'content-blue-181', 'title': '服务能力层级',
+                'information_relation': 'framework', 'content': content}
+        self.assertEqual(resolve(LIBRARY, self.request(page))['pages'][0]['layout_id'],
+                         'content-blue-181')
+        payload, adapter = adapt_for_layout('content-blue-181', content, page['title'])
+        self.assertEqual(adapter, 'four_nested_layers_to_p181')
+        self.assertEqual(payload['texts']['layers[3].heading'], '层级4')
+        automatic = dict(page)
+        del automatic['layout_id']
+        self.assertEqual(resolve(LIBRARY, self.request(automatic))['pages'][0]['layout_id'],
+                         'content-blue-181')
+        wrong = dict(page, content=dict(content, order='outer_to_inner'))
+        self.assertNotEqual(resolve(LIBRARY, self.request(wrong))['pages'][0]
+                            ['selection_mode'], 'source_template')
+
+    def test_five_year_timeline_requires_real_ascending_years(self):
+        content = {'type': 'milestone_timeline', 'items': [
+            {'label': f'{2026 + i}年', 'title': f'阶段{i+1}', 'body': f'完成第{i+1}阶段工作'}
+            for i in range(5)]}
+        page = {'layout_id': 'content-blue-199', 'title': '五年建设路线',
+                'information_relation': 'timeline', 'content': content}
+        self.assertEqual(resolve(LIBRARY, self.request(page))['pages'][0]['layout_id'],
+                         'content-blue-199')
+        payload, adapter = adapt_for_layout('content-blue-199', content, page['title'])
+        self.assertEqual(adapter, 'five_year_milestones_to_p199')
+        self.assertEqual(payload['texts']['years[4].label'], '2030年')
+        automatic = dict(page)
+        del automatic['layout_id']
+        self.assertEqual(resolve(LIBRARY, self.request(automatic))['pages'][0]['layout_id'],
+                         'content-blue-199')
+        wrong_items = [dict(item) for item in content['items']]
+        wrong_items[2]['label'] = '阶段三'
+        wrong = dict(page, content=dict(content, items=wrong_items))
+        self.assertNotEqual(resolve(LIBRARY, self.request(wrong))['pages'][0]
+                            ['selection_mode'], 'source_template')
+
     def test_smart_and_risk_response_reject_generic_pages(self):
         for layout_id, relation in [('content-blue-125', 'framework'),
                                     ('content-blue-050', 'comparison')]:

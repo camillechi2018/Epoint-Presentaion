@@ -16,6 +16,30 @@ def classify_trial_failure(message: str) -> str:
 
 def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = None) -> tuple[dict, str | None]:
     """Return a copied payload; never split, invent, or summarize user facts."""
+    if layout_id in ('content-blue-181', 'content-blue-199') and not content.get('texts'):
+        items = content.get('items')
+        title = content.get('title') or page_title
+        is_layers = layout_id.endswith('181')
+        expected_type = 'hierarchy' if is_layers else 'milestone_timeline'
+        required = ('title', 'body') if is_layers else ('label', 'title', 'body')
+        if (content.get('type') == expected_type and isinstance(items, list)
+                and len(items) == (4 if is_layers else 5)
+                and isinstance(title, str) and title.strip()
+                and (not is_layers or content.get('order') == 'inner_to_outer')
+                and all(isinstance(item, dict) and all(isinstance(item.get(key), str)
+                        and item[key].strip() for key in required) for item in items)):
+            texts = {'page.title': title}
+            for index, item in enumerate(items):
+                prefix = f'layers[{index}]' if is_layers else f'years[{index}]'
+                texts[f'{prefix}.heading'] = item['title']
+                texts[f'{prefix}.body'] = item['body']
+                if not is_layers:
+                    texts[f'{prefix}.label'] = item['label']
+            adapted = dict(content)
+            adapted['texts'] = texts
+            adapted['item_count'] = len(items)
+            return adapted, ('four_nested_layers_to_p181' if is_layers
+                             else 'five_year_milestones_to_p199')
     if layout_id in ('content-blue-256', 'content-blue-258') and not content.get('texts'):
         items = content.get('items')
         title = content.get('title') or page_title

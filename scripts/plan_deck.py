@@ -32,6 +32,7 @@ CONTENT_RELATIONS = {
     'metrics': 'metrics', 'comparison': 'comparison', 'process': 'process',
     'bullets': 'parallel-points', 'cards': 'parallel-points',
     'data_table': 'data-table', 'milestone_timeline': 'timeline',
+    'hierarchy': 'framework',
 }
 
 
@@ -125,6 +126,16 @@ def matches_structural_contract(entry, page, taxonomy):
     if not all(isinstance(item, dict) and all(isinstance(item.get(key), str)
                and item[key].strip() for key in contract.get('item_fields', [])) for item in items):
         return False
+    if contract.get('required_order') and content.get('order') != contract['required_order']:
+        return False
+    if contract.get('label_sequence') == 'ascending_years':
+        import re
+        labels = [re.fullmatch(r'(\d{4})年?', item['label'].strip()) for item in items]
+        if any(label is None for label in labels):
+            return False
+        years = [int(label.group(1)) for label in labels]
+        if years != sorted(set(years)):
+            return False
     for path in contract.get('required_content_fields', []):
         value = content
         for part in path.split('.'):
