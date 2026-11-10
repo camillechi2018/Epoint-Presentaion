@@ -16,6 +16,45 @@ def classify_trial_failure(message: str) -> str:
 
 def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = None) -> tuple[dict, str | None]:
     """Return a copied payload; never split, invent, or summarize user facts."""
+    if layout_id in ('content-blue-180', 'content-tech-028') and not content.get('texts'):
+        items = content.get('items')
+        title = content.get('title') or page_title
+        if not isinstance(title, str) or not title.strip() or not isinstance(items, list):
+            return dict(content), None
+        def nonempty(value):
+            return isinstance(value, str) and bool(value.strip())
+        if layout_id == 'content-blue-180':
+            if (content.get('type') != 'stage_matrix' or content.get('order') != 'left_to_right'
+                    or len(items) != 4 or not all(
+                        isinstance(item, dict) and nonempty(item.get('title')) and nonempty(item.get('label'))
+                        and isinstance(item.get('highlights'), list) and len(item['highlights']) == 2
+                        and all(isinstance(h, dict) and nonempty(h.get('title')) and nonempty(h.get('body'))
+                                for h in item['highlights']) for item in items)):
+                return dict(content), None
+            texts = {'page.title': title}
+            for i, item in enumerate(items):
+                prefix = f'areas[{i}]'
+                texts.update({f'{prefix}.heading': item['title'], f'{prefix}.label': item['label']})
+                for j, highlight in enumerate(item['highlights']):
+                    texts.update({f'{prefix}.items[{j}].heading': highlight['title'],
+                                  f'{prefix}.items[{j}].body': highlight['body']})
+        else:
+            if (content.get('type') != 'two_phase_plan' or content.get('order') != 'left_to_right'
+                    or len(items) != 2 or not nonempty(content.get('summary'))
+                    or not all(isinstance(item, dict) and nonempty(item.get('title'))
+                               and isinstance(item.get('issues'), list) and len(item['issues']) == 5
+                               and all(nonempty(issue) for issue in item['issues']) for item in items)):
+                return dict(content), None
+            texts = {'heading': title, 'summary': content['summary']}
+            for side, item in zip(('left', 'right'), items):
+                texts[f'phase_{1 if side == "left" else 2}.title'] = item['title']
+                for j, issue in enumerate(item['issues'], 1):
+                    texts[f'{side}.issue_{j}'] = issue
+        adapted = dict(content)
+        adapted['texts'] = texts
+        adapted.pop('items', None)
+        adapted.pop('item_count', None)
+        return adapted, f'{content["type"]}_{len(items)}_to_{layout_id}'
     # These layouts were visually reviewed for cross-scenario reuse. Every
     # explanatory field below comes from the request; only ordinal markers are
     # computed. A missing conclusion, outcome, or tag rejects the adapter.
