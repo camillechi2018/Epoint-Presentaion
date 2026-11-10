@@ -94,7 +94,7 @@ metadata:
 
 **进入自动候选须同时满足当前记录。** 检查所选风格和主题、正文或结构角色、具体／通用信息关系、`classification_status=verified`、可用 PPTX 状态、可用媒体、`verified_counts` 与真实项数。对短文、长文和标题逐字段检查 `semantic_path`、`max_chars`、`max_lines`、`max_width_units`；某组件的长正文已验收，不代表它的中心标题、顶部总结或其他字段也可加长。固定项数组件不得删空文字伪装为少项；变项数仅按该组件的 `verified_counts` 开放。图表、进度百分比、日期等必须来自本次材料，并执行该组件登记的数据一致性规则。
 
-**正文长文案参考值。** 在当前知识库 `review/body-longcopy-capacity.json` 中按组件 ID 和 `semantic_path` 读取逐字段的 `recommended_max_cjk_chars`、`registered_min_max_chars` 与 `use_for_planning_cjk_chars`。内容规划以 `use_for_planning_cjk_chars` 为参考，实际填充仍须通过 `bindings.json` 的字符数、行数、行宽及 PowerPoint 边界验收。长正文自动选稿还须检查该组件的 `long_copy_review_status=长文案已验收`；`视觉复核未通过`、填充失败和标题溢出状态不可用于长正文自动选稿。参考值由蓝红科技版本逐字段测量，蓝红共用较小值；适用于中文单段自动换行。短标签与标题不能当作正文槽，`preparation_methods` 含 `source_fallback` 的组件还需正常填充路径复核。每次从固定知识库 commit 读取，不在 Skill 中复制组件数值。
+**正文长文案参考值。** 在当前知识库 `review/body-longcopy-capacity.json` 中按组件 ID 和 `semantic_path` 读取逐字段的 `recommended_max_cjk_chars`、`registered_min_max_chars` 与 `use_for_planning_cjk_chars`。内容规划以 `use_for_planning_cjk_chars` 为参考，实际填充仍须通过 `bindings.json` 的字符数、行数、行宽及 PowerPoint 边界验收。长正文自动选稿还须检查该组件的 `long_copy_review_status=长文案已验收`；`视觉复核未通过`、填充失败和标题溢出状态不可用于长正文自动选稿。参考值由蓝红科技版本逐字段测量，蓝红共用较小值；适用于中文单段自动换行。短标签与标题不能当作正文槽，`preparation_methods` 含 `source_fallback` 的组件还需正常填充路径复核。**结构复用新增的短文案跨业务试填只验证新字段映射，不会重置该组件既有的长文案验收；报告中分别记录结构映射验收、逐字段长文案验收和整稿视觉复核。**每次从固定知识库 commit 读取，不在 Skill 中复制组件数值。
 
 **结构页容量按页面职责读取。** 封面、目录、章节、封底从当前固定知识库提交的 `review/structure-page-capacity.json` 读取主题、项数和逐字段已测容量；实际选版仍执行各组件 `bindings.json` 的字符、行数、行宽限制与 PowerPoint 渲染检查。目录按支持项数和每项标题／副标题分别校验；封面核对标题、副标题、署名与日期；章节页核对编号、标题和辅助文字，并保持整稿同一 `layout_id`；封底核对结束语与署名。已测字数只是对应压力样例的规划参考，不保证任意同长度文字均适配。封面、章节、封底的全部可编辑文字字段必须提供真实非空内容，缺失则改选版式或停止完整出稿，不保留来源示例文案。`visual_review=pending_final_deck_review` 的目录须在成稿中逐页目视复核。
 
