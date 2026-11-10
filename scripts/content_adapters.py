@@ -16,6 +16,48 @@ def classify_trial_failure(message: str) -> str:
 
 def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = None) -> tuple[dict, str | None]:
     """Return a copied payload; never split, invent, or summarize user facts."""
+    if layout_id in ('content-blue-133', 'content-blue-230') and not content.get('texts'):
+        items = content.get('items')
+        title = content.get('title') or page_title
+        def present(value):
+            return isinstance(value, str) and bool(value.strip())
+        expected = 3 if layout_id.endswith('133') else 5
+        kind = 'problem_action_pairs' if expected == 3 else 'phase_goal_activity_output'
+        keys = (('problem_title', 'problem_body', 'action_title', 'action_body')
+                if expected == 3 else ('title', 'goal', 'activity', 'output'))
+        extras = ('axis_top', 'axis_bottom', 'problem_label', 'action_label') if expected == 3 else ()
+        if (content.get('type') != kind or not present(title)
+                or not isinstance(items, list) or len(items) != expected
+                or not all(present(content.get(key)) for key in extras)
+                or not all(isinstance(item, dict) and all(present(item.get(key)) for key in keys)
+                           for item in items)):
+            return dict(content), None
+        texts = {'page.title': title}
+        if expected == 3:
+            texts.update({'axis.top': content['axis_top'], 'axis.bottom': content['axis_bottom'],
+                          'column.problem': content['problem_label'],
+                          'column.action': content['action_label']})
+            for i, item in enumerate(items):
+                for key in keys:
+                    texts[f'pairs[{i}].{key}'] = item[key]
+        else:
+            for i, item in enumerate(items):
+                texts[f'steps[{i}].heading'] = f'{i+1:02d}\n{item["title"]}'
+                texts[f'steps[{i}].goal_label'] = content.get('goal_label', '目标')
+                texts[f'steps[{i}].activity_label'] = content.get('activity_label', '活动')
+                texts[f'steps[{i}].output_label'] = content.get('output_label', '输出')
+                for key in ('goal', 'activity', 'output'):
+                    texts[f'steps[{i}].{key}'] = item[key]
+        adapted = dict(content)
+        adapted['texts'] = texts
+        if expected == 5:
+            # P230's native process-terminal handler consumes items separately;
+            # the complete five-slot binding above already supplies every field.
+            adapted.pop('items', None)
+            adapted.pop('item_count', None)
+        else:
+            adapted['item_count'] = expected
+        return adapted, f'{kind}_{expected}_to_{layout_id}'
     if layout_id == 'content-tech-021' and not content.get('texts'):
         items = content.get('items')
         title = content.get('title') or page_title
