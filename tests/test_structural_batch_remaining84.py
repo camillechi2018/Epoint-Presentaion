@@ -45,6 +45,12 @@ def sample(layout_id):
         return {'type': 'cards', 'summary': '六项工作围绕同一主题',
                 'center': {'topic': '项目建设'},
                 'items': [{'title': f'任务{i}'} for i in range(1, 7)]}
+    if layout_id == 'content-tech-042':
+        return {'type': 'cycle', 'conclusion': '四项工作形成闭环', 'items': items}
+    if layout_id == 'content-tech-045':
+        return {'type': 'process', 'items': items}
+    if layout_id == 'content-tech-081':
+        return {'type': 'hierarchy', 'order': 'top_to_bottom', 'items': items[:3]}
     if layout_id in ('content-tech-063', 'content-tech-064', 'content-tech-065'):
         dates = [f'{2025+i}年{i}月' if layout_id.endswith('065') else f'{2025+i}年'
                  for i in range(1, 6)]
@@ -63,13 +69,14 @@ class StructuralBatchTests(unittest.TestCase):
         cls.catalog = {x['id']: x for x in catalog['layouts']}
         cls.taxonomy = load_taxonomy(LIBRARY, catalog)
 
-    def test_sixteen_generic_requests_have_no_binding_gaps(self):
+    def test_activated_generic_requests_have_no_binding_gaps(self):
         for layout_id in ('content-blue-060', 'content-blue-267', 'content-tech-026',
                           'content-tech-029', 'content-tech-040', 'content-tech-048',
                           'content-tech-033', 'content-tech-054', 'content-tech-063',
                           'content-tech-064', 'content-tech-065', 'content-tech-034',
                           'content-tech-037', 'content-tech-038', 'content-tech-043',
-                          'content-tech-020'):
+                          'content-tech-020', 'content-tech-042', 'content-tech-045',
+                          'content-tech-081'):
             with self.subTest(layout_id=layout_id):
                 entry = self.catalog[layout_id]
                 content = sample(layout_id)
@@ -114,6 +121,17 @@ class StructuralBatchTests(unittest.TestCase):
         reasons = eligible(entry, page, {'_root': LIBRARY, 'allow_draft': True,
                                         'theme': 'deep-blue-tech'}, self.taxonomy)
         self.assertIn('structure_contract', reasons)
+
+    def test_new_fixed_structures_reject_missing_facts_or_wrong_order(self):
+        for layout_id, mutate in (
+            ('content-tech-042', lambda c: c.pop('conclusion')),
+            ('content-tech-045', lambda c: c['items'][0].pop('body')),
+            ('content-tech-081', lambda c: c.update(order='bottom_to_top')),
+        ):
+            with self.subTest(layout_id=layout_id):
+                content = sample(layout_id)
+                mutate(content)
+                self.assertIsNone(adapt_for_layout(layout_id, content, '项目建设安排')[1])
 
 
 if __name__ == '__main__':

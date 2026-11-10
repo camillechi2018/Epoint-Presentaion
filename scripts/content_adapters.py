@@ -36,6 +36,9 @@ def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = Non
         'content-tech-038': ('process', 4, ('title', 'body'), ('summary',)),
         'content-tech-043': ('cards', 3, ('title', 'body'), ('summary',)),
         'content-tech-020': ('cards', 6, ('title',), ('summary', 'center.topic')),
+        'content-tech-042': ('cycle', 4, ('title', 'body'), ('conclusion',)),
+        'content-tech-045': ('process', 4, ('title', 'body'), ()),
+        'content-tech-081': ('hierarchy', 3, ('title', 'body'), ()),
     }
     if layout_id in new_contracts and not content.get('texts'):
         kind, count, required, extras = new_contracts[layout_id]
@@ -48,6 +51,7 @@ def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = Non
             return value
         valid = (content.get('type') == kind and isinstance(items, list) and len(items) == count
                  and isinstance(title, str) and title.strip()
+                 and (layout_id != 'content-tech-081' or content.get('order') == 'top_to_bottom')
                  and all(isinstance(extra_value(key), str) and extra_value(key).strip() for key in extras)
                  and all(isinstance(item, dict) and all(
                      isinstance(item.get(key), str) and item[key].strip()
@@ -112,6 +116,19 @@ def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = Non
             for i, item in enumerate(items):
                 side = 'left' if i < 3 else 'right'
                 texts[f'{side}_{i % 3 + 1}.title'] = item['title']
+        elif layout_id in ('content-tech-042', 'content-tech-045',
+                           'content-tech-081'):
+            if layout_id == 'content-tech-042':
+                texts['center.conclusion'] = content['conclusion']
+            if layout_id == 'content-tech-045':
+                texts['summary'] = title
+            for i, item in enumerate(items, 1):
+                if layout_id == 'content-tech-081':
+                    texts.update({f'stage_{i}.title': item['title'], f'stage_{i}.body': item['body']})
+                else:
+                    texts.update({f'item_{i}.title': item['title'], f'item_{i}.body': item['body']})
+                    if layout_id == 'content-tech-045':
+                        texts[f'item_{i}.step'] = f'{i:02d}'
         else:  # P048's title and body binding indices have different source order.
             texts.update({'summary': content['summary'], 'top_conclusion': content['conclusion']})
             for i, (title_index, body_index) in enumerate(zip((3, 4, 2, 1), (2, 1, 3, 4))):
@@ -120,7 +137,8 @@ def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = Non
                               f'item_{body_index}.body': item['body']})
         adapted = dict(content)
         adapted['texts'] = texts
-        if layout_id == 'content-tech-038':
+        if layout_id in ('content-tech-038', 'content-tech-042', 'content-tech-045',
+                         'content-tech-081'):
             # The source's variable-column path is an unverified internal
             # prototype. Reuse only its fixed four reviewed text slots.
             adapted.pop('items', None)
