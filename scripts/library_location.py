@@ -5,6 +5,7 @@ import os
 import subprocess
 from hashlib import sha256
 import tempfile
+import time
 
 from build_minimal_pack import build as build_minimal_pack
 
@@ -16,14 +17,56 @@ def config():
 
 
 def _git(args, cwd=None):
-    result = subprocess.run(
-        ['git', *args], cwd=cwd, capture_output=True, text=True,
-        encoding='utf-8', errors='replace',
-        env={**os.environ, 'GIT_TERMINAL_PROMPT': '0', 'GCM_INTERACTIVE': 'never'},
-    )
-    if result.returncode:
-        raise RuntimeError('Git 知识库更新失败：' + (result.stderr.strip() or result.stdout.strip()))
-    return result.stdout.strip()
+    attempts = 2 if args and args[0] in ('fetch', 'clone') else 1
+    for attempt in range(attempts):
+        try:
+            result = subprocess.run(
+                ['git', *args], cwd=cwd, capture_output=True, text=True,
+                encoding='utf-8', errors='replace', timeout=35,
+                env={**os.environ, 'GIT_TERMINAL_PROMPT': '0', 'GCM_INTERACTIVE': 'never'},
+            )
+        except subprocess.TimeoutExpired as exc:
+            error = 'git_timeout: ' + ' '.join(args[:2])
+        else:
+            if result.returncode == 0:
+                return result.stdout.strip()
+            detail = result.stderr.strip() or result.stdout.strip()
+            lowered = detail.lower()
+            if any(x in lowered for x in ('403', '401', 'authentication', 'permission denied', 'repository not found')):
+                category = 'git_permission'
+            elif any(x in lowered for x in ('proxy', '502', '503', 'timed out', 'could not resolve', 'connection')):
+                category = 'git_network'
+            else:
+                category = 'git_command'
+            error = category + ': ' + detail
+        if attempt + 1 < attempts:
+            time.sleep(0.5)
+    raise RuntimeError(error)
+
+
+def verified_full_cache(cfg, marker):
+    """Use only the previously validated, clean checkout at the marked commit."""
+    checkout = (SKILL / cfg['git_checkout_path']).resolve()
+    if not marker.is_file() or not (checkout / '.git').exists():
+        raise RuntimeError('full_cache_missing')
+    record = json.loads(marker.read_text(encoding='utf-8'))
+    if record.get('root') != str((checkout / cfg.get('git_repository_directory', '.')).resolve()):
+        raise RuntimeError('full_cache_origin_mismatch: root')
+    if _git(['remote', 'get-url', 'origin'], checkout) != cfg['git_url']:
+        raise RuntimeError('full_cache_origin_mismatch: origin')
+    if _git(['branch', '--show-current'], checkout) != cfg.get('git_branch', 'main'):
+        raise RuntimeError('full_cache_branch_mismatch')
+    if _git(['status', '--porcelain'], checkout):
+        raise RuntimeError('full_cache_dirty')
+    commit = _git(['rev-parse', 'HEAD'], checkout)
+    if not commit or commit != record.get('commit'):
+        raise RuntimeError('full_cache_commit_mismatch')
+    root = (checkout / cfg.get('git_repository_directory', '.')).resolve()
+    manifest = root / cfg.get('manifest', 'knowledge-manifest.json')
+    if not manifest.is_file() or sha256(manifest.read_bytes()).hexdigest() != record.get('manifest_sha256'):
+        raise RuntimeError('full_cache_manifest_hash_mismatch')
+    validate_manifest(root, cfg)
+    return root, commit
 
 
 def git_library(cfg):
@@ -98,7 +141,7 @@ def resolve_library(override=None, *, allow_verified_cache=True, cache_only=Fals
     pack = (SKILL / cfg['offline_pack_path']).resolve()
     try:
         if cache_only:
-            raise RuntimeError('OFFLINE_CACHE_ONLY')
+            raise RuntimeError('offline_cache_only')
         root = git_library(cfg)
         validate_manifest(root, cfg)
         commit = _git(['rev-parse', 'HEAD'], root)
@@ -119,10 +162,18 @@ def resolve_library(override=None, *, allow_verified_cache=True, cache_only=Fals
                                       'root': str(root)}, ensure_ascii=False, indent=2), encoding='utf-8')
         return root, 'remote_template', commit, None
     except (RuntimeError, FileNotFoundError, ValueError) as exc:
+        if allow_verified_cache:
+            try:
+                root, commit = verified_full_cache(cfg, marker)
+                return root, 'verified_full_cache', commit, None if cache_only else str(exc)
+            except (RuntimeError, FileNotFoundError, ValueError) as cache_exc:
+                cache_warning = str(exc) + '; ' + str(cache_exc)
+        else:
+            cache_warning = str(exc)
         if not allow_verified_cache or not pack.is_dir():
-            raise
+            raise RuntimeError(cache_warning) from exc
         manifest = validate_manifest(pack, cfg)
-        return pack, 'local_verified_template', manifest['source_commit'], None if cache_only else str(exc)
+        return pack, 'local_verified_template', manifest['source_commit'], None if cache_only else cache_warning
 
 
 def get_library(override=None):
