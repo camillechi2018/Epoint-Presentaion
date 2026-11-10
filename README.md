@@ -2,7 +2,7 @@
 
 把材料整理成符合新点品牌风格、可继续编辑的企业演示文稿。先选 **蓝色系、红色系或科技风格**，再由 Agent 梳理内容与信息关系，优先试用知识库组件；正文不适配时使用技能内的排版规则，仍保持同一套色彩、字体和 Logo。
 
-**当前技能版本：1.0.27。** [查看技能入口](SKILL.md) · [查看完整模板知识库](https://github.com/camillechi2018/Epoint-Presentaion-KnowledgeBase)
+**当前技能版本：1.0.28。** [查看技能入口](SKILL.md) · [查看完整模板知识库](https://github.com/camillechi2018/Epoint-Presentaion-KnowledgeBase)
 
 ## 先看三种风格
 
