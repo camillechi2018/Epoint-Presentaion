@@ -205,6 +205,18 @@ def matches_structural_discovery(entry, page, taxonomy, root=None):
     if not structural_relation_compatible(entry, page):
         return False
     content = page.get('content') if isinstance(page.get('content'), dict) else {}
+    # A flat list of prose has no independently supplied title/body pairs,
+    # center topic, or other nested slots. Discover it only when the existing
+    # lossless adapter can actually map every required field. Rich structured
+    # inputs still enter discovery before field mapping for diagnostics.
+    items = content.get('items')
+    if (content.get('type') == 'bullets' and isinstance(items, list) and items
+            and all(isinstance(item, str) for item in items)
+            and not content.get('texts')):
+        from content_adapters import adapt_structural_fields
+        _, adapter = adapt_structural_fields(entry, content, page.get('title'))
+        if adapter is None:
+            return False
     if root is not None and isinstance(content.get('items'), list):
         counts, _ = count_profile(entry, root)
         if len(content['items']) not in counts:
@@ -250,6 +262,12 @@ def matches_strict_contract(entry, page):
     if contract.get('policy', entry.get('matching_policy')) != 'semantic_strict':
         return True
     content = page.get('content') if isinstance(page.get('content'), dict) else {}
+    # Some classified strict layouts still have no registered invariant.
+    # Their source relation may be a broad label such as parallel-points;
+    # that label alone cannot authorize a generic automatic fill.
+    if not contract.get('required_relation') and not contract.get('exact_binding_relations'):
+        return bool(page.get('layout_id') == entry.get('id')
+                    and isinstance(content.get('texts'), dict) and content['texts'])
     if (page.get('layout_id') == entry.get('id') and isinstance(content.get('texts'), dict)
             and content['texts'] and page.get('information_relation') in contract.get('exact_binding_relations', [])):
         return True
@@ -291,6 +309,10 @@ def eligible(e, p, request, taxonomy):
     structural_match = matches_structural_discovery(e, p, taxonomy, request['_root'])
     structural_relation_match = matches_structural_relation(e, p, taxonomy)
     contract = e.get('matching_contract') or {}
+    if e.get('matching_policy') == 'data_contract':
+        payload = p.get('content') if isinstance(p.get('content'), dict) else {}
+        if payload.get('type') not in ('metrics', 'chart', 'data_table', 'table', 'template_fields'):
+            reasons.append('data_contract')
     strict_content=p.get('content') if isinstance(p.get('content'),dict) else {}
     strict_exact=(specified and isinstance(strict_content.get('texts'),dict) and bool(strict_content['texts'])
                   and p.get('information_relation') in contract.get('exact_binding_relations',[]))

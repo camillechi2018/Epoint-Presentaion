@@ -81,7 +81,9 @@ def adapt_structural_fields(entry, content, page_title=None, diagnostics=False):
             return None
         value = nested(item, field.split('.'))
         if value is None and field in ('heading', 'title'):
-            value = item.get('title')
+            value = item.get('title') or item.get('heading')
+        if value is None and field == 'body':
+            value = item.get('description') or item.get('text')
         return value
     for path in paths:
         value = None
@@ -118,6 +120,10 @@ def adapt_structural_fields(entry, content, page_title=None, diagnostics=False):
                         index = 0 if path.startswith('left.') else 1
                         indices.add(index)
                         value = nested(items[index], [path.split('.')[1]])
+                        if value is None and path.endswith('.title'):
+                            value = items[index].get('heading')
+                        if value is None and path.endswith('.body'):
+                            value = items[index].get('description') or items[index].get('text')
         if not present(value):
             missing.append(path)
         else:

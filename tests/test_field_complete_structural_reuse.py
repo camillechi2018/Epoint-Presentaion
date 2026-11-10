@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 from plan_deck import eligible, matches_structural_contract, matches_structural_discovery, count_profile
 from content_adapters import adapt_for_layout, structural_mapping_issue, field_source_evidence
 from fill_layout import fill
+from relation_match import load_taxonomy
 
 
 class FieldCompleteStructuralReuseTest(unittest.TestCase):
@@ -92,6 +93,43 @@ class FieldCompleteStructuralReuseTest(unittest.TestCase):
                     source.write_text(json.dumps(payload, ensure_ascii=False), encoding='utf-8')
                     fill(ROOT, layout_id, source, output, allow_draft=True)
                     self.assertGreater(output.stat().st_size, 1000)
+
+    def test_flat_bullets_do_not_recall_unmappable_special_geometry(self):
+        catalog = json.loads((ROOT / 'catalog.json').read_text(encoding='utf-8'))
+        by_id = {entry['id']: entry for entry in catalog['layouts']}
+        taxonomy = load_taxonomy(ROOT, catalog)
+        request = {'_root': ROOT, 'allow_draft': True, 'allow_visual_reviewed': True,
+                   'theme': 'blue', 'style_family': 'legacy-blue-red'}
+        page = {'role': 'body', 'title': '材料概况', 'information_relation': 'parallel-points',
+                'content': {'type': 'bullets', 'items': [f'第{i}条完整事实' for i in range(6)]},
+                'needs': {'item_count': 6}, 'theme': 'blue'}
+        self.assertFalse(matches_structural_discovery(by_id['content-blue-244'], page, taxonomy, ROOT))
+        self.assertIn('structure_contract', eligible(by_id['content-blue-244'], page, request, taxonomy))
+        page['theme'] = 'deep-blue-tech'
+        page['content']['items'].pop()
+        page['needs']['item_count'] = 5
+        request.update(theme='deep-blue-tech', style_family='deep-blue-tech')
+        self.assertIn('structure_contract', eligible(by_id['content-tech-024'], page, request, taxonomy))
+        page['content']['items'] = page['content']['items'][:3]
+        page['needs']['item_count'] = 3
+        self.assertIn('semantic_invariant', eligible(by_id['content-tech-031'], page, request, taxonomy))
+        self.assertIn('data_contract', eligible(by_id['content-tech-053'], page, request, taxonomy))
+
+    def test_explicit_heading_description_aliases_map_without_inventing_facts(self):
+        entry = next(x for x in self.ready if x['id'] == 'content-blue-143')
+        content = {'type': 'cards', 'items': [
+            {'heading': f'服务{i}', 'description': f'第{i}项真实说明'} for i in range(1, 5)]}
+        mapped, adapter = adapt_for_layout(entry['id'], content, '服务体系', entry=entry)
+        self.assertEqual(adapter, 'declared_structural_fields')
+        for i in range(4):
+            self.assertIn(f'第{i+1}项真实说明', mapped['texts'].values())
+        mapped['theme'] = 'blue'
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / 'alias-content.json'
+            output = Path(directory) / 'alias-content.pptx'
+            source.write_text(json.dumps(mapped, ensure_ascii=False), encoding='utf-8')
+            fill(ROOT, entry['id'], source, output, allow_draft=True)
+            self.assertGreater(output.stat().st_size, 1000)
 
     def test_extra_required_facts_are_not_invented(self):
         entry = next(x for x in self.ready if x['id'] == 'content-blue-089')

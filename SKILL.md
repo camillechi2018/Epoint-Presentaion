@@ -2,7 +2,7 @@
 name: epoint-presentation
 description: 制作新点品牌可编辑 PPTX；Skill 自带 Logo、锁定色系、字体、三风格资料包和已校验结构页最小包。优先读取 Git 知识库，断网时使用本地已校验模板；正文可灵活编排。
 metadata:
-  version: "1.0.29"
+  version: "1.0.30"
 ---
 
 # 新点企业演示文稿：新模板方案
@@ -17,7 +17,7 @@ metadata:
 
 **正文匹配输入规则。** 正文页可用 `role=body`，并尽量给出 `information_relation`、真实项数与结构化 `content`。普通组件只要具备知识库 `matching_policy=structural`、`matching_activation=pilot_verified` 或 `structure_ready` 及完整 `matching_contract`，就可按图形关系跨原稿业务场景复用；原稿业务场景名不作为普通组件的拒绝条件；SMART、风险应对、四象限等 `semantic_strict` 组件仍须符合登记的不变量；指标和图表仍核对数据契约。通用 `items` 输入先按结构发现 `pilot_verified` 与 `structure_ready` 候选；目标字段缺口单独标记为 `awaiting_mapping`。执行器优先把真实标题、说明、摘要与有序条目映射到 `required_binding_paths`；材料确有额外分组、短标签、中心论点等信息时再显式提供。缺必填事实或文字超容量的候选继续试下一项，不得重复原稿示例、编造事实或把候选召回记为已使用。完整 `template_fields` 输入仍可作为兼容接口。固定图标只有明确承载审批等专用含义时才转为严格语义例外。实际可用组件以当次知识库清单、适配器及真实试填结果为准。`content-blue-142` 的通用四卡与真实中心标题现可自动映射；中心标题过宽时仍须合理换行并实际试填，单页映射不等于整稿视觉签收。缺标题、说明或超出容量即拒绝。环形箭头页 `content-blue-076` 仅用于材料确有四段闭环且中心标题与短标签均真实提供的情况，不把普通四项并列伪装为循环。旧请求中的 `layout_id=no-verified-template-for-this-relation` 仅是历史占位，入口会移除后重新检索。候选仍须通过原生项数、容量、字段试填；候选命中不代表组件可用。其他组件若缺少 `bindings.json` 所需字段，逐一试填并记录 `MISSING_REQUIRED_FIELD` 等原因，最终回到同风格技能排版。不得拆分或编造业务事实来提高模板复用率。用 `scripts/audit_matching.py --library <固定知识库> --request <逐页请求> --out <审计.json> --trial` 可复核正文尝试率、候选率与单页实填率；审计中的实填成功仍须经过整稿 PowerPoint 渲染和视觉复核。
 
-完整字段结构调用的输入形态和缺字段回退见[普通正文组件结构调用](references/structural-template-fields.md)。
+纯字符串 `bullets` 只有在现有无损适配器能填满结构字段时才进入复杂组件候选；没有登记专用不变量的严格语义组件，不凭普通 `parallel-points` 等宽泛关系自动进入候选；数据契约组件须有结构化指标、图表或表格输入。显式结构字段中的 `heading`／`description` 可等值映射到标题／正文，不能据此拆写或省略原始事实。完整字段结构调用的输入形态和缺字段回退见[普通正文组件结构调用](references/structural-template-fields.md)。
 
 结构候选试填还须检查输入事实是否全部有对应槽位。若材料提供了条目正文，而候选仅能显示标题，记录 `INPUT_FACTS_UNMAPPED` 和具体字段，继续尝试其他候选；不得通过丢弃正文提高模板使用率。日程等嵌套组件仅在材料真实提供阶段与子任务时逐项映射，不能编造子任务填满槽位。
 
