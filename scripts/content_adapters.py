@@ -113,6 +113,83 @@ def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = Non
         adapted.pop('items', None)
         adapted.pop('item_count', None)
         return adapted, f'{content["type"]}_{len(items)}_to_{layout_id}'
+    if layout_id in ('content-blue-261', 'content-blue-266', 'content-tech-018',
+                     'schedule-tech-069', 'content-tech-016') and not content.get('texts'):
+        items = content.get('items')
+        title = content.get('title') or page_title
+        def nonempty(value):
+            return isinstance(value, str) and bool(value.strip())
+        if not nonempty(title) or not isinstance(items, list):
+            return dict(content), None
+        if layout_id == 'content-blue-261':
+            if (content.get('type') != 'cycle' or content.get('order') != 'clockwise'
+                    or len(items) != 6 or not nonempty(content.get('center_title'))
+                    or not all(isinstance(x, dict) and all(nonempty(x.get(k)) for k in ('title', 'body')) for x in items)):
+                return dict(content), None
+            center = content['center_title']
+            if ('\n' not in center and 3 <= len(center) <= 4
+                    and all('\u3400' <= char <= '\u9fff' for char in center)):
+                center = center[:2] + '\n' + center[2:]
+            texts = {'page.title': title, 'center.title': center}
+            for i, item in enumerate(items):
+                texts.update({f'steps[{i}].heading': item['title'], f'steps[{i}].body': item['body']})
+        elif layout_id == 'content-blue-266':
+            if (content.get('type') != 'process' or content.get('order') != 'serpentine'
+                    or len(items) != 6 or not all(isinstance(x, dict)
+                    and all(nonempty(x.get(k)) for k in ('title', 'body')) for x in items)):
+                return dict(content), None
+            texts = {'page.title': title}
+            for i, item in enumerate(items):
+                texts.update({f'steps[{i}].heading': item['title'], f'steps[{i}].body': item['body']})
+        elif layout_id == 'content-tech-018':
+            if (content.get('type') != 'hierarchy' or content.get('order') != 'bottom_to_top'
+                    or len(items) != 3 or not all(isinstance(x, dict) and nonempty(x.get('body')) for x in items)
+                    or not all(nonempty(content.get(k)) for k in ('summary', 'left_support', 'right_support'))):
+                return dict(content), None
+            texts = {'heading': title, 'summary': content['summary'],
+                     'left_support': content['left_support'], 'right_support': content['right_support']}
+            for i, item in enumerate(items):
+                texts[f'tier_{3-i}.body'] = item['body']
+        elif layout_id == 'schedule-tech-069':
+            import re
+            labels = content.get('column_labels')
+            if (content.get('type') != 'schedule' or content.get('order') != 'chronological'
+                    or len(items) != 6 or not nonempty(content.get('summary'))
+                    or not isinstance(labels, dict)
+                    or not all(nonempty(labels.get(k)) for k in ('time', 'activity', 'owner'))
+                    or not all(isinstance(x, dict)
+                    and all(nonempty(x.get(k)) for k in ('time', 'activity', 'owner')) for x in items)):
+                return dict(content), None
+            ranges = [re.fullmatch(r'(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})', x['time'].strip()) for x in items]
+            if any(x is None for x in ranges):
+                return dict(content), None
+            minutes = [(int(x[1])*60+int(x[2]), int(x[3])*60+int(x[4])) for x in ranges]
+            if any(start >= end or end > 24*60 for start, end in minutes) or any(
+                    minutes[i][1] > minutes[i+1][0] for i in range(5)):
+                return dict(content), None
+            texts = {'heading': title, 'summary': content['summary'],
+                     'table.time_heading': labels['time'],
+                     'table.activity_heading': labels['activity'],
+                     'table.owner_heading': labels['owner']}
+            for i, item in enumerate(items, 1):
+                for key in ('time', 'activity', 'owner'):
+                    texts[f'row_{i}.{key}'] = item[key]
+        else:
+            if (content.get('type') != 'framework' or len(items) != 5
+                    or not all(nonempty(content.get(k)) for k in ('summary', 'unit'))
+                    or not all(isinstance(x, dict)
+                    and all(nonempty(x.get(k)) for k in ('title', 'body')) for x in items)):
+                return dict(content), None
+            texts = {'heading': title, 'summary': content['summary'],
+                     'center.count': '5', 'center.unit': content['unit']}
+            for i, item in enumerate(items, 1):
+                texts[f'item_{i}.label'] = item['title']
+                texts[f'item_{i}.body'] = item['body']
+        adapted = dict(content)
+        adapted['texts'] = texts
+        adapted.pop('items', None)
+        adapted.pop('item_count', None)
+        return adapted, f'{content["type"]}_{len(items)}_to_{layout_id}'
     # These layouts were visually reviewed for cross-scenario reuse. Every
     # explanatory field below comes from the request; only ordinal markers are
     # computed. A missing conclusion, outcome, or tag rejects the adapter.
