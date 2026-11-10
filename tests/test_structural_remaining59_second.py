@@ -65,6 +65,25 @@ class Remaining59SecondTests(unittest.TestCase):
                      'items': [{'title': '措施', 'body': '说明'} for _ in range(4)]}
         self.assertIsNone(adapt_for_layout('content-tech-016', framework, '计划')[1])
 
+    def test_three_part_framework_has_all_user_fields(self):
+        content = {'type': 'framework', 'summary': '三项保障', 'unit': '项保障',
+                   'items': [{'title': f'保障{i}', 'subtitle': f'第{i}项工作',
+                              'body': f'落实第{i}项工作。'} for i in range(1, 4)]}
+        layout_id = 'content-tech-021'
+        adapted, adapter = adapt_for_layout(layout_id, content, '交付保障')
+        self.assertIsNotNone(adapter)
+        self.assertEqual(adapted['texts']['center.count'], '3')
+        self.assertEqual(binding_gap(self.entries[layout_id],
+                         {'title': '交付保障', 'content': content}, LIBRARY,
+                         'deep-blue-tech'), 0)
+        page = {'role': 'body', 'title': '交付保障', 'content': content,
+                'information_relation': 'framework', 'needs': {'item_count': 3}}
+        self.assertEqual(eligible(self.entries[layout_id], page,
+                         {'_root': LIBRARY, 'allow_draft': True, 'theme': 'deep-blue-tech',
+                          'style_family': 'deep-blue-tech'}, self.taxonomy), [])
+        content['items'][1].pop('subtitle')
+        self.assertIsNone(adapt_for_layout(layout_id, content, '交付保障')[1])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -16,6 +16,27 @@ def classify_trial_failure(message: str) -> str:
 
 def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = None) -> tuple[dict, str | None]:
     """Return a copied payload; never split, invent, or summarize user facts."""
+    if layout_id == 'content-tech-021' and not content.get('texts'):
+        items = content.get('items')
+        title = content.get('title') or page_title
+        def nonempty(value):
+            return isinstance(value, str) and bool(value.strip())
+        if (content.get('type') != 'framework' or not nonempty(title)
+                or not all(nonempty(content.get(k)) for k in ('summary', 'unit'))
+                or not isinstance(items, list) or len(items) != 3
+                or not all(isinstance(x, dict) and all(
+                    nonempty(x.get(k)) for k in ('title', 'subtitle', 'body')) for x in items)):
+            return dict(content), None
+        texts = {'heading': title, 'summary': content['summary'],
+                 'center.count': '3', 'center.unit': content['unit']}
+        for i, item in enumerate(items, 1):
+            for key in ('title', 'subtitle', 'body'):
+                texts[f'item_{i}.{key}'] = item[key]
+        adapted = dict(content)
+        adapted['texts'] = texts
+        adapted.pop('items', None)
+        adapted.pop('item_count', None)
+        return adapted, 'framework_3_to_content-tech-021'
     if layout_id in ('content-blue-180', 'content-blue-204', 'content-blue-207',
                      'content-blue-214', 'content-blue-240',
                      'content-tech-028') and not content.get('texts'):
