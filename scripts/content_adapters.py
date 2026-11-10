@@ -144,7 +144,8 @@ def adapt_structural_fields(entry, content, page_title=None, diagnostics=False):
             for index, child in enumerate(value):
                 check_item_facts(child, f'{path}[{index}]')
     control_keys = {'type', 'structure_type', 'title', 'theme', 'library_commit',
-                    'layout_assessment', 'free_layout', 'source_refs', 'layout_id'}
+                    'layout_assessment', 'free_layout', 'source_refs', 'layout_id',
+                    'unit_claims'}
     for key, value in content.items():
         if (key not in control_keys and not key.startswith('_')
                 and key != 'source_refs' and not key.endswith('_source_refs')):

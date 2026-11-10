@@ -157,6 +157,7 @@ class FieldCompleteStructuralReuseTest(unittest.TestCase):
     def test_source_reference_metadata_is_not_treated_as_extra_copy(self):
         entry = next(x for x in self.ready if x['id'] == 'content-blue-143')
         content = {'type': 'cards', 'source_refs': ['company_intro-006'],
+                   'unit_claims': ['C01'],
                    'items': [{'title': f'领域{i}', 'body': f'服务内容{i}',
                               'source_refs': ['company_intro-006']} for i in range(4)]}
         _, adapter = adapt_for_layout(entry['id'], content, '业务概览', entry=entry)
