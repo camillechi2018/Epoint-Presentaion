@@ -1,0 +1,308 @@
+{
+  "knowledge_base_commit": "6c5177f4c2ee1b4595c8bcdfb9d17ecb8054e48a",
+  "galleries": {
+    "blue": {
+      "image": "component-gallery-blue-16.png",
+      "components": [
+        {
+          "id": "content-blue-015",
+          "relation": "five-project-progress",
+          "family_id": "five-progress-cards",
+          "source": "layouts/content-blue-015/ready-blue.png"
+        },
+        {
+          "id": "content-blue-036",
+          "relation": "multi-metric-finance-dashboard",
+          "family_id": "four-charts-monthly-table",
+          "source": "source-previews/blue/P036.png"
+        },
+        {
+          "id": "content-blue-050",
+          "relation": "risk-response",
+          "family_id": "risk-response-triangles",
+          "source": "source-previews/blue/P050.png"
+        },
+        {
+          "id": "content-blue-060",
+          "relation": "ordered-steps",
+          "family_id": "four-step-arrow",
+          "source": "layouts/content-blue-060/ready-blue.png"
+        },
+        {
+          "id": "content-blue-070",
+          "relation": "six-project-year-schedule",
+          "family_id": "six-row-three-phase-schedule",
+          "source": "source-previews/blue/P070.png"
+        },
+        {
+          "id": "content-blue-081",
+          "relation": "three-goal-achievement",
+          "family_id": "goal-kpi-three-columns",
+          "source": "layouts/content-blue-081/ready-blue.png"
+        },
+        {
+          "id": "content-blue-106",
+          "relation": "five-achievement-rows",
+          "family_id": "five-icon-result-rows",
+          "source": "layouts/content-blue-106/ready-blue.png"
+        },
+        {
+          "id": "content-blue-112",
+          "relation": "four-achievement-list",
+          "family_id": "numbered-achievement-rows",
+          "source": "layouts/content-blue-112/ready-blue.png"
+        },
+        {
+          "id": "content-blue-133",
+          "relation": "problem-solution",
+          "family_id": "three-problem-action-rows",
+          "source": "source-previews/blue/P133.png"
+        },
+        {
+          "id": "content-blue-150",
+          "relation": "parallel-items",
+          "family_id": "five-parallel-cards",
+          "source": "layouts/content-blue-150/ready-blue.png"
+        },
+        {
+          "id": "content-blue-199",
+          "relation": "five-year-roadmap",
+          "family_id": "five-year-alternating-timeline",
+          "source": "layouts/content-blue-199/ready-blue.png"
+        },
+        {
+          "id": "content-blue-230",
+          "relation": "five-stage-process",
+          "family_id": "process-five-chevron",
+          "source": "source-previews/blue/P230.png"
+        },
+        {
+          "id": "content-blue-247",
+          "relation": "five-change-outcome-columns",
+          "family_id": "five-change-outcome-comparison",
+          "source": "source-previews/blue/P247.png"
+        },
+        {
+          "id": "content-blue-260",
+          "relation": "cyclical-process",
+          "family_id": "cycle-four-ring",
+          "source": "layouts/content-blue-260/ready-blue.png"
+        },
+        {
+          "id": "content-blue-268",
+          "relation": "annual-revenue-cost-profit",
+          "family_id": "annual-finance-area-chart",
+          "source": "source-previews/blue/P268.png"
+        },
+        {
+          "id": "content-blue-279",
+          "relation": "quarterly-detail",
+          "family_id": "quarterly-table-insights",
+          "source": "source-previews/blue/P279.png"
+        }
+      ]
+    },
+    "red": {
+      "image": "component-gallery-red-16.png",
+      "components": [
+        {
+          "id": "content-blue-015",
+          "relation": "five-project-progress",
+          "family_id": "five-progress-cards",
+          "source": "layouts/content-blue-015/ready-red.png"
+        },
+        {
+          "id": "content-blue-036",
+          "relation": "multi-metric-finance-dashboard",
+          "family_id": "four-charts-monthly-table",
+          "source": "source-previews/red/P036.png"
+        },
+        {
+          "id": "content-blue-050",
+          "relation": "risk-response",
+          "family_id": "risk-response-triangles",
+          "source": "source-previews/red/P050.png"
+        },
+        {
+          "id": "content-blue-060",
+          "relation": "ordered-steps",
+          "family_id": "four-step-arrow",
+          "source": "layouts/content-blue-060/ready-red.png"
+        },
+        {
+          "id": "content-blue-070",
+          "relation": "six-project-year-schedule",
+          "family_id": "six-row-three-phase-schedule",
+          "source": "source-previews/red/P070.png"
+        },
+        {
+          "id": "content-blue-081",
+          "relation": "three-goal-achievement",
+          "family_id": "goal-kpi-three-columns",
+          "source": "layouts/content-blue-081/ready-red.png"
+        },
+        {
+          "id": "content-blue-106",
+          "relation": "five-achievement-rows",
+          "family_id": "five-icon-result-rows",
+          "source": "layouts/content-blue-106/ready-red.png"
+        },
+        {
+          "id": "content-blue-112",
+          "relation": "four-achievement-list",
+          "family_id": "numbered-achievement-rows",
+          "source": "layouts/content-blue-112/ready-red.png"
+        },
+        {
+          "id": "content-blue-133",
+          "relation": "problem-solution",
+          "family_id": "three-problem-action-rows",
+          "source": "source-previews/red/P133.png"
+        },
+        {
+          "id": "content-blue-150",
+          "relation": "parallel-items",
+          "family_id": "five-parallel-cards",
+          "source": "layouts/content-blue-150/ready-red.png"
+        },
+        {
+          "id": "content-blue-199",
+          "relation": "five-year-roadmap",
+          "family_id": "five-year-alternating-timeline",
+          "source": "layouts/content-blue-199/ready-red.png"
+        },
+        {
+          "id": "content-blue-230",
+          "relation": "five-stage-process",
+          "family_id": "process-five-chevron",
+          "source": "source-previews/red/P230.png"
+        },
+        {
+          "id": "content-blue-247",
+          "relation": "five-change-outcome-columns",
+          "family_id": "five-change-outcome-comparison",
+          "source": "source-previews/red/P247.png"
+        },
+        {
+          "id": "content-blue-260",
+          "relation": "cyclical-process",
+          "family_id": "cycle-four-ring",
+          "source": "layouts/content-blue-260/ready-red.png"
+        },
+        {
+          "id": "content-blue-268",
+          "relation": "annual-revenue-cost-profit",
+          "family_id": "annual-finance-area-chart",
+          "source": "source-previews/red/P268.png"
+        },
+        {
+          "id": "content-blue-279",
+          "relation": "quarterly-detail",
+          "family_id": "quarterly-table-insights",
+          "source": "source-previews/red/P279.png"
+        }
+      ]
+    },
+    "tech": {
+      "image": "component-gallery-tech-16.png",
+      "components": [
+        {
+          "id": "content-tech-016",
+          "relation": "hierarchy",
+          "family_id": "tech-hierarchy-016",
+          "source": "source-previews/tech/P016.png"
+        },
+        {
+          "id": "content-tech-017",
+          "relation": "metrics",
+          "family_id": "tech-hierarchy-017",
+          "source": "source-previews/tech/P017.png"
+        },
+        {
+          "id": "content-tech-020",
+          "relation": "parallel-points",
+          "family_id": "tech-parallel-points-020",
+          "source": "source-previews/tech/P020.png"
+        },
+        {
+          "id": "content-tech-021",
+          "relation": "key-points",
+          "family_id": "tech-process-021",
+          "source": "source-previews/tech/P021.png"
+        },
+        {
+          "id": "content-tech-026",
+          "relation": "comparison",
+          "family_id": "tech-comparison-026",
+          "source": "source-previews/tech/P026.png"
+        },
+        {
+          "id": "content-tech-028",
+          "relation": "process",
+          "family_id": "tech-process-028",
+          "source": "source-previews/tech/P028.png"
+        },
+        {
+          "id": "content-tech-030",
+          "relation": "cycle",
+          "family_id": "tech-hierarchy-030",
+          "source": "source-previews/tech/P030.png"
+        },
+        {
+          "id": "content-tech-032",
+          "relation": "process",
+          "family_id": "tech-process-032",
+          "source": "source-previews/tech/P032.png"
+        },
+        {
+          "id": "content-tech-042",
+          "relation": "cycle",
+          "family_id": "tech-cycle-042",
+          "source": "source-previews/tech/P042.png"
+        },
+        {
+          "id": "content-tech-046",
+          "relation": "cycle",
+          "family_id": "tech-cycle-046",
+          "source": "source-previews/tech/P046.png"
+        },
+        {
+          "id": "content-tech-053",
+          "relation": "metrics",
+          "family_id": "tech-metrics-053",
+          "source": "source-previews/tech/P053.png"
+        },
+        {
+          "id": "content-tech-054",
+          "relation": "process",
+          "family_id": "tech-process-054",
+          "source": "source-previews/tech/P054.png"
+        },
+        {
+          "id": "content-tech-063",
+          "relation": "timeline",
+          "family_id": "tech-timeline-063",
+          "source": "source-previews/tech/P063.png"
+        },
+        {
+          "id": "schedule-tech-069",
+          "relation": "schedule",
+          "family_id": "tech-schedule-069",
+          "source": "source-previews/tech/P069.png"
+        },
+        {
+          "id": "data-chart-tech-071",
+          "relation": "data-chart",
+          "family_id": "tech-data-chart-071",
+          "source": "source-previews/tech/P071.png"
+        },
+        {
+          "id": "data-chart-tech-075",
+          "relation": "data-chart",
+          "family_id": "tech-data-chart-075",
+          "source": "source-previews/tech/P075.png"
+        }
+      ]
+    }
+  }
+}
