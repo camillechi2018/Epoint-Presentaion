@@ -79,7 +79,7 @@ def count_profile(entry, root):
 def binding_gap(entry, page, root, theme):
     """Count fields not yet mapped by an explicitly prepared template payload."""
     content = page.get('content') if isinstance(page.get('content'), dict) else {}
-    content, _ = adapt_for_layout(entry['id'], content)
+    content, _ = adapt_for_layout(entry['id'], content, page.get('title'))
     texts = content.get('texts') if isinstance(content.get('texts'), dict) else {}
     binding_rel = entry.get('red_bindings') if theme == 'red' and entry.get('red_bindings') else entry['bindings']
     fields = json.loads((root / binding_rel).read_text(encoding='utf-8-sig'))['fields']
@@ -87,6 +87,13 @@ def binding_gap(entry, page, root, theme):
     return sum(field['field'] not in provided and field.get('semantic_path') not in provided
                for field in fields if field.get('semantic_role') not in
                ('brand_locked', 'decoration_locked', 'computed_item_count') and field['field'] != 'brand')
+
+def content_is_four_cards(page):
+    content = page.get('content')
+    return (page.get('role') in (None, 'body', 'content', 'summary')
+            and page.get('information_relation') in (None, 'parallel-points', 'summary')
+            and isinstance(content, dict) and content.get('type') == 'cards'
+            and isinstance(content.get('items'), list) and len(content['items']) == 4)
 
 def eligible(e, p, request, taxonomy):
     reasons=[]
@@ -105,8 +112,17 @@ def eligible(e, p, request, taxonomy):
     if e.get('media_status')=='missing-source-image':reasons.append('missing_source_image')
     if str(e.get('pptx_support','')).startswith('blocked_'):reasons.append('pptx_blocked')
     relation=p.get('matching_relation') or p.get('information_relation')
-    if not match_role(e,p.get('role'),relation,taxonomy):reasons.append('role')
-    if not match_relation(e,relation,taxonomy):reasons.append('relation')
+    four_card_adapter = False
+    if e['id'] == 'content-blue-112' and content_is_four_cards(p):
+        _, adapter = adapt_for_layout(e['id'], p['content'], p.get('title'))
+        four_card_adapter = adapter is not None
+    if not match_role(e,p.get('role'),relation,taxonomy) and not four_card_adapter:reasons.append('role')
+    relation_matches = match_relation(e,relation,taxonomy)
+    # A four-card summary can use this verified four-item layout when every
+    # required field comes directly from the supplied cards and page title.
+    if not relation_matches and four_card_adapter:
+        relation_matches = True
+    if not relation_matches:reasons.append('relation')
     theme=p.get('theme',request.get('theme'))
     if theme and theme not in e.get('themes',[]):reasons.append('theme')
     if p.get('format','pptx') in ('html','both') and e.get('html_support')!='verified':reasons.append('html_unavailable')

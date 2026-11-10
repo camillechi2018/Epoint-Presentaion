@@ -1,4 +1,4 @@
-param(
+﻿param(
   [Parameter(Mandatory=$true)][string[]]$InputPath,
   [string]$ReportPath='',
   [double]$TolerancePt=3

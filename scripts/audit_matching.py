@@ -72,7 +72,7 @@ def audit(library: Path, request_path: Path, work: Path, trial: bool) -> dict:
             content_path.write_text(json.dumps(content, ensure_ascii=False), encoding='utf-8')
             for order, layout_id in enumerate(candidate_ids, 1):
                 output = work / f'P{index:03d}-trial-{order}.pptx'
-                candidate_content, adapter = adapt_for_layout(layout_id, content)
+                candidate_content, adapter = adapt_for_layout(layout_id, content, source.get('title'))
                 trial_content_path = content_path
                 if adapter:
                     trial_content_path = work / f'P{index:03d}-trial-{order}-content.json'

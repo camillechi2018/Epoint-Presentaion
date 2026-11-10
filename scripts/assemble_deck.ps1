@@ -1,4 +1,4 @@
-param(
+﻿param(
  [Parameter(Mandatory=$true)][string]$Manifest,
  [Parameter(Mandatory=$true)][string]$OutputPath,
  [string]$RenderDirectory='',
@@ -6,7 +6,7 @@ param(
 )
 $ErrorActionPreference='Stop'
 $mf=(Resolve-Path -LiteralPath $Manifest).Path;$base=Split-Path $mf -Parent
-$plan=Get-Content -LiteralPath $mf -Raw|ConvertFrom-Json
+$plan=Get-Content -LiteralPath $mf -Raw -Encoding utf8|ConvertFrom-Json
 $items=@($plan.slides);if($items.Count -lt 1){throw '清单没有页面'}
 $dest=[IO.Path]::GetFullPath($OutputPath);if(Test-Path -LiteralPath $dest){throw '输出文件已存在，请另存新文件'}
 $inputs=@();foreach($item in $items){$fp=[string]$item.path;if(-not [IO.Path]::IsPathRooted($fp)){$fp=Join-Path $base $fp};$fp=(Resolve-Path -LiteralPath $fp).Path;if($fp -eq $dest){throw '输出不能覆盖输入'};$inputs+=@{path=$fp;layout_id=$item.layout_id;source_stamp=$item.source_stamp}}

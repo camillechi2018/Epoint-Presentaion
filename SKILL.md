@@ -2,7 +2,7 @@
 name: epoint-presentation
 description: 制作新点品牌可编辑 PPTX；Skill 自带 Logo、锁定色系、字体、三风格资料包和已校验结构页最小包。优先读取 Git 知识库，断网时使用本地已校验模板；正文可灵活编排。
 metadata:
-  version: "1.0.28"
+  version: "1.0.29"
 ---
 
 # 新点企业演示文稿：新模板方案
@@ -15,7 +15,7 @@ metadata:
 
 实际执行时，按已排序候选最多尝试 3 张单页模板；字段缺失或容量不合格会记入 `trial_results` 并换下一张。三张均不合格时，正文记录 `NO_FIT_AFTER_TRIAL`，再按锁定风格编排；封面、目录、章节和封底则停止完整出稿。每页需在请求的 `content` 中提供真实可填字段；不把模板示例文字当作内容。
 
-**正文匹配输入规则。** 正文页可用 `role=body`，并尽量给出 `information_relation`、真实项数与结构化 `content`。旧请求中的 `layout_id=no-verified-template-for-this-relation` 仅是历史占位，入口会移除后重新检索；不要再写入新请求。无明确关系时，入口只从已知的 `content.type` 推导通用关系；请求的专用关系名若不在知识库关系表中，也可用已知 `content.type` 对应的通用关系搜索候选，但保留原专用关系供审计。候选仍须通过原生项数、容量、字段试填；通用关系命中不代表组件可用。通用四卡片数据只在标题、四组标题与说明完整时可无损映射到 `content-blue-112`；其他组件若缺少 `bindings.json` 所需语义字段，逐一试填并记录 `MISSING_REQUIRED_FIELD` 等原因，最终回到同风格技能排版。不得拆分或编造业务事实来提高模板复用率。用 `scripts/audit_matching.py --library <固定知识库> --request <逐页请求> --out <审计.json> --trial` 可复核正文尝试率、候选率与单页实填率；失败候选的 `unmapped_semantic_paths` 列出尚未填入的模板字段，须区分“事实缺失”和“已有事实尚未映射”。审计中的实填成功仍须经过整稿 PowerPoint 渲染和视觉复核。
+**正文匹配输入规则。** 正文页可用 `role=body`，并尽量给出 `information_relation`、真实项数与结构化 `content`。旧请求中的 `layout_id=no-verified-template-for-this-relation` 仅是历史占位，入口会移除后重新检索；不要再写入新请求。无明确关系时，入口只从已知的 `content.type` 推导通用关系；请求的专用关系名若不在知识库关系表中，也可用已知 `content.type` 对应的通用关系搜索候选，但保留原专用关系供审计。候选仍须通过原生项数、容量、字段试填；通用关系命中不代表组件可用。通用四卡片数据在页面标题、四组标题与说明完整时，可跨并列／总结关系尝试无损映射到 `content-blue-112`；页面标题可取逐页请求的 `title`，但字段超出组件容量仍须拒绝，不得擅自缩写。其他组件若缺少 `bindings.json` 所需语义字段，逐一试填并记录 `MISSING_REQUIRED_FIELD` 等原因，最终回到同风格技能排版。不得拆分或编造业务事实来提高模板复用率。用 `scripts/audit_matching.py --library <固定知识库> --request <逐页请求> --out <审计.json> --trial` 可复核正文尝试率、候选率与单页实填率；失败候选的 `unmapped_semantic_paths` 列出尚未填入的模板字段，须区分“事实缺失”和“已有事实尚未映射”。审计中的实填成功仍须经过整稿 PowerPoint 渲染和视觉复核。
 
 `assets/style-kits/` 保存蓝白简约、红白简约、深蓝科技三套本地规则及各 7 张不同页面职责的视觉样本。先通过 `scripts/read_style_kit.py --theme <blue|red|deep-blue-tech>` 获取清单，再实际打开相应预览图；读取路径本身不算已看过视觉。生成正文只允许同主题的锁定颜色、字体、Logo 与构图规则，不复制样本图里的业务文字。
 

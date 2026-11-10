@@ -216,7 +216,7 @@ def execute_plan(request, plan, report, output: Path):
                 candidate_ids = [locked_section_layout_id]
                 choice['candidate_ids'] = candidate_ids
             for candidate_id in candidate_ids:
-                candidate_data, adapter = adapt_for_layout(candidate_id, data)
+                candidate_data, adapter = adapt_for_layout(candidate_id, data, page.get('title'))
                 candidate_content_path = content_path
                 if adapter:
                     candidate_content_path = work / f'P{index:03d}-{candidate_id}-content.json'

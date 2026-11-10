@@ -14,14 +14,14 @@ def classify_trial_failure(message: str) -> str:
     return 'TRIAL_REJECTED'
 
 
-def adapt_for_layout(layout_id: str, content: dict) -> tuple[dict, str | None]:
+def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = None) -> tuple[dict, str | None]:
     """Return a copied payload; never split, invent, or summarize user facts."""
     if layout_id != 'content-blue-112' or content.get('texts'):
         return dict(content), None
     items = content.get('items')
     if content.get('type') != 'cards' or not isinstance(items, list) or len(items) != 4:
         return dict(content), None
-    title = content.get('title')
+    title = content.get('title') or page_title
     if not isinstance(title, str) or not title.strip():
         return dict(content), None
     texts = {'page.title': title}
