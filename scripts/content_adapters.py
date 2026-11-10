@@ -16,7 +16,8 @@ def classify_trial_failure(message: str) -> str:
 
 def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = None) -> tuple[dict, str | None]:
     """Return a copied payload; never split, invent, or summarize user facts."""
-    if layout_id in ('content-blue-180', 'content-tech-028') and not content.get('texts'):
+    if layout_id in ('content-blue-180', 'content-blue-204', 'content-blue-240',
+                     'content-tech-028') and not content.get('texts'):
         items = content.get('items')
         title = content.get('title') or page_title
         if not isinstance(title, str) or not title.strip() or not isinstance(items, list):
@@ -38,6 +39,30 @@ def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = Non
                 for j, highlight in enumerate(item['highlights']):
                     texts.update({f'{prefix}.items[{j}].heading': highlight['title'],
                                   f'{prefix}.items[{j}].body': highlight['body']})
+        elif layout_id == 'content-blue-204':
+            months = tuple(f'{i}月' for i in range(1, 7))
+            if (content.get('type') != 'monthly_timeline' or content.get('order') != 'chronological'
+                    or len(items) != 6 or not all(
+                        isinstance(item, dict) and item.get('month') == months[i]
+                        and all(nonempty(item.get(k)) for k in ('title', 'body'))
+                        for i, item in enumerate(items))):
+                return dict(content), None
+            texts = {'page.title': title}
+            for i, item in enumerate(items):
+                texts.update({f'months[{i}].heading': item['title'],
+                              f'months[{i}].body': item['body']})
+        elif layout_id == 'content-blue-240':
+            if (content.get('type') != 'serpentine_process' or content.get('order') != 'serpentine'
+                    or len(items) != 6 or not nonempty(content.get('center_title'))
+                    or not all(isinstance(item, dict)
+                               and all(nonempty(item.get(k)) for k in ('title', 'goal', 'body'))
+                               for item in items)):
+                return dict(content), None
+            texts = {'page.title': title, 'center.title': content['center_title']}
+            for i, item in enumerate(items):
+                texts.update({f'steps[{i}].heading': item['title'],
+                              f'steps[{i}].goal': item['goal'],
+                              f'steps[{i}].body': item['body']})
         else:
             if (content.get('type') != 'two_phase_plan' or content.get('order') != 'left_to_right'
                     or len(items) != 2 or not nonempty(content.get('summary'))
