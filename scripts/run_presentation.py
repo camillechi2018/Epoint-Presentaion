@@ -211,7 +211,7 @@ def execute_plan(request, plan, report, output: Path):
             content_path = work / f'P{index:03d}-content.json'
             content_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
             filled = None
-            candidate_ids = choice.get('candidate_ids', [choice['layout_id']])[:3]
+            candidate_ids = choice.get('candidate_ids', [choice['layout_id']])
             if page.get('role') == 'section' and locked_section_layout_id:
                 candidate_ids = [locked_section_layout_id]
                 choice['candidate_ids'] = candidate_ids

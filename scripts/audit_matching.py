@@ -51,7 +51,7 @@ def audit(library: Path, request_path: Path, work: Path, trial: bool) -> dict:
             continue
         counters['body_pages'] += 1
         counters['template_attempted'] += 1  # resolve examined every catalog entry
-        candidate_ids = choice.get('candidate_ids', [])[:3]
+        candidate_ids = choice.get('candidate_ids', [])
         if candidate_ids:
             counters['eligible_pages'] += 1
         row = {'page': index, 'purpose': source['purpose'],

@@ -907,6 +907,51 @@ def fill(lib,layout,content,out,allow_draft=False,internal=False,logo_config=Non
         target=next((shape for shape in walk(s.shapes) if shape.shape_id==shape_id),None)
         if target is None:raise ValueError('需清理的源稿对象不存在：'+str(shape_id))
         target._element.getparent().remove(target._element)
+    if data.get('generic_visual'):
+        contract=m.get('matching_contract') or {}
+        if (m.get('matching_activation')!='pilot_verified'
+                or contract.get('policy')!='structural'):
+            raise ValueError('该组件未验收通用视觉适配')
+        ids=contract.get('generic_drop_shape_ids')
+        if not isinstance(ids,list) or not ids:
+            raise ValueError('通用视觉适配缺少固定图标清理清单')
+        direct={shape.shape_id:shape for shape in s.shapes}
+        if len(set(ids))!=len(ids) or any(sid not in direct for sid in ids):
+            raise ValueError('通用视觉适配的固定图标对象不完整')
+        for sid in ids:
+            shape=direct[sid]
+            shape._element.getparent().remove(shape._element)
+        number_ids=contract.get('generic_number_container_ids',[])
+        if number_ids:
+            if (not isinstance(number_ids,list) or len(number_ids)!=4
+                    or len(set(number_ids))!=4 or set(number_ids)&set(ids)
+                    or any(sid not in direct or not direct[sid].has_text_frame for sid in number_ids)):
+                raise ValueError('通用流程序号容器对象不完整')
+            brand=json.loads((Path(__file__).resolve().parents[1]/'assets/brand/brand-baseline.json').read_text(encoding='utf-8'))
+            color_role=contract.get('generic_number_color_role','primary')
+            if color_role=='neutral.white':
+                color_value=brand['themes'][theme]['neutral']['white']
+            elif color_role=='primary':
+                color_value=brand['themes'][theme]['primary']
+            else:
+                raise ValueError('通用流程序号颜色角色不合法')
+            number_color=RGBColor.from_string(color_value.lstrip('#'))
+            number_size=contract.get('generic_number_font_pt',24)
+            if not isinstance(number_size,(int,float)) or not 12<=number_size<=28:
+                raise ValueError('通用流程序号字号不合法')
+            for index,sid in enumerate(number_ids,1):
+                shape=direct[sid]
+                set_text(shape,f'{index:02d}')
+                shape.text_frame.vertical_anchor=MSO_ANCHOR.MIDDLE
+                shape.text_frame.margin_left=shape.text_frame.margin_right=0
+                shape.text_frame.margin_top=shape.text_frame.margin_bottom=0
+                shape.text_frame.word_wrap=False
+                for paragraph in shape.text_frame.paragraphs:
+                    paragraph.alignment=PP_ALIGN.CENTER
+                    for run in paragraph.runs:
+                        run.font.size=Pt(number_size)
+                        run.font.bold=True
+                        run.font.color.rgb=number_color
     if m.get('background_override'):
         override=(lib/m['background_override']).resolve()
         if not override.is_relative_to(lib) or not override.is_file():raise ValueError('封面替换图缺失或越出知识库')

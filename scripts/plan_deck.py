@@ -95,6 +95,71 @@ def content_is_four_cards(page):
             and isinstance(content, dict) and content.get('type') == 'cards'
             and isinstance(content.get('items'), list) and len(content['items']) == 4)
 
+
+def matches_structural_contract(entry, page, taxonomy):
+    """Opt-in structural reuse; an unreviewed entry retains legacy matching."""
+    contract = entry.get('matching_contract') or {}
+    if contract.get('policy') != 'structural':
+        return False
+    if page.get('role') not in (None, 'body', 'content', 'summary', 'parallel'):
+        return False
+    content = page.get('content') if isinstance(page.get('content'), dict) else {}
+    # Existing curated requests carry the exact binding paths and an explicit
+    # layout ID. Keep that path available; the real fill still validates each field.
+    if (page.get('layout_id') == entry.get('id') and isinstance(content.get('texts'), dict)
+            and content['texts']):
+        return True
+    if entry.get('matching_activation') != 'pilot_verified':
+        return False
+    requested_relation = canonical(page.get('information_relation'), taxonomy)
+    compatible = contract.get('compatible_relations', [])
+    if requested_relation and compatible and requested_relation not in compatible:
+        return False
+    if content.get('type') not in contract.get('content_types', []):
+        return False
+    items = content.get('items')
+    if not isinstance(items, list) or len(items) not in contract.get('verified_counts', []):
+        return False
+    if not isinstance(content.get('title') or page.get('title'), str) or not (content.get('title') or page.get('title')).strip():
+        return False
+    if not all(isinstance(item, dict) and all(isinstance(item.get(key), str)
+               and item[key].strip() for key in contract.get('item_fields', [])) for item in items):
+        return False
+    for path in contract.get('required_content_fields', []):
+        value = content
+        for part in path.split('.'):
+            value = value.get(part) if isinstance(value, dict) else None
+        if not isinstance(value, str) or not value.strip():
+            return False
+    return True
+
+
+def matches_strict_contract(entry, page):
+    contract = entry.get('matching_contract') or {}
+    if contract.get('policy', entry.get('matching_policy')) != 'semantic_strict':
+        return True
+    content = page.get('content') if isinstance(page.get('content'), dict) else {}
+    if (page.get('layout_id') == entry.get('id') and isinstance(content.get('texts'), dict)
+            and content['texts'] and page.get('information_relation') in contract.get('exact_binding_relations', [])):
+        return True
+    return page.get('information_relation') == contract.get('required_relation', entry.get('information_relation'))
+
+
+def matches_structural_relation(entry, page, taxonomy):
+    """Reuse verified generic geometry across source business names, not topology."""
+    # A catalog classification is an inventory result, not permission to
+    # auto-map arbitrary input into this layout. Only an activated, reviewed
+    # contract may soften the source-business relation gate.
+    if (entry.get('matching_activation') != 'pilot_verified'
+            or (entry.get('matching_contract') or {}).get('policy') != 'structural'
+            or page.get('role') in ('cover', 'directory', 'section', 'closing')):
+        return False
+    requested = canonical(page.get('matching_relation') or page.get('information_relation'), taxonomy)
+    if requested is None:
+        content = page.get('content') if isinstance(page.get('content'), dict) else {}
+        requested = canonical(CONTENT_RELATIONS.get(content.get('type')), taxonomy)
+    return bool(requested and requested == entry.get('canonical_relation'))
+
 def eligible(e, p, request, taxonomy):
     reasons=[]
     requested_style=p.get('style_family',request.get('style_family'))
@@ -112,17 +177,24 @@ def eligible(e, p, request, taxonomy):
     if e.get('media_status')=='missing-source-image':reasons.append('missing_source_image')
     if str(e.get('pptx_support','')).startswith('blocked_'):reasons.append('pptx_blocked')
     relation=p.get('matching_relation') or p.get('information_relation')
-    four_card_adapter = False
-    if e['id'] == 'content-blue-112' and content_is_four_cards(p):
-        _, adapter = adapt_for_layout(e['id'], p['content'], p.get('title'))
-        four_card_adapter = adapter is not None
-    if not match_role(e,p.get('role'),relation,taxonomy) and not four_card_adapter:reasons.append('role')
+    structural_match = matches_structural_contract(e, p, taxonomy)
+    structural_relation_match = matches_structural_relation(e, p, taxonomy)
+    contract = e.get('matching_contract') or {}
+    strict_content=p.get('content') if isinstance(p.get('content'),dict) else {}
+    strict_exact=(specified and isinstance(strict_content.get('texts'),dict) and bool(strict_content['texts'])
+                  and p.get('information_relation') in contract.get('exact_binding_relations',[]))
+    strict_match = (contract.get('policy') == 'semantic_strict'
+                    and (p.get('information_relation') == contract.get('required_relation') or strict_exact))
+    if (e.get('matching_contract') or {}).get('policy') == 'structural' and not structural_match:
+        reasons.append('structure_contract')
+    if not match_role(e,p.get('role'),relation,taxonomy) and not (structural_match or structural_relation_match or strict_match):reasons.append('role')
     relation_matches = match_relation(e,relation,taxonomy)
-    # A four-card summary can use this verified four-item layout when every
-    # required field comes directly from the supplied cards and page title.
-    if not relation_matches and four_card_adapter:
+    if not relation_matches and (structural_match or structural_relation_match):
+        relation_matches = True
+    if not relation_matches and strict_match:
         relation_matches = True
     if not relation_matches:reasons.append('relation')
+    if not matches_strict_contract(e,p):reasons.append('semantic_invariant')
     theme=p.get('theme',request.get('theme'))
     if theme and theme not in e.get('themes',[]):reasons.append('theme')
     if p.get('format','pptx') in ('html','both') and e.get('html_support')!='verified':reasons.append('html_unavailable')
@@ -253,22 +325,25 @@ def resolve(library,request):
             _,native_count=count_profile(e,root) if requested_count is not None else ([],None)
             count_fit=1 if requested_count is not None and requested_count==native_count else 0
             gap=binding_gap(e,p,root,p.get('theme',request.get('theme')))
-            scored.append((exact_relation,exact_role,gap,penalty-fit*2-count_fit,-impact,rng.random(),fit,count_fit,e))
+            scored.append((gap,exact_relation,exact_role,penalty-fit*2-count_fit,-impact,rng.random(),fit,count_fit,e))
         scored.sort(key=lambda row:row[:6]);best=scored[0];e=best[8];fam=e.get('family_id',e['id'])
         layout_usage[e['id']]+=1;family_usage[fam]+=1
         if p.get('role')=='section' and section_layout_id is None:
             section_layout_id=e['id']
+        trial_limit=request.get('max_template_trials',6)
+        if type(trial_limit) is not int or not 1<=trial_limit<=8:
+            raise ValueError('max_template_trials须为1至8的整数')
         chosen.append({'page':index,'purpose':p['purpose'],'evidence':p.get('evidence'),
-                        'selection_mode':'source_template','selection_label':'知识库模板','candidate_ids':[e['id']] if p.get('role')=='section' else [row[8]['id'] for row in scored[:3]],
+                        'selection_mode':'source_template','selection_label':'知识库模板','candidate_ids':[e['id']] if p.get('role')=='section' else [row[8]['id'] for row in scored[:trial_limit]],
                        'trial_results':[],'reason_code':None,'source_stamp':None,
                        'layout_id':e['id'],'family_id':fam,'source_mapping':e.get('source_mapping'),
                        'matched_role':e.get('role'),'matched_relation':e.get('information_relation'),
                        'canonical_relation':e.get('canonical_relation'),
                        'fit_signals':{'label_overlap':best[6],'native_count':bool(best[7]),
-                                      'unmapped_binding_fields':best[2]},
+                                      'unmapped_binding_fields':best[0]},
                        'style_family':e.get('style_family') or 'legacy-blue-red',
                        'theme':p.get('theme',request.get('theme')),'candidate_count':len(candidates),
-                       'selection_reason':'指定组件' if p.get('layout_id') else '关系与职责硬筛后按字段映射、标签语义、原生项数及结构复用排序',
+                       'selection_reason':'指定组件' if p.get('layout_id') else '按主题、结构关系、字段缺口和容量筛选；原稿业务标签仅参与排序',
                        'diversity_gap':family_usage[fam]>1 and all(family_usage[x.get('family_id',x['id'])]>0 for x in candidates),
                        'classification_status':e.get('classification_status'),
                        'manual_review_required':e.get('classification_status')!='verified' or e.get('status')!='approved'})
