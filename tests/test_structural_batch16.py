@@ -44,10 +44,12 @@ class StructuralBatch16Tests(unittest.TestCase):
                                              LIBRARY, entry['themes'][0]), 0)
                 page = {'role': 'body', 'title': '项目实施安排', 'information_relation': 'process',
                         'content': content, 'needs': {'item_count': len(content['items'])}}
-                reasons = eligible(entry, page, {'_root': LIBRARY, 'allow_draft': True,
-                                                 'theme': entry['themes'][0]}, self.taxonomy)
-                self.assertNotIn('structure_contract', reasons)
-                self.assertNotIn('semantic_invariant', reasons)
+                request = {'_root': LIBRARY, 'allow_draft': True,
+                           'theme': entry['themes'][0]}
+                if layout_id.startswith('content-tech-'):
+                    request['style_family'] = 'deep-blue-tech'
+                reasons = eligible(entry, page, request, self.taxonomy)
+                self.assertEqual(reasons, [])
 
     def test_missing_facts_are_rejected(self):
         matrix = sample('content-blue-180')
