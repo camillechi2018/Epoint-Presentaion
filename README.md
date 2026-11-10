@@ -10,6 +10,13 @@
 | --- | --- | --- |
 | ![蓝色系预览](assets/style-previews/blue.png) | ![红色系预览](assets/style-previews/red.png) | ![科技风格预览](assets/style-previews/tech.png) |
 
+每种风格再看一张封面和一张正文页。以下图片取自技能包内的模板样张，文字是演示内容，实际出稿会按用户材料替换。
+
+| 页面 | 蓝色系 | 红色系 | 科技风格 |
+| --- | --- | --- | --- |
+| 封面 | ![蓝色系封面样张](assets/style-kits/blue/cover-cover-02.png) | ![红色系封面样张](assets/style-kits/red/cover-supp-cover-red-06.png) | ![科技风格封面样张](assets/style-kits/deep-blue-tech/cover-cover-tech-001.png) |
+| 正文 | ![蓝色系流程正文样张](assets/style-kits/blue/process-content-blue-060.png) | ![红色系对比正文样张](assets/style-kits/red/comparison-content-blue-133.png) | ![科技风格并列正文样张](assets/style-kits/deep-blue-tech/parallel-content-tech-021.png) |
+
 预览用于选择整稿视觉方向，不表示最终一定使用图中的页面。实际封面、目录、章节页和封底从适配的知识库模板或已校验的本地最小包中选择。
 
 ## 快速开始
