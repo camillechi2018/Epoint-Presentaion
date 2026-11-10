@@ -123,8 +123,14 @@ def matches_structural_contract(entry, page, taxonomy):
         return False
     if not isinstance(content.get('title') or page.get('title'), str) or not (content.get('title') or page.get('title')).strip():
         return False
-    if not all(isinstance(item, dict) and all(isinstance(item.get(key), str)
-               and item[key].strip() for key in contract.get('item_fields', [])) for item in items):
+    def valid_item_field(item, key):
+        value = item.get(key)
+        if key == 'tags' and contract.get('item_tag_count'):
+            return (isinstance(value, list) and len(value) == contract['item_tag_count']
+                    and all(isinstance(tag, str) and tag.strip() for tag in value))
+        return isinstance(value, str) and bool(value.strip())
+    if not all(isinstance(item, dict) and all(valid_item_field(item, key)
+               for key in contract.get('item_fields', [])) for item in items):
         return False
     if contract.get('required_order') and content.get('order') != contract['required_order']:
         return False
@@ -135,6 +141,14 @@ def matches_structural_contract(entry, page, taxonomy):
             return False
         years = [int(label.group(1)) for label in labels]
         if years != sorted(set(years)):
+            return False
+    if contract.get('label_sequence') == 'ascending_dates':
+        import re
+        dates = [re.fullmatch(r'(\d{4})年(1[0-2]|[1-9])月', item['label'].strip()) for item in items]
+        if any(date is None for date in dates):
+            return False
+        pairs = [(int(date.group(1)), int(date.group(2))) for date in dates]
+        if pairs != sorted(set(pairs)):
             return False
     for path in contract.get('required_content_fields', []):
         value = content
