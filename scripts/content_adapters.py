@@ -35,14 +35,20 @@ def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = Non
         'content-tech-037': ('cards', 3, ('title', 'body'), ('summary',)),
         'content-tech-038': ('process', 4, ('title', 'body'), ('summary',)),
         'content-tech-043': ('cards', 3, ('title', 'body'), ('summary',)),
+        'content-tech-020': ('cards', 6, ('title',), ('summary', 'center.topic')),
     }
     if layout_id in new_contracts and not content.get('texts'):
         kind, count, required, extras = new_contracts[layout_id]
         items = content.get('items')
         title = content.get('title') or page_title
+        def extra_value(path):
+            value = content
+            for part in path.split('.'):
+                value = value.get(part) if isinstance(value, dict) else None
+            return value
         valid = (content.get('type') == kind and isinstance(items, list) and len(items) == count
                  and isinstance(title, str) and title.strip()
-                 and all(isinstance(content.get(key), str) and content[key].strip() for key in extras)
+                 and all(isinstance(extra_value(key), str) and extra_value(key).strip() for key in extras)
                  and all(isinstance(item, dict) and all(
                      isinstance(item.get(key), str) and item[key].strip()
                      if key != 'tags' else isinstance(item.get('tags'), list) and len(item['tags']) == 2
@@ -101,6 +107,11 @@ def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = Non
                 texts.update({f'item_{i}.title': item['title'], f'item_{i}.body': item['body']})
                 if layout_id == 'content-tech-038':
                     texts[f'item_{i}.number'] = f'{i:02d}'
+        elif layout_id == 'content-tech-020':
+            texts.update({'summary': content['summary'], 'center.topic': content['center']['topic']})
+            for i, item in enumerate(items):
+                side = 'left' if i < 3 else 'right'
+                texts[f'{side}_{i % 3 + 1}.title'] = item['title']
         else:  # P048's title and body binding indices have different source order.
             texts.update({'summary': content['summary'], 'top_conclusion': content['conclusion']})
             for i, (title_index, body_index) in enumerate(zip((3, 4, 2, 1), (2, 1, 3, 4))):

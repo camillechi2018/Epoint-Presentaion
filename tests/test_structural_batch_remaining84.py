@@ -41,6 +41,10 @@ def sample(layout_id):
         return {'type': 'cards', 'summary': '说明三项工作', 'items': items[:3]}
     if layout_id == 'content-tech-038':
         return {'type': 'process', 'summary': '按顺序推进四项任务', 'items': items}
+    if layout_id == 'content-tech-020':
+        return {'type': 'cards', 'summary': '六项工作围绕同一主题',
+                'center': {'topic': '项目建设'},
+                'items': [{'title': f'任务{i}'} for i in range(1, 7)]}
     if layout_id in ('content-tech-063', 'content-tech-064', 'content-tech-065'):
         dates = [f'{2025+i}年{i}月' if layout_id.endswith('065') else f'{2025+i}年'
                  for i in range(1, 6)]
@@ -59,12 +63,13 @@ class StructuralBatchTests(unittest.TestCase):
         cls.catalog = {x['id']: x for x in catalog['layouts']}
         cls.taxonomy = load_taxonomy(LIBRARY, catalog)
 
-    def test_fifteen_generic_requests_have_no_binding_gaps(self):
+    def test_sixteen_generic_requests_have_no_binding_gaps(self):
         for layout_id in ('content-blue-060', 'content-blue-267', 'content-tech-026',
                           'content-tech-029', 'content-tech-040', 'content-tech-048',
                           'content-tech-033', 'content-tech-054', 'content-tech-063',
                           'content-tech-064', 'content-tech-065', 'content-tech-034',
-                          'content-tech-037', 'content-tech-038', 'content-tech-043'):
+                          'content-tech-037', 'content-tech-038', 'content-tech-043',
+                          'content-tech-020'):
             with self.subTest(layout_id=layout_id):
                 entry = self.catalog[layout_id]
                 content = sample(layout_id)
