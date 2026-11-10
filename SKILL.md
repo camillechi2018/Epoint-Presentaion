@@ -15,7 +15,9 @@ metadata:
 
 实际执行时，按已排序候选默认最多尝试 6 张单页模板，可用 `max_template_trials` 在 1–8 之间调整；字段缺失或容量不合格会记入 `trial_results` 并换下一张。候选均不合格时，正文记录 `NO_FIT_AFTER_TRIAL`，再按锁定风格编排；封面、目录、章节和封底则停止完整出稿。每页需在请求的 `content` 中提供真实可填字段；不把模板示例文字当作内容。
 
-**正文匹配输入规则。** 正文页可用 `role=body`，并尽量给出 `information_relation`、真实项数与结构化 `content`。普通组件只有同时具备知识库 `matching_policy=structural`、`matching_activation=pilot_verified` 和对应 `matching_contract` 时，才可按图形关系跨原稿业务场景复用；仅完成分类的组件保留原有匹配限制，原稿业务场景名对已激活组件只参与排序；SMART、风险应对、四象限等 `semantic_strict` 组件仍须符合登记的不变量；指标和图表仍核对数据契约。通用卡片、流程等结构化输入仅可映射到知识库当前已激活、且技能适配器支持的组件；适配器逐字段复制输入事实，通用视觉按组件契约移除原稿固定业务图标，必要时使用已登记的中性步骤序号。实际可用组件以当次知识库清单、适配器及真实试填结果为准。`content-blue-142` 虽能试填，但固定图标尚未完成通用视觉适配，暂不开放自动跨业务调用。缺标题、说明或超出容量即拒绝。环形箭头页 `content-blue-076` 仅用于材料确有四段闭环且中心标题与短标签均真实提供的情况，不把普通四项并列伪装为循环。旧请求中的 `layout_id=no-verified-template-for-this-relation` 仅是历史占位，入口会移除后重新检索。候选仍须通过原生项数、容量、字段试填；候选命中不代表组件可用。其他组件若缺少 `bindings.json` 所需字段，逐一试填并记录 `MISSING_REQUIRED_FIELD` 等原因，最终回到同风格技能排版。不得拆分或编造业务事实来提高模板复用率。用 `scripts/audit_matching.py --library <固定知识库> --request <逐页请求> --out <审计.json> --trial` 可复核正文尝试率、候选率与单页实填率；审计中的实填成功仍须经过整稿 PowerPoint 渲染和视觉复核。
+**正文匹配输入规则。** 正文页可用 `role=body`，并尽量给出 `information_relation`、真实项数与结构化 `content`。普通组件只要具备知识库 `matching_policy=structural`、`matching_activation=pilot_verified` 或 `structure_ready` 及完整 `matching_contract`，就可按图形关系跨原稿业务场景复用；原稿业务场景名不作为普通组件的拒绝条件；SMART、风险应对、四象限等 `semantic_strict` 组件仍须符合登记的不变量；指标和图表仍核对数据契约。通用 `items` 输入优先走 `pilot_verified` 适配器；`structure_ready` 组件走完整字段路径：先按结构选版，再读取 `required_binding_paths`，由本次材料填写 `content.type=template_fields`、`content.structure_type` 和 `content.texts`，不能漏填、重复原稿示例或编造事实。固定图标只有明确承载审批等专用含义时才转为严格语义例外。实际可用组件以当次知识库清单、适配器及真实试填结果为准。`content-blue-142` 已开放完整字段结构调用；通用 `items` 路径尚未验收时须先完成逐字段映射。缺标题、说明或超出容量即拒绝。环形箭头页 `content-blue-076` 仅用于材料确有四段闭环且中心标题与短标签均真实提供的情况，不把普通四项并列伪装为循环。旧请求中的 `layout_id=no-verified-template-for-this-relation` 仅是历史占位，入口会移除后重新检索。候选仍须通过原生项数、容量、字段试填；候选命中不代表组件可用。其他组件若缺少 `bindings.json` 所需字段，逐一试填并记录 `MISSING_REQUIRED_FIELD` 等原因，最终回到同风格技能排版。不得拆分或编造业务事实来提高模板复用率。用 `scripts/audit_matching.py --library <固定知识库> --request <逐页请求> --out <审计.json> --trial` 可复核正文尝试率、候选率与单页实填率；审计中的实填成功仍须经过整稿 PowerPoint 渲染和视觉复核。
+
+完整字段结构调用的输入形态和缺字段回退见[普通正文组件结构调用](references/structural-template-fields.md)。
 
 `assets/style-kits/` 保存蓝白简约、红白简约、深蓝科技三套本地规则及各 7 张不同页面职责的视觉样本。先通过 `scripts/read_style_kit.py --theme <blue|red|deep-blue-tech>` 获取清单，再实际打开相应预览图；读取路径本身不算已看过视觉。生成正文只允许同主题的锁定颜色、字体、Logo 与构图规则，不复制样本图里的业务文字。
 
@@ -72,7 +74,7 @@ metadata:
 
 ## 使用知识库模板制作整套
 
-用户提供的文档、网页或演示文件默认作为内容来源，除非明确指定为视觉参考。先确认整套风格，再规划每页结论、证据和信息关系。用户明确要求复用模板且知识库可用时，在已选 `theme` 和 `style_family` 内筛选封面、正文与封底；逐页先按信息关系匹配，再按语义字段试填。正文模板不适合内容时，可使用同风格的本地品牌底座灵活编排；四类结构页若无合格知识库候选，应调整标题、拆分目录或暂停完整出稿，并明确说明采用了 `skill_offline_brand`、模板复用情况及仍需人工复核的页面。不得把业务事实强行塞入不匹配的固定槽位。
+用户提供的文档、网页或演示文件默认作为内容来源，除非明确指定为视觉参考。先确认整套风格，再规划每页结论、证据和信息关系。用户明确要求复用模板且知识库可用时，在已选 `theme` 和 `style_family` 内筛选封面、正文与封底；逐页先按图形结构匹配，再按字段位置和容量试填。正文模板不适合内容时，可使用同风格的本地品牌底座灵活编排；四类结构页若无合格知识库候选，应调整标题、拆分目录或暂停完整出稿，并明确说明采用了 `skill_offline_brand`、模板复用情况及仍需人工复核的页面。不得把业务事实强行塞入不匹配的固定槽位。
 
 整套出稿开始时先检查 Git 知识库是否可获取，并记录成功时的 commit 或失败原因；Skill 自带风格预览不代表知识库已连接。知识库可用时逐页记录 `source_template`、`guided_composition` 或 `free_composition`，以及候选数和未复用原因；只有实际抽取并填充源页才计入模板复用率。交付前核对整套所选主题与实际颜色：新绘图形使用 `brand-baseline.json` 的语义颜色，原稿保留的其他颜色须说明来源或做逐对象映射，不得仅凭 Logo 或单一蓝色装饰宣称使用了整套模板。
 
@@ -81,7 +83,7 @@ metadata:
 ## 核心工作流
 
 1. 从用户材料建立逐页计划：每页一句结论、证据来源、信息关系、项数、文字长度、图表数据、图片来源和输出格式。业务事实仅来自本次材料，不引用模板示例数字或标题。
-2. 先按风格、角色、图形关系、已验证项数、格式和基础容量筛选；知识库 `relation-taxonomy.json` 将具体关系归入统一类型。已验收普通正文只有 `matching_policy=structural`、`matching_activation=pilot_verified` 且有已验收映射契约时，才允许同类图形关系跨原稿业务名称复用，`semantic_strict` 仍需符合专用关系；图表和指标另核对数据契约。四类结构页仍按角色精确匹配，未验收组件不因别名进入自动选版。`items` 自动推导项数，显式项数矛盾时拒绝；旧固定组件只有具备原生项数或静态验收记录才可按该项数检索。随后按可映射字段缺口、关系、已审定标签、原生项数和结构重复度排序，默认对最多 6 张合格候选实填，允许设定 1–8 张，并记录字段缺失、容量与图片槽等失败原因。标签和初筛候选均不等于实填成功；不能为求变化选错结构。候选不足时说明 `diversity_gap`，固定 seed 仅用于同档候选的可复现打散。
+2. 先按风格、角色、图形关系、已验证项数、格式和基础容量筛选；知识库 `relation-taxonomy.json` 将具体关系归入统一类型。已验收普通正文在 `matching_policy=structural` 且 `matching_activation=pilot_verified` 或 `structure_ready` 时允许跨原稿业务名称复用；前者可用通用 `items` 适配器，后者须填满登记字段，`semantic_strict` 仍需符合专用关系；图表和指标另核对数据契约。四类结构页仍按角色精确匹配，未验收组件不因别名进入自动选版。`items` 自动推导项数，显式项数矛盾时拒绝；旧固定组件只有具备原生项数或静态验收记录才可按该项数检索。随后按可映射字段缺口、关系、已审定标签、原生项数和结构重复度排序，默认对最多 6 张合格候选实填，允许设定 1–8 张，并记录字段缺失、容量与图片槽等失败原因。标签和初筛候选均不等于实填成功；不能为求变化选错结构。候选不足时说明 `diversity_gap`，固定 seed 仅用于同档候选的可复现打散。
 3. 将用户已选风格映射为 `blue`／`red`／`deep-blue-tech` 主题；科技风必须显式设置 `style_family=deep-blue-tech`，封面、目录、内容和封底在同风格内匹配；旧三源默认选版不会进入科技风。原生形状、图表、表格和 SVG 只按登记的语义颜色角色变更；JPG／PNG 按色系与风格选择。品牌 Logo 内部颜色锁定。
 4. 默认添加独立 Logo。原 20 张封面默认保留源稿股票代码 `688232`；其中含 Slogan 的 P03、P04、P14、P15、P16、P20 保留完整“成为行业数字化领航者”。科技风源稿没有股票代码或该 Slogan，不得从旧封面规则自动复制。科技风已有源 Logo 的页保留原件，缺失页按背景补白色／彩色 Logo。红色来源模板中已为黑白灰单色的组内 Logo 必须保留原图片及组变换，不能按子图的组内尺寸重新插入；若确需换图，先验证最终渲染的实际尺寸。Logo 审计必须同时检查图片存在和可见尺寸，封面与封底需目视复核。Logo、股票代码和 Slogan 在动效中保持静态。
 5. 已实现可编辑 PPTX 的按页提取与填充。每次任务从固定 Git commit 的 `catalog.json`、`relation-taxonomy.json` 和对应 `layout_rules.json` 读取当前候选、`classification_status`、`pptx_support`、`verified_counts`、字段容量与媒体状态；目录也按各组件登记的 `directory_item_fields` 和长文案容量判断。不得把来源盘点、原型项数、示例预览或历史批次说明当作当前验收状态。只有字段完整且实填通过的候选才能用于组装；资产仍为 `draft_pending_review` 时显式允许草稿并保留人工复核。填充时清除源稿自动翻页，动效按新的讲述规则单独添加；静态最终画面须完整。填充后渲染、检查碰撞、字体、Logo、媒体引用和实际放映。
@@ -92,7 +94,7 @@ metadata:
 
 **知识库是版式能力的唯一实时来源。** 每次出稿先同步并校验 `knowledge-base.json` 指向的 Git 知识库，在同一任务内固定 commit。组件数量、组件 ID、蓝红科技覆盖、固定或可变项数、长文案容量、动效和 HTML 支持均从该 commit 的 `catalog.json`、`relation-taxonomy.json`、`bindings.json`、`layout_rules.json`、`motion.json` 及相关审阅记录读取。Skill 不保存累计组件数或逐批白名单；历史验收证据留在知识库 `review/` 和项目验收报告中。更新知识库的元数据并通过清单校验后，下一次调用自动使用新候选。
 
-**进入自动候选须同时满足当前记录。** 检查所选风格和主题、正文或结构角色、具体／通用信息关系、`classification_status=verified`、可用 PPTX 状态、可用媒体、`verified_counts` 与真实项数。对短文、长文和标题逐字段检查 `semantic_path`、`max_chars`、`max_lines`、`max_width_units`；某组件的长正文已验收，不代表它的中心标题、顶部总结或其他字段也可加长。固定项数组件不得删空文字伪装为少项；变项数仅按该组件的 `verified_counts` 开放。图表、进度百分比、日期等必须来自本次材料，并执行该组件登记的数据一致性规则。
+**进入自动候选须同时满足当前记录。** 检查所选风格和主题、正文或结构角色、具体／通用信息关系、`classification_status=verified`、可用 PPTX 状态、可用媒体、`verified_counts` 与真实项数。对短文、长文和标题逐字段检查 `semantic_path`、`max_chars`、`max_lines`、`max_width_units`；`structure_ready` 先由模型按版式结构填满 `required_binding_paths`，再由程序检查缺失、容量和步骤／日期等原生规则；某组件的长正文已验收，不代表它的中心标题、顶部总结或其他字段也可加长。固定项数组件不得删空文字伪装为少项；变项数仅按该组件的 `verified_counts` 开放。图表、进度百分比、日期等必须来自本次材料，并执行该组件登记的数据一致性规则。
 
 **正文长文案参考值。** 在当前知识库 `review/body-longcopy-capacity.json` 中按组件 ID 和 `semantic_path` 读取逐字段的 `recommended_max_cjk_chars`、`registered_min_max_chars` 与 `use_for_planning_cjk_chars`。内容规划以 `use_for_planning_cjk_chars` 为参考，实际填充仍须通过 `bindings.json` 的字符数、行数、行宽及 PowerPoint 边界验收。长正文自动选稿还须检查该组件的 `long_copy_review_status=长文案已验收`；`视觉复核未通过`、填充失败和标题溢出状态不可用于长正文自动选稿。参考值由蓝红科技版本逐字段测量，蓝红共用较小值；适用于中文单段自动换行。短标签与标题不能当作正文槽，`preparation_methods` 含 `source_fallback` 的组件还需正常填充路径复核。**结构复用新增的短文案跨业务试填只验证新字段映射，不会重置该组件既有的长文案验收；报告中分别记录结构映射验收、逐字段长文案验收和整稿视觉复核。**每次从固定知识库 commit 读取，不在 Skill 中复制组件数值。
 

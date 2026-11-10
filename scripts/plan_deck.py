@@ -110,6 +110,16 @@ def matches_structural_contract(entry, page, taxonomy):
     if (page.get('layout_id') == entry.get('id') and isinstance(content.get('texts'), dict)
             and content['texts']):
         return True
+    # The field-complete route lets any reviewed structural page be reused
+    # without matching the source deck's business vocabulary. Its actual
+    # geometry and text limits are still enforced by fill_layout.
+    if (entry.get('matching_activation') in ('structure_ready', 'pilot_verified')
+            and content.get('type') == 'template_fields'
+            and content.get('structure_type') == contract.get('structure_type')
+            and isinstance(content.get('texts'), dict)):
+        required = contract.get('required_binding_paths', [])
+        return bool(required and all(isinstance(content['texts'].get(path), str)
+                                     and content['texts'][path].strip() for path in required))
     if entry.get('matching_activation') != 'pilot_verified':
         return False
     requested_relation = canonical(page.get('information_relation'), taxonomy)

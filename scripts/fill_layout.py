@@ -755,9 +755,9 @@ def fill(lib,layout,content,out,allow_draft=False,internal=False,logo_config=Non
     removed_fields=set()
     if rules.get('cardinality_mode')=='directory_reflow' and item_count is not None:
         removed_fields={field for item in rules['directory_item_fields'][item_count:] for field in item.values()}
-    required_fields={x['field'] for x in bindings if x.get('semantic_role') not in ('brand_locked','decoration_locked','computed_item_count') and x['shape_id'] not in removed_ids and x['field'] not in removed_fields}-{'brand'}
+    required_fields={x['field'] for x in bindings if x.get('semantic_role') not in ('brand_locked','decoration_locked','source_decorative_locked','computed_item_count') and x['shape_id'] not in removed_ids and x['field'] not in removed_fields}-{'brand'}
     if set(texts)-known:raise ValueError('未知字段 '+str(set(texts)-known))
-    if any(b['field'] in texts for b in bindings if b.get('semantic_role') in ('decoration_locked','computed_item_count') and not (b.get('semantic_role')=='computed_item_number' and rules.get('cardinality_mode')=='tech_process_columns')):
+    if any(b['field'] in texts for b in bindings if b.get('semantic_role') in ('decoration_locked','source_decorative_locked','computed_item_count') and not (b.get('semantic_role')=='computed_item_number' and rules.get('cardinality_mode')=='tech_process_columns')):
         raise ValueError('原生装饰字段不可替换')
     if any(b['field'] in texts for b in bindings if b['shape_id'] in removed_ids):raise ValueError('输入包含已删除分项的字段')
     if required_fields-set(texts) and not internal:raise ValueError('缺少字段 '+str(required_fields-set(texts)))
@@ -993,7 +993,7 @@ def fill(lib,layout,content,out,allow_draft=False,internal=False,logo_config=Non
         else:logo_shape._element.getparent().remove(logo_shape._element)
     lookup={x.shape_id:x for x in walk(s.shapes)}
     for b in bindings:
-        if b.get('semantic_role') not in ('brand_locked','decoration_locked') and b['shape_id'] in lookup:set_text(lookup[b['shape_id']],'')
+        if b.get('semantic_role') not in ('brand_locked','decoration_locked','source_decorative_locked') and b['shape_id'] in lookup:set_text(lookup[b['shape_id']],'')
     for b in bindings:
         if b['field'] in texts and not (logo_enabled and b['field']=='brand'):set_text(lookup[b['shape_id']],texts[b['field']])
     for fit in rules.get('text_box_expand_pt',[]):
