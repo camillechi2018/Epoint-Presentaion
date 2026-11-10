@@ -16,7 +16,8 @@ def classify_trial_failure(message: str) -> str:
 
 def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = None) -> tuple[dict, str | None]:
     """Return a copied payload; never split, invent, or summarize user facts."""
-    if layout_id in ('content-blue-180', 'content-blue-204', 'content-blue-240',
+    if layout_id in ('content-blue-180', 'content-blue-204', 'content-blue-207',
+                     'content-blue-214', 'content-blue-240',
                      'content-tech-028') and not content.get('texts'):
         items = content.get('items')
         title = content.get('title') or page_title
@@ -50,6 +51,38 @@ def adapt_for_layout(layout_id: str, content: dict, page_title: str | None = Non
             texts = {'page.title': title}
             for i, item in enumerate(items):
                 texts.update({f'months[{i}].heading': item['title'],
+                              f'months[{i}].body': item['body']})
+        elif layout_id == 'content-blue-207':
+            quarters = ('第一季度', '第二季度', '第三季度', '第四季度')
+            if (content.get('type') != 'quarter_cycle' or content.get('order') != 'clockwise'
+                    or len(items) != 4 or not nonempty(content.get('center_title'))
+                    or not all(isinstance(item, dict) and item.get('quarter') == quarters[i]
+                               and all(nonempty(item.get(k)) for k in ('title', 'body'))
+                               for i, item in enumerate(items))):
+                return dict(content), None
+            texts = {'page.title': title, 'center.title': content['center_title']}
+            for i, item in enumerate(items):
+                texts.update({f'quarters[{i}].label': item['quarter'],
+                              f'quarters[{i}].heading': item['title'],
+                              f'quarters[{i}].body': item['body']})
+        elif layout_id == 'content-blue-214':
+            import re
+            if (content.get('type') != 'monthly_roadmap' or content.get('order') != 'chronological'
+                    or len(items) != 6 or not all(isinstance(item, dict)
+                        and all(nonempty(item.get(k)) for k in ('date', 'title', 'body'))
+                        for item in items)):
+                return dict(content), None
+            # Native month slots are seven characters wide; October-December overflow.
+            dates = [re.fullmatch(r'(\d{4})年([1-9])月', item['date']) for item in items]
+            if any(date is None for date in dates):
+                return dict(content), None
+            serial = [int(date.group(1)) * 12 + int(date.group(2)) for date in dates]
+            if any(b != a + 1 for a, b in zip(serial, serial[1:])):
+                return dict(content), None
+            texts = {'page.title': title}
+            for i, item in enumerate(items):
+                texts.update({f'months[{i}].date': item['date'],
+                              f'months[{i}].heading': item['title'],
                               f'months[{i}].body': item['body']})
         elif layout_id == 'content-blue-240':
             if (content.get('type') != 'serpentine_process' or content.get('order') != 'serpentine'

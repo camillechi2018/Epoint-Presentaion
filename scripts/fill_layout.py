@@ -826,9 +826,11 @@ def fill(lib,layout,content,out,allow_draft=False,internal=False,logo_config=Non
     quarter_plan=rules.get('quarter_plan_fields')
     if quarter_plan:
         center=texts[semantic_aliases.get(quarter_plan['center'],quarter_plan['center'])].strip()
-        if not re.fullmatch(r'\d{4}年季度工作计划',center):
+        generic_quarters=quarter_plan.get('mode')=='generic_quarters'
+        if not generic_quarters and not re.fullmatch(r'\d{4}年季度工作计划',center):
             raise ValueError('季度计划中心标题须为 YYYY年季度工作计划')
-        expected=['第一季度工作计划','第二季度工作计划','第三季度工作计划','第四季度工作计划']
+        expected=(['第一季度','第二季度','第三季度','第四季度'] if generic_quarters else
+                  ['第一季度工作计划','第二季度工作计划','第三季度工作计划','第四季度工作计划'])
         for alias,label in zip(quarter_plan['labels'],expected):
             if texts[semantic_aliases.get(alias,alias)].strip()!=label:
                 raise ValueError('季度标签与图形位置不一致：'+alias)
