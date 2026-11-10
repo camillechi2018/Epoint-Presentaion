@@ -1,5 +1,5 @@
 ---
-name: epoint-presentation-next
+name: epoint-presentation
 description: 制作新点品牌可编辑 PPTX；Skill 自带 Logo、锁定色系、字体、三风格资料包和已校验结构页最小包。优先读取 Git 知识库，断网时使用本地已校验模板；正文可灵活编排。
 metadata:
   version: "1.0.28"
@@ -25,7 +25,7 @@ metadata:
 
 `assets/minimal-template-pack/` 保存三种风格各一套封面、目录、章节、封底可编辑源页，共 12 页，并记录原仓库提交、原页号与文件哈希。远端获取失败时，仅在包内所有文件通过哈希校验后使用它，并标记 `library_source=local_verified_template`。远端成功后，先验证新提交再更新本地包；无合格来源时完整稿阻断。蓝色封面现为 `cover-01`（P001 蓝色星球图），已完成短文案试填及本机 PowerPoint 渲染检查，仍为待审阅草稿；实际标题和辅助文字须通过组件绑定容量与成稿视觉检查。构建本地包时仅从蓝色封面离线副本移除源稿嵌入字体及其引用，保留远端原稿、形状和可编辑文本；跨机器使用时仍须确认 Microsoft YaHei 和 Arial 可用，并复核版面。HTML 模板出稿仍需单独验收。
 
-本 Skill 是 `epoint-presentation` 的独立派生版。Skill 内置用户提供的 Logo、基础蓝／红／深蓝色系、字体角色和离线基础出稿器；`knowledge-base.json` 指向现有仓库的 `main` 分支，提供《01蓝色系》《02红色系》《20页封面（比例16-9）》《03深蓝-科技风》等原稿模板和图库。深蓝科技风用独立 `style_family=deep-blue-tech`，默认不与简约蓝红混排。旧 Skill 改读独立的旧版知识库仓库。当前品牌及模板资产为 `draft_pending_review`，不能称为正式批准 VI。
+本 Skill 基于旧版 `epoint-presentation-legacy` 迭代。Skill 内置用户提供的 Logo、基础蓝／红／深蓝色系、字体角色和离线基础出稿器；`knowledge-base.json` 指向现有仓库的 `main` 分支，提供《01蓝色系》《02红色系》《20页封面（比例16-9）》《03深蓝-科技风》等原稿模板和图库。深蓝科技风用独立 `style_family=deep-blue-tech`，默认不与简约蓝红混排。旧 Skill 改读独立的旧版知识库仓库。当前品牌及模板资产为 `draft_pending_review`，不能称为正式批准 VI。
 
 ## 出稿前选择视觉风格
 

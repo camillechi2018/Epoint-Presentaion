@@ -39,12 +39,12 @@
 将本仓库完整克隆到所用 Agent 的技能目录，确保 `SKILL.md`、`assets/`、`references/` 和 `scripts/` 都在同一目录。以 Codex 的用户技能目录为例：
 
 ```powershell
-git clone https://github.com/camillechi2018/Epoint-Presentaion.git "$HOME/.codex/skills/epoint-presentation-next"
+git clone https://github.com/camillechi2018/Epoint-Presentaion.git "$HOME/.codex/skills/epoint-presentation"
 ```
 
 然后在支持技能的 Agent 中附上材料，例如：
 
-> 调用 epoint-presentation-next，用这份报告制作一套可编辑 PPTX。先给我蓝色系、红色系、科技风格的预览供选择；保留材料中的事实和数字。
+> 调用 epoint-presentation，用这份报告制作一套可编辑 PPTX。先给我蓝色系、红色系、科技风格的预览供选择；保留材料中的事实和数字。
 
 如果已指定风格，可直接说“用蓝色系制作”，不需要再次选择。完整模板知识库由 [`knowledge-base.json`](knowledge-base.json) 指向独立 Git 仓库；首次使用远端模板需要能够访问 GitHub。字体使用 Microsoft YaHei 和 Arial，实际文字换行仍需在生成环境中检查。
 
