@@ -14,7 +14,9 @@ from pathlib import Path
 
 from library_location import SKILL, resolve_library
 from plan_deck import resolve
-from content_adapters import adapt_for_layout, classify_trial_failure
+from content_adapters import (adapt_for_layout, classify_trial_failure,
+                              structural_mapping_issue, field_source_evidence)
+from capacity_preflight import preflight
 from fill_layout import fill
 from render_offline_brand import render as render_guided_page, resolved_variant, validate_page
 from fallback_rules import fallback_type
@@ -216,9 +218,33 @@ def execute_plan(request, plan, report, output: Path):
                 candidate_ids = [locked_section_layout_id]
                 choice['candidate_ids'] = candidate_ids
             for candidate_id in candidate_ids:
-                candidate_data, adapter = adapt_for_layout(candidate_id, data, page.get('title'))
+                catalog = json.loads((Path(report['library_path']) / 'catalog.json').read_text(encoding='utf-8-sig'))
+                entry = next(e for e in catalog['layouts'] if e['id'] == candidate_id)
+                candidate_data, adapter = adapt_for_layout(candidate_id, data, page.get('title'), entry=entry)
+                if not adapter and entry.get('matching_activation') in ('structure_ready', 'pilot_verified'):
+                    issue = structural_mapping_issue(entry, data, page.get('title'))
+                    if issue:
+                        choice['trial_results'].append({
+                            'layout_id': candidate_id, 'status': 'rejected',
+                            'reason': '结构字段未完成真实内容映射',
+                            'reason_code': issue['reason_code'],
+                            'unmapped_semantic_paths': issue['paths'],
+                            'content_adapter': None})
+                        continue
+                capacity_check = preflight(Path(report['library_path']), entry, data,
+                                            page.get('title'), report['theme'])
+                if capacity_check['hard_issues']:
+                    choice['trial_results'].append({
+                        'layout_id': candidate_id, 'status': 'rejected',
+                        'reason': '绑定字段容量预检未通过', 'reason_code': 'TEXT_OVER_CAPACITY',
+                        'capacity_preflight': capacity_check, 'content_adapter': adapter})
+                    continue
+                wrap_applied = capacity_check['wrap_suggestions']
+                if wrap_applied and isinstance(candidate_data.get('texts'), dict):
+                    candidate_data = dict(candidate_data)
+                    candidate_data['texts'] = dict(candidate_data['texts'], **wrap_applied)
                 candidate_content_path = content_path
-                if adapter:
+                if adapter or wrap_applied:
                     candidate_content_path = work / f'P{index:03d}-{candidate_id}-content.json'
                     candidate_content_path.write_text(json.dumps(candidate_data, ensure_ascii=False, indent=2), encoding='utf-8')
                 try:
@@ -226,7 +252,12 @@ def execute_plan(request, plan, report, output: Path):
                                   allow_draft=request.get('asset_policy', 'verified_draft') != 'approved_only')
                     choice['layout_id'] = candidate_id
                     choice['trial_results'].append({'layout_id': candidate_id, 'status': 'filled',
-                                                    'visual_qa': 'not_run', 'content_adapter': adapter})
+                                                    'visual_qa': 'not_run', 'content_adapter': adapter,
+                                                    'capacity_preflight': capacity_check,
+                                                    'wrap_applied': wrap_applied,
+                                                    'field_source_evidence': field_source_evidence(
+                                                        dict(content, source_refs=page.get('source_refs', [])),
+                                                        candidate_data) if adapter else {}})
                     if page.get('role') == 'section' and locked_section_layout_id is None:
                         locked_section_layout_id = candidate_id
                     break
@@ -234,6 +265,8 @@ def execute_plan(request, plan, report, output: Path):
                     choice['trial_results'].append({'layout_id': candidate_id, 'status': 'rejected',
                                                     'reason': safe_message(exc),
                                                     'reason_code': classify_trial_failure(str(exc)),
+                                                    'capacity_preflight': capacity_check,
+                                                    'wrap_applied': wrap_applied,
                                                     'content_adapter': adapter})
                     for partial in (page_out, page_out.with_suffix('.qa.json'),
                                     page_out.with_suffix('.colors.json')):

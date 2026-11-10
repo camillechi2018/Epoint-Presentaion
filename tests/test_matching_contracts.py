@@ -66,21 +66,25 @@ class MatchingContracts(unittest.TestCase):
         self.assertNotEqual(resolve(LIBRARY, self.request(misleading))['pages'][0]
                             ['selection_mode'], 'source_template')
 
-    def test_fixed_icons_defer_generic_capability_arcs(self):
+    def test_generic_capability_arcs_accept_complete_user_content(self):
         content = {'type': 'cards', 'center': {'title': '服务\n能力'},
                    'items': [{'title': title, 'body': body} for title, body in
                              [('咨询', '提供业务咨询'), ('实施', '完成系统部署'),
                               ('运营', '保障日常运行'), ('培训', '开展人员培训')]]}
         page = {'layout_id': 'content-blue-142', 'title': '四项服务',
                 'information_relation': 'parallel-points', 'content': content}
-        self.assertNotEqual(resolve(LIBRARY, self.request(page))['pages'][0]
+        self.assertEqual(resolve(LIBRARY, self.request(page))['pages'][0]
                             ['selection_mode'], 'source_template')
         adapted, name = adapt_for_layout('content-blue-142', content, page['title'])
         self.assertEqual(name, 'four_cards_with_center_to_p142')
         self.assertEqual(adapted['texts']['center.title'], '服务\n能力')
         missing = dict(page, content=dict(content, center={}))
-        self.assertNotEqual(resolve(LIBRARY, self.request(missing))['pages'][0]
-                            ['selection_mode'], 'source_template')
+        discovered = resolve(LIBRARY, self.request(missing))['pages'][0]
+        self.assertEqual(discovered['selection_mode'], 'source_template')
+        self.assertGreater(discovered['fit_signals']['unmapped_binding_fields'], 0)
+        self.assertFalse(matches_structural_contract(
+            next(e for e in json.loads((LIBRARY / 'catalog.json').read_text(encoding='utf-8'))['layouts']
+                 if e['id'] == 'content-blue-142'), missing, {}))
 
     def test_generic_visual_removes_fixed_pictograms(self):
         content = {'type': 'cards', 'items': [{'title': title, 'body': body} for title, body in
@@ -125,8 +129,8 @@ class MatchingContracts(unittest.TestCase):
                             ['selection_mode'], 'source_template')
         automatic = dict(page)
         del automatic['layout_id']
-        self.assertEqual(resolve(LIBRARY, self.request(automatic))['pages'][0]['layout_id'],
-                         'content-blue-256')
+        discovered = resolve(LIBRARY, self.request(automatic))['pages'][0]
+        self.assertIn('content-blue-256', discovered['candidate_ids'])
 
     def test_specialized_problem_solving_and_issue_action_remain_strict(self):
         for layout_id, relation in [('content-blue-119', 'process'),

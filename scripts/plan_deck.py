@@ -7,6 +7,7 @@ from library_location import get_library
 from relation_match import canonical, load_taxonomy, match_relation, match_role
 from fallback_rules import fallback_type, fallback_catalog
 from content_adapters import adapt_for_layout
+from capacity_preflight import preflight
 
 
 def semantic_fit(page, entry):
@@ -80,7 +81,7 @@ def count_profile(entry, root):
 def binding_gap(entry, page, root, theme):
     """Count fields not yet mapped by an explicitly prepared template payload."""
     content = page.get('content') if isinstance(page.get('content'), dict) else {}
-    content, _ = adapt_for_layout(entry['id'], content, page.get('title'))
+    content, _ = adapt_for_layout(entry['id'], content, page.get('title'), entry=entry)
     texts = content.get('texts') if isinstance(content.get('texts'), dict) else {}
     binding_rel = entry.get('red_bindings') if theme == 'red' and entry.get('red_bindings') else entry['bindings']
     fields = json.loads((root / binding_rel).read_text(encoding='utf-8-sig'))['fields']
@@ -97,6 +98,24 @@ def content_is_four_cards(page):
             and isinstance(content.get('items'), list) and len(content['items']) == 4)
 
 
+STRUCTURAL_RELATION_GROUPS = {
+    'parallel-points': {'parallel-points', 'summary', 'framework'},
+    'framework': {'parallel-points', 'framework', 'hierarchy', 'summary'},
+    'summary': {'parallel-points', 'summary'},
+    'ordered-steps': {'process', 'ordered-steps'},
+    'process': {'process', 'ordered-steps'},
+    'comparison': {'comparison'}, 'hierarchy': {'hierarchy', 'framework'},
+    'cycle': {'cycle'}, 'timeline': {'timeline'}, 'schedule': {'schedule'},
+    'single-focus': {'single-focus'},
+}
+
+
+def structural_relation_compatible(entry, page):
+    structure = (entry.get('matching_contract') or {}).get('structure_type')
+    requested = page.get('matching_relation') or page.get('information_relation')
+    return not requested or requested in STRUCTURAL_RELATION_GROUPS.get(structure, {requested})
+
+
 def matches_structural_contract(entry, page, taxonomy):
     """Opt-in structural reuse; an unreviewed entry retains legacy matching."""
     contract = entry.get('matching_contract') or {}
@@ -104,7 +123,12 @@ def matches_structural_contract(entry, page, taxonomy):
         return False
     if page.get('role') not in (None, 'body', 'content', 'summary', 'parallel'):
         return False
+    if entry.get('matching_activation') == 'structure_ready' and not structural_relation_compatible(entry, page):
+        return False
     content = page.get('content') if isinstance(page.get('content'), dict) else {}
+    if entry.get('matching_activation') == 'structure_ready':
+        from content_adapters import adapt_structural_fields
+        content, _ = adapt_structural_fields(entry, content, page.get('title'))
     # Existing curated requests carry the exact binding paths and an explicit
     # layout ID. Keep that path available; the real fill still validates each field.
     if (page.get('layout_id') == entry.get('id') and isinstance(content.get('texts'), dict)
@@ -169,6 +193,58 @@ def matches_structural_contract(entry, page, taxonomy):
     return True
 
 
+def matches_structural_discovery(entry, page, taxonomy, root=None):
+    """Find a reviewed layout by geometry before checking template-specific fields."""
+    contract = entry.get('matching_contract') or {}
+    if contract.get('policy') != 'structural':
+        return False
+    if entry.get('matching_activation') != 'structure_ready':
+        return matches_structural_contract(entry, page, taxonomy)
+    if page.get('role') in ('cover', 'directory', 'section', 'closing'):
+        return False
+    if not structural_relation_compatible(entry, page):
+        return False
+    content = page.get('content') if isinstance(page.get('content'), dict) else {}
+    if root is not None and isinstance(content.get('items'), list):
+        counts, _ = count_profile(entry, root)
+        if len(content['items']) not in counts:
+            return False
+    if matches_structural_contract(entry, page, taxonomy):
+        return True
+    structure = contract.get('structure_type')
+    declared = content.get('structure_type')
+    if declared and declared != structure:
+        return False
+    if not declared:
+        # These are structural relations, not original deck business labels.
+        compatible = {
+            'cards': {'parallel-points', 'framework', 'summary'},
+            'bullets': {'parallel-points', 'summary'},
+            'process': {'process', 'ordered-steps'},
+            'comparison': {'comparison'},
+            'hierarchy': {'hierarchy', 'framework'},
+            'cycle': {'cycle'},
+            'timeline': {'timeline'},
+            'milestone_timeline': {'timeline'},
+            'schedule': {'schedule'},
+            'single_focus': {'single-focus'},
+        }
+        if structure not in compatible.get(content.get('type'), set()):
+            return False
+    items = content.get('items')
+    if isinstance(items, list):
+        actual_count = len(items)
+    else:
+        actual_count = (page.get('needs') or {}).get('item_count')
+    if type(actual_count) is not int or actual_count < 1:
+        return False
+    if root is not None:
+        counts, _ = count_profile(entry, root)
+        if actual_count not in counts:
+            return False
+    return True
+
+
 def matches_strict_contract(entry, page):
     contract = entry.get('matching_contract') or {}
     if contract.get('policy', entry.get('matching_policy')) != 'semantic_strict':
@@ -212,7 +288,7 @@ def eligible(e, p, request, taxonomy):
     if e.get('media_status')=='missing-source-image':reasons.append('missing_source_image')
     if str(e.get('pptx_support','')).startswith('blocked_'):reasons.append('pptx_blocked')
     relation=p.get('matching_relation') or p.get('information_relation')
-    structural_match = matches_structural_contract(e, p, taxonomy)
+    structural_match = matches_structural_discovery(e, p, taxonomy, request['_root'])
     structural_relation_match = matches_structural_relation(e, p, taxonomy)
     contract = e.get('matching_contract') or {}
     strict_content=p.get('content') if isinstance(p.get('content'),dict) else {}
@@ -354,14 +430,43 @@ def resolve(library,request):
             if p.get('role')=='cover': impact={'high':3,'medium-high':2,'medium':1}.get(e.get('visual_impact'),0)
             exact_role=0 if not p.get('role') or e.get('role')==p['role'] else 1
             relation=p.get('information_relation')
-            exact_relation=0 if not relation or relation==e.get('information_relation') or relation in e.get('relation_aliases',[]) else 1
-            fit=semantic_fit(p,e)
+            ordinary=(e.get('matching_contract') or {}).get('policy')=='structural'
+            exact_relation=0 if ordinary or not relation or relation==e.get('information_relation') or relation in e.get('relation_aliases',[]) else 1
+            fit=0 if ordinary else semantic_fit(p,e)
             requested_count=need.get('item_count')
             _,native_count=count_profile(e,root) if requested_count is not None else ([],None)
             count_fit=1 if requested_count is not None and requested_count==native_count else 0
             gap=binding_gap(e,p,root,p.get('theme',request.get('theme')))
-            scored.append((gap,exact_relation,exact_role,penalty-fit*2-count_fit,-impact,rng.random(),fit,count_fit,e))
-        scored.sort(key=lambda row:row[:6]);best=scored[0];e=best[8];fam=e.get('family_id',e['id'])
+            capacity_check=preflight(root,e,content,p.get('title'),p.get('theme',request.get('theme')))
+            hard_count=len(capacity_check['hard_issues'])
+            warning_count=len(capacity_check['advisory'])
+            margin=capacity_check['capacity_margin'] if capacity_check['capacity_margin'] is not None else -1
+            viable=0 if gap==0 and hard_count==0 else 1
+            scored.append((viable,gap,hard_count,warning_count,-margin,exact_relation,exact_role,
+                           penalty-fit*2-count_fit,-impact,rng.random(),fit,count_fit,e,capacity_check))
+        scored.sort(key=lambda row:row[:10]);best=scored[0];e=best[12];fam=e.get('family_id',e['id'])
+        candidate_summaries=[]
+        for row in scored[:12]:
+            candidate=row[12]
+            binding_rel=(candidate.get('red_bindings') if p.get('theme',request.get('theme'))=='red'
+                         and candidate.get('red_bindings') else candidate['bindings'])
+            binding_fields=json.loads((root/binding_rel).read_text(encoding='utf-8-sig'))['fields']
+            candidate_summaries.append({
+                'layout_id':candidate['id'],
+                'structure_type':(candidate.get('matching_contract') or {}).get('structure_type'),
+                'verified_counts':count_profile(candidate,root)[0],
+                'field_roles':sorted({field.get('semantic_role') for field in binding_fields
+                                      if field.get('semantic_role') and field.get('semantic_role')
+                                      not in ('brand_locked','decoration_locked')}),
+                'required_field_count':len((candidate.get('matching_contract') or {}).get('required_binding_paths',[])),
+                'meaning_policy':(candidate.get('matching_contract') or {}).get('policy',candidate.get('matching_policy')),
+                'capacity':candidate.get('capacity'),
+                'media_status':candidate.get('media_status'),
+                'classification_status':candidate.get('classification_status'),
+                'unmapped_binding_fields':row[1],
+                'field_status':'ready' if row[1]==0 else 'awaiting_mapping',
+                'capacity_preflight':row[13],
+                'source_preview':candidate.get('preview')})
         layout_usage[e['id']]+=1;family_usage[fam]+=1
         if p.get('role')=='section' and section_layout_id is None:
             section_layout_id=e['id']
@@ -369,16 +474,20 @@ def resolve(library,request):
         if type(trial_limit) is not int or not 1<=trial_limit<=8:
             raise ValueError('max_template_trials须为1至8的整数')
         chosen.append({'page':index,'purpose':p['purpose'],'evidence':p.get('evidence'),
-                        'selection_mode':'source_template','selection_label':'知识库模板','candidate_ids':[e['id']] if p.get('role')=='section' else [row[8]['id'] for row in scored[:trial_limit]],
+                        'selection_mode':'source_template','selection_label':'知识库模板','candidate_ids':[e['id']] if p.get('role')=='section' else [row[12]['id'] for row in scored[:trial_limit]],
+                       'candidate_summaries':candidate_summaries,
+                       'field_ready_candidate_count':sum(row[1]==0 for row in scored),
                        'trial_results':[],'reason_code':None,'source_stamp':None,
                        'layout_id':e['id'],'family_id':fam,'source_mapping':e.get('source_mapping'),
                        'matched_role':e.get('role'),'matched_relation':e.get('information_relation'),
                        'canonical_relation':e.get('canonical_relation'),
-                       'fit_signals':{'label_overlap':best[6],'native_count':bool(best[7]),
-                                      'unmapped_binding_fields':best[0]},
+                       'fit_signals':{'label_overlap':best[10],'native_count':bool(best[11]),
+                                      'unmapped_binding_fields':best[1],
+                                      'capacity_status':best[13]['status'],
+                                      'capacity_margin':best[13]['capacity_margin']},
                        'style_family':e.get('style_family') or 'legacy-blue-red',
                        'theme':p.get('theme',request.get('theme')),'candidate_count':len(candidates),
-                       'selection_reason':'指定组件' if p.get('layout_id') else '按主题、结构关系、字段缺口和容量筛选；原稿业务标签仅参与排序',
+                       'selection_reason':'指定组件' if p.get('layout_id') else '按主题、结构、字段完整性、容量风险与重复度排序；普通组件不按原稿业务标签排序',
                        'diversity_gap':family_usage[fam]>1 and all(family_usage[x.get('family_id',x['id'])]>0 for x in candidates),
                        'classification_status':e.get('classification_status'),
                        'manual_review_required':e.get('classification_status')!='verified' or e.get('status')!='approved'})

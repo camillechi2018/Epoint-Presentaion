@@ -54,9 +54,11 @@ def sample(layout_id):
     if layout_id in ('content-tech-063', 'content-tech-064', 'content-tech-065'):
         dates = [f'{2025+i}年{i}月' if layout_id.endswith('065') else f'{2025+i}年'
                  for i in range(1, 6)]
+        detail_key = 'title' if layout_id.endswith('064') else 'body'
         return {'type': 'milestone_timeline', 'order': 'chronological',
                 'summary': '逐年推进项目建设',
-                'items': [dict(label=dates[i-1], title=f'阶段{i}', body=f'完成第{i}项工作。')
+                'items': [dict(label=dates[i-1], **{detail_key: (
+                    f'阶段{i}' if detail_key == 'title' else f'完成第{i}项工作。')})
                           for i in range(1, 6)]}
     return {'type': 'cards', 'summary': '并列说明四项工作', 'conclusion': '四项工作协同推进',
             'items': items}

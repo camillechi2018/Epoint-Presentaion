@@ -14,7 +14,9 @@ from pathlib import Path
 
 from fill_layout import fill
 from plan_deck import resolve
-from content_adapters import adapt_for_layout, classify_trial_failure
+from content_adapters import (adapt_for_layout, classify_trial_failure,
+                              structural_mapping_issue, field_source_evidence)
+from capacity_preflight import preflight
 
 
 def unmapped_binding_paths(library: Path, layout_id: str, content: dict, theme: str) -> list[str]:
@@ -72,15 +74,44 @@ def audit(library: Path, request_path: Path, work: Path, trial: bool) -> dict:
             content_path.write_text(json.dumps(content, ensure_ascii=False), encoding='utf-8')
             for order, layout_id in enumerate(candidate_ids, 1):
                 output = work / f'P{index:03d}-trial-{order}.pptx'
-                candidate_content, adapter = adapt_for_layout(layout_id, content, source.get('title'))
+                catalog = json.loads((library / 'catalog.json').read_text(encoding='utf-8-sig'))
+                entry = next(e for e in catalog['layouts'] if e['id'] == layout_id)
+                candidate_content, adapter = adapt_for_layout(layout_id, content, source.get('title'), entry=entry)
+                if not adapter and entry.get('matching_activation') in ('structure_ready', 'pilot_verified'):
+                    issue = structural_mapping_issue(entry, content, source.get('title'))
+                    if issue:
+                        counters[issue['reason_code']] += 1
+                        row['trials'].append({
+                            'layout_id': layout_id, 'status': 'rejected',
+                            'reason_code': issue['reason_code'],
+                            'unmapped_semantic_paths': issue['paths'],
+                            'content_adapter': None})
+                        continue
+                capacity_check = preflight(library, entry, content, source.get('title'), request['theme'])
+                if capacity_check['hard_issues']:
+                    counters['TEXT_OVER_CAPACITY'] += 1
+                    row['trials'].append({'layout_id': layout_id, 'status': 'rejected',
+                                          'reason_code': 'TEXT_OVER_CAPACITY',
+                                          'capacity_preflight': capacity_check,
+                                          'content_adapter': adapter})
+                    continue
+                wrap_applied = capacity_check['wrap_suggestions']
+                if wrap_applied and isinstance(candidate_content.get('texts'), dict):
+                    candidate_content = dict(candidate_content)
+                    candidate_content['texts'] = dict(candidate_content['texts'], **wrap_applied)
                 trial_content_path = content_path
-                if adapter:
+                if adapter or wrap_applied:
                     trial_content_path = work / f'P{index:03d}-trial-{order}-content.json'
                     trial_content_path.write_text(json.dumps(candidate_content, ensure_ascii=False), encoding='utf-8')
                 try:
                     fill(library, layout_id, trial_content_path, output, allow_draft=planning_request['allow_draft'])
                     row['trials'].append({'layout_id': layout_id, 'status': 'filled',
-                                          'visual_qa': 'not_run', 'content_adapter': adapter})
+                                          'visual_qa': 'not_run', 'content_adapter': adapter,
+                                          'capacity_preflight': capacity_check,
+                                          'wrap_applied': wrap_applied,
+                                          'field_source_evidence': field_source_evidence(
+                                              dict(content, source_refs=source.get('source_refs', [])),
+                                              candidate_content) if adapter else {}})
                     row['source_template_used'] = True
                     counters['trial_filled_pages'] += 1
                     break
@@ -89,6 +120,8 @@ def audit(library: Path, request_path: Path, work: Path, trial: bool) -> dict:
                     counters[code] += 1
                     rejection = {'layout_id': layout_id, 'status': 'rejected',
                                  'reason_code': code, 'detail': str(exc)[:300],
+                                 'capacity_preflight': capacity_check,
+                                 'wrap_applied': wrap_applied,
                                  'content_adapter': adapter}
                     if code == 'MISSING_REQUIRED_FIELD':
                         rejection['unmapped_semantic_paths'] = unmapped_binding_paths(
