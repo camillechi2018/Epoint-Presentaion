@@ -16,7 +16,7 @@ from library_location import SKILL, resolve_library
 from plan_deck import resolve
 from content_adapters import (adapt_for_layout, classify_trial_failure,
                               structural_mapping_issue, field_source_evidence)
-from capacity_preflight import preflight
+from capacity_preflight import preflight as capacity_preflight
 from fill_layout import fill
 from render_offline_brand import render as render_guided_page, resolved_variant, validate_page
 from fallback_rules import fallback_type
@@ -231,7 +231,7 @@ def execute_plan(request, plan, report, output: Path):
                             'unmapped_semantic_paths': issue['paths'],
                             'content_adapter': None})
                         continue
-                capacity_check = preflight(Path(report['library_path']), entry, data,
+                capacity_check = capacity_preflight(Path(report['library_path']), entry, data,
                                             page.get('title'), report['theme'])
                 if capacity_check['hard_issues']:
                     choice['trial_results'].append({
