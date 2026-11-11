@@ -9,7 +9,7 @@ from pptx import Presentation
 from lxml import etree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from assemble_native import P, assemble
+from assemble_native import P, assemble, assemble_many
 
 
 class NativePilotTests(unittest.TestCase):
@@ -56,6 +56,23 @@ class NativePilotTests(unittest.TestCase):
                                if name.startswith('ppt/notesSlides/') and name.endswith('.xml')]
             self.assertEqual(len(note_masters), 1)
             self.assertEqual(len(note_slides), 2)
+
+    def test_three_page_assembly_keeps_page_order(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            paths = []
+            for number in range(3):
+                deck = Presentation()
+                slide = deck.slides.add_slide(deck.slide_layouts[6])
+                slide.shapes.add_textbox(0, 0, 1000000, 300000).text = str(number)
+                path = root / f'page{number}.pptx'
+                deck.save(path)
+                paths.append(path)
+            output = root / 'joined.pptx'
+            report = assemble_many(paths, output)
+            self.assertEqual(report['slides'], 3)
+            self.assertEqual([slide.shapes[0].text for slide in Presentation(output).slides],
+                             ['0', '1', '2'])
 
     def test_multi_slide_source_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import posixpath
+import re
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -75,7 +76,7 @@ def inspect(path, sources=()):
     presentation = ET.fromstring(files['ppt/presentation.xml'])
     pres_links = {link.attrib['Id']: link for link in relations('ppt/presentation.xml')}
     slide_nodes = list(presentation.find('{' + P + '}sldIdLst'))
-    if len(slide_nodes) != 2 or len({x.attrib['id'] for x in slide_nodes}) != 2:
+    if len(slide_nodes) < 2 or len({x.attrib['id'] for x in slide_nodes}) != len(slide_nodes):
         raise ValueError('PILOT_SLIDE_COUNT_OR_IDS_INVALID')
     masters = presentation.find('{' + P + '}sldMasterIdLst')
     if masters is None:
@@ -121,10 +122,25 @@ def inspect(path, sources=()):
         used.add(resolve(layout, master_links[0].attrib['Target']))
     if registered != used:
         raise ValueError('UNUSED_OR_UNREGISTERED_MASTER')
+    themes = set()
+    commits = set()
+    for stamp in stamps:
+        parts = stamp.split(':', 3)
+        if len(parts) != 4:
+            raise ValueError('SOURCE_STAMP_INVALID')
+        themes.add(parts[2])
+        commit = stamp.rsplit(':', 1)[-1]
+        if not re.fullmatch(r'[0-9a-f]{40}', commit):
+            raise ValueError('SOURCE_COMMIT_INVALID')
+        commits.add(commit)
+    if len(themes) != 1:
+        raise ValueError('MIXED_THEMES')
+    if len(commits) != 1:
+        raise ValueError('MIXED_LIBRARY_COMMITS')
     source_sha = []
     if sources:
-        if len(sources) != 2:
-            raise ValueError('EXPECTED_TWO_SOURCE_FILES')
+        if len(sources) != len(slides):
+            raise ValueError('SOURCE_COUNT_MISMATCH')
         for index, path in enumerate(sources):
             with ZipFile(path) as archive:
                 source_files = {name: archive.read(name) for name in archive.namelist() if not name.endswith('/')}
@@ -133,13 +149,14 @@ def inspect(path, sources=()):
                 raise ValueError('SOURCE_SLIDE_XML_MISMATCH: ' + str(index + 1))
             source_sha.append(hashlib.sha256(Path(path).read_bytes()).hexdigest())
     return {'status': 'passed', 'slide_count': len(slides), 'registered_masters': len(registered),
+            'theme': next(iter(themes)), 'library_commit': next(iter(commits)),
             'source_stamps': stamps, 'source_file_sha256': source_sha, 'package_parts': len(files)}
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', type=Path, required=True)
-    parser.add_argument('--sources', type=Path, nargs=2, required=True)
+    parser.add_argument('--sources', type=Path, nargs='+', required=True)
     parser.add_argument('--out', type=Path)
     args = parser.parse_args()
     result = inspect(args.input, args.sources)

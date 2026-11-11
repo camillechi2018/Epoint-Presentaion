@@ -1,4 +1,4 @@
-"""Experimental native OPC assembly of exactly two pre-filled single-slide PPTX files.
+"""Experimental native OPC assembly of pre-filled single-slide PPTX files.
 
 This S2 pilot is not the production deck entrypoint and does not replace source,
 font, color, media or visual acceptance gates.
@@ -57,12 +57,7 @@ def one_slide(files):
     return resolve('ppt/presentation.xml', target)
 
 
-def assemble(first, second, output):
-    with ZipFile(first) as z:
-        out = {name: z.read(name) for name in z.namelist() if not name.endswith('/')}
-    with ZipFile(second) as z:
-        source = {name: z.read(name) for name in z.namelist() if not name.endswith('/')}
-    one_slide(out)
+def _merge_one(out, source):
     second_slide = one_slide(source)
     source_types = xml(source['[Content_Types].xml'])
     overrides = {x.attrib['PartName'].lstrip('/'): x.attrib['ContentType']
@@ -196,17 +191,39 @@ def assemble(first, second, output):
         for link in xml(out[part]):
             if link.attrib.get('TargetMode') != 'External' and resolve(owner, link.attrib['Target']) not in out:
                 raise ValueError('OUTPUT_RELATION_MISSING: ' + owner + ' -> ' + link.attrib['Target'])
+    return len(copied), len(masters)
+
+
+def assemble_many(inputs, output):
+    inputs = tuple(Path(item) for item in inputs)
+    if len(inputs) < 2:
+        raise ValueError('AT_LEAST_TWO_SOURCE_SLIDES_REQUIRED')
+    with ZipFile(inputs[0]) as z:
+        out = {name: z.read(name) for name in z.namelist() if not name.endswith('/')}
+    one_slide(out)
+    copied_total = 0
+    registered_masters = 0
+    for source_path in inputs[1:]:
+        with ZipFile(source_path) as z:
+            source = {name: z.read(name) for name in z.namelist() if not name.endswith('/')}
+        copied_count, registered_masters = _merge_one(out, source)
+        copied_total += copied_count
     with ZipFile(output, 'w', ZIP_DEFLATED) as z:
         for name, data in out.items():
             z.writestr(name, data)
-    return {'slides': 2, 'copied_parts': len(copied), 'registered_masters': len(masters),
-            'output': str(output)}
+    return {'slides': len(inputs), 'copied_parts': copied_total,
+            'registered_masters': registered_masters, 'output': str(output)}
+
+
+def assemble(first, second, output):
+    return assemble_many((first, second), output)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--first', type=Path, required=True)
-    parser.add_argument('--second', type=Path, required=True)
+    parser.add_argument('--first', type=Path)
+    parser.add_argument('--second', type=Path)
+    parser.add_argument('--pages', type=Path, nargs='+')
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--experimental', action='store_true', required=True,
                         help='Explicit acknowledgement that full template audit is pending')
@@ -216,7 +233,10 @@ def main():
     if args.out.exists():
         raise SystemExit('OUTPUT_EXISTS')
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    print(json.dumps(assemble(args.first, args.second, args.out)))
+    inputs = args.pages if args.pages else (args.first, args.second)
+    if any(item is None for item in inputs):
+        raise SystemExit('SOURCE_PAGES_REQUIRED')
+    print(json.dumps(assemble_many(inputs, args.out)))
 
 
 if __name__ == '__main__':

@@ -76,6 +76,18 @@ class NativePackageAuditTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'DUPLICATE_MASTER_OR_LAYOUT_ID'):
             inspect(bad, self.sources)
 
+    def test_mixed_source_commits_are_rejected(self):
+        with ZipFile(self.deck) as archive:
+            files = {name: archive.read(name) for name in archive.namelist() if not name.endswith('/')}
+        slide = 'ppt/slides/slide999.xml'
+        files[slide] = files[slide].replace(b'a' * 40, b'b' * 40)
+        bad = self.root / 'mixed-commits.pptx'
+        with ZipFile(bad, 'w', ZIP_DEFLATED) as archive:
+            for name, data in files.items():
+                archive.writestr(name, data)
+        with self.assertRaisesRegex(ValueError, 'MIXED_LIBRARY_COMMITS'):
+            inspect(bad)
+
 
 if __name__ == '__main__':
     unittest.main()
