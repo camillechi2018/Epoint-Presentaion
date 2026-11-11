@@ -6,11 +6,11 @@ import os
 import platform
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 from runtime_paths import SKILL_ROOT, state_root
 from runtime_process import capture
+from runtime_storage import atomic_json, exclusive_lock
 
 
 def main():
@@ -30,10 +30,10 @@ def main():
     lock = None
     try:
         root.mkdir(parents=True, exist_ok=True)
-        # Exclusive creation prevents two installers from mutating an environment together.
-        lock = (root / 'install.lock').open('x', encoding='utf-8')
-        lock.write(str(os.getpid()))
-        lock.flush()
+        # OS lock is released on a crashed installer; the persistent file is not a stale owner flag.
+        guard = exclusive_lock(root / 'install.lock', timeout=10)
+        guard.__enter__()
+        lock = guard
         # A failed ensurepip can leave python behind; retry must repair that partial venv.
         if not python.is_file() or capture([python, '-m', 'pip', '--version'])['returncode'] != 0:
             create = capture([sys.executable, '-m', 'venv', str(target)], timeout=90)
@@ -67,14 +67,7 @@ def main():
             old = json.loads(active.read_text(encoding='utf-8'))
             record['previous_python'] = (old.get('previous_python') if old.get('python') == record['python']
                                          else old.get('python'))
-        with tempfile.NamedTemporaryFile(dir=root, suffix='.json', delete=False) as handle:
-            pending = Path(handle.name)
-            handle.write((json.dumps(record, ensure_ascii=False, indent=2) + '\n').encode())
-        try:
-            os.replace(pending, active)
-        finally:
-            if pending.exists():
-                pending.unlink()
+        atomic_json(active, record)
         print(json.dumps({'status': 'passed', 'python': record['python'], 'runtime_record': str(active),
                           'scope': 'dependencies_and_library_checks_only', 'versions': record['versions']}))
         return 0
@@ -83,8 +76,7 @@ def main():
         return 2
     finally:
         if lock is not None:
-            lock.close()
-            (root / 'install.lock').unlink()
+            lock.__exit__(None, None, None)
 
 
 if __name__ == '__main__':

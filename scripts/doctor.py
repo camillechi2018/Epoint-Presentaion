@@ -7,6 +7,7 @@ import os
 import platform
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 from distribution import verify_manifest, write_json
@@ -38,7 +39,36 @@ def probe_command(name):
             'error_code': None if ok else result['error'] or 'COMMAND_PROBE_FAILED'}
 
 
-def report(*, library=None, state_dir=None, goal='inspect'):
+def deep_probe(paths):
+    """Explicit local writes and editable PPTX roundtrip; no Office UI is launched."""
+    outcome = {}
+    for name in ('state', 'cache'):
+        try:
+            root = Path(paths[name])
+            root.mkdir(parents=True, exist_ok=True)
+            with tempfile.TemporaryDirectory(prefix='epoint-doctor-', dir=root) as folder:
+                marker = Path(folder) / 'probe.txt'
+                marker.write_bytes(b'epoint')
+                if marker.read_bytes() != b'epoint':
+                    raise OSError('write/read mismatch')
+            outcome[name + '_write'] = {'status': 'available'}
+        except OSError as exc:
+            outcome[name + '_write'] = {'status': 'unavailable', 'error_code': 'DIRECTORY_NOT_WRITABLE',
+                                         'detail': type(exc).__name__}
+    code = ('import tempfile; from pathlib import Path; from pptx import Presentation; '
+            'p=Presentation(); s=p.slides.add_slide(p.slide_layouts[6]); '
+            't=s.shapes.add_textbox(0,0,1000000,300000); t.text="Epoint 测试"; '
+            'f=Path(tempfile.mkdtemp())/"probe.pptx"; p.save(f); '
+            'q=Presentation(f); assert len(q.slides)==1; '
+            'assert q.slides[0].shapes[0].text=="Epoint 测试"; f.unlink(); f.parent.rmdir()')
+    result = capture([sys.executable, '-c', code], timeout=30)
+    outcome['pptx_roundtrip'] = {'status': 'available' if result['returncode'] == 0 else 'unavailable',
+                                 'error_code': None if result['returncode'] == 0 else
+                                 result['error'] or 'PPTX_ROUNDTRIP_FAILED'}
+    return outcome
+
+
+def report(*, library=None, state_dir=None, goal='inspect', deep=False):
     paths = locations(state_dir)
     root = Path(library).resolve() if library else SKILL_ROOT / 'assets' / 'minimal-template-pack'
     dependencies = {name: probe_import(name) for name in IMPORTS}
@@ -73,9 +103,17 @@ def report(*, library=None, state_dir=None, goal='inspect'):
         blockers.append('DEPENDENCY_IMPORT_FAILED')
     if goal == 'assemble' and assembly['status'] != 'available':
         blockers.append(assembly['error_code'])
+    deep_checks = deep_probe(paths) if deep else None
+    if deep_checks:
+        if goal in {'fill', 'assemble'} and deep_checks['pptx_roundtrip']['status'] != 'available':
+            blockers.append(deep_checks['pptx_roundtrip']['error_code'])
+        for name in ('state_write', 'cache_write'):
+            if deep_checks[name]['status'] != 'available':
+                blockers.append(deep_checks[name]['error_code'])
     # Basic detection never claims fonts, Office opening or rendering have been tested.
     return {'schema_version': '1.0', 'status': 'blocked' if blockers else 'passed',
-            'scope': 'environment_inspection_only', 'goal': goal, 'blockers': blockers,
+            'scope': 'local_pptx_roundtrip_only' if deep else 'environment_inspection_only',
+            'goal': goal, 'blockers': blockers, 'deep_checks': deep_checks,
             'runtime': {'os': platform.system(), 'architecture': platform.machine(),
                         'python': platform.python_version(), 'executable': sys.executable,
                         'site_packages_enabled': not bool(sys.flags.no_site)},
@@ -91,8 +129,9 @@ def main(argv=None):
     parser.add_argument('--state-dir', type=Path)
     parser.add_argument('--goal', choices=['inspect', 'fill', 'assemble'], default='inspect')
     parser.add_argument('--out', type=Path)
+    parser.add_argument('--deep', action='store_true')
     args = parser.parse_args(argv)
-    result = report(library=args.library, state_dir=args.state_dir, goal=args.goal)
+    result = report(library=args.library, state_dir=args.state_dir, goal=args.goal, deep=args.deep)
     if args.out:
         args.out.parent.mkdir(parents=True, exist_ok=True)
         write_json(args.out, result)

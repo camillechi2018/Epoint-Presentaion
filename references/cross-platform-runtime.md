@@ -6,7 +6,7 @@
 
 需要可执行的 Python 3.10 或更高版本。Windows 在技能根目录执行 `powershell -File .\install.ps1`；macOS/Linux 执行 `sh ./install.sh`。启动器会实际运行候选 Python，不要求用户机械替换 python/python3。
 
-安装器创建用户状态目录下的版本化虚拟环境；完成依赖和本地模板包校验后才原子更新 `runtime.json`。失败保留先前的活动解释器，重复安装复用同一依赖版本环境。核心直接依赖记录于 `requirements-core.txt`，实际安装的直接和间接依赖版本记录在 `runtime.json`。不同 OS/架构仍需实测，不因依赖能安装就声明完整支持。
+安装器创建用户状态目录下的版本化虚拟环境；完成依赖和本地模板包校验后才原子更新 `runtime.json`。失败保留先前的活动解释器，重复安装复用同一依赖版本环境。安装器使用系统文件锁，崩溃退出后锁可自动释放。核心直接依赖记录于 `requirements-core.txt`，实际安装的直接和间接依赖版本记录在 `runtime.json`。不同 OS/架构仍需实测，不因依赖能安装就声明完整支持。
 
 安装到指定位置：两个安装脚本都支持 `--state-dir <目录>`。后续设置 `EPOINT_STATE_DIR` 为同一目录，再用启动器选中的 Python 执行 `scripts/run.py`。该入口读取活动解释器，转调原有统一工作流并原样传递参数。旧入口仍可使用，但须自行指定正确解释器。
 
@@ -24,7 +24,9 @@
 - `--goal fill`：另外要求核心 Python 包能导入；不代表已经完成实际单页或视觉验收。
 - `--goal assemble`：要求已验证的整稿后端。本轮尚未实现深度后端冒烟测试，Windows 检出 COM 也标记 `untested`，不会据此宣称整稿验收通过。
 
-结果区分 available、unavailable、untested，stdout 仅输出 ASCII 安全的机器 JSON；报告文件为 UTF-8。不会启动 Office、自动上传材料、安装依赖或调整网络设置。字体、实际渲染、可写目录深测和网络连通性主动探测仍待后续补齐。
+显式添加 `--deep` 时，在指定用户状态目录及缓存目录写入并读取临时文件，并用当前 Python 创建一页含中文可编辑文本的 PPTX，保存后重开核对。`--state-dir` 与 `EPOINT_CACHE_DIR` 可指定这些检查使用的目录；检查报告的 `deep_checks` 记录结果。此检查验证写入与 PPTX 基础往返，不代表已有模板的合并、目标 Office 打开、导出或视觉验收。
+
+结果区分 available、unavailable、untested，stdout 仅输出 ASCII 安全的机器 JSON；报告文件为 UTF-8。基础自检不会启动 Office、自动上传材料、安装依赖或调整网络设置。字体、实际渲染、应用打开与导出、网络连通性主动探测仍待后续补齐。
 
 ## 分发与校验
 
