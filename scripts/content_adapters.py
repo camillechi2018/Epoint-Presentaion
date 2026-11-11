@@ -116,7 +116,8 @@ def adapt_structural_fields(entry, content, page_title=None, diagnostics=False):
                     if (value is None and path in ('left.title', 'left.body',
                                                    'right.title', 'right.body')
                             and content.get('type') == 'cards'
-                            and isinstance(items, list) and len(items) == 2):
+                            and isinstance(items, list) and len(items) == 2
+                            and isinstance(items[0 if path.startswith('left.') else 1], dict)):
                         index = 0 if path.startswith('left.') else 1
                         indices.add(index)
                         value = nested(items[index], [path.split('.')[1]])

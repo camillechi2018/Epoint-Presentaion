@@ -131,6 +131,41 @@ class FieldCompleteStructuralReuseTest(unittest.TestCase):
             fill(ROOT, entry['id'], source, output, allow_draft=True)
             self.assertGreater(output.stat().st_size, 1000)
 
+    def test_string_cards_report_missing_fields_without_crashing(self):
+        entry = next(x for x in self.ready if x['id'] == 'content-tech-023')
+        content = {'type': 'cards', 'summary': '共同说明', 'items': ['第一条事实', '第二条事实']}
+        mapped, adapter = adapt_for_layout(entry['id'], content, '服务体系', entry=entry)
+        self.assertIsNone(adapter)
+        self.assertEqual(mapped, content)
+        issue = structural_mapping_issue(entry, content, '服务体系')
+        self.assertEqual(issue['reason_code'], 'MISSING_REQUIRED_FIELD')
+
+    def test_text_alias_preserves_both_columns_and_rejects_extra_facts(self):
+        entry = next(x for x in self.ready if x['id'] == 'content-tech-023')
+        content = {'type': 'cards', 'summary': '共同说明', 'items': [
+            {'heading': '甲类', 'text': '第一类真实说明'},
+            {'heading': '乙类', 'text': '第二类真实说明'}]}
+        mapped, adapter = adapt_for_layout(entry['id'], content, '服务体系', entry=entry)
+        self.assertIsNotNone(adapter)
+        self.assertEqual(mapped['texts']['left.title'], '甲类')
+        self.assertEqual(mapped['texts']['right.body'], '第二类真实说明')
+        content['items'][0]['extra_fact'] = '不能遗漏的额外事实'
+        self.assertIsNone(adapt_for_layout(entry['id'], content, '服务体系', entry=entry)[1])
+        self.assertEqual(structural_mapping_issue(entry, content, '服务体系')['reason_code'],
+                         'INPUT_FACTS_UNMAPPED')
+
+    def test_flat_strings_still_reach_a_compatible_title_only_layout(self):
+        entry = next(x for x in self.ready if x['id'] == 'content-tech-066')
+        content = {'type': 'bullets', 'structure_type': 'timeline',
+                   'items': [f'{i}月' for i in range(1, 8)]}
+        page = {'role': 'body', 'title': '进度安排', 'content': content,
+                'information_relation': 'timeline', 'needs': {'item_count': 7}}
+        self.assertTrue(matches_structural_discovery(entry, page, {}, ROOT))
+        mapped, adapter = adapt_for_layout(entry['id'], content, page['title'], entry=entry)
+        self.assertIsNotNone(adapter)
+        for i in range(1, 8):
+            self.assertEqual(mapped['texts'][f'milestone_{i}'], f'{i}月')
+
     def test_extra_required_facts_are_not_invented(self):
         entry = next(x for x in self.ready if x['id'] == 'content-blue-089')
         content = {'type': 'cards', 'items': [{'title': f'方向{i}', 'body': '真实内容'} for i in range(4)]}
