@@ -132,7 +132,8 @@ def main() -> int:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
     print(json.dumps({'status': report['status'], 'report': str(path)}, ensure_ascii=True))
-    return 0 if report['status'] == 'rendered_pending_visual_review' else 2
+    return 0 if report['status'] in ('rendered_pending_visual_review',
+                                     'prepared_pending_mac_powerpoint') else 2
 
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from pptx import Presentation
 from pptx.util import Inches
@@ -13,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 from audit_fonts import audit
 from font_profile import probe, resolve
 from normalize_fonts import normalize
+from calibrate_renderer import calibrate
 
 
 class FontProfileTests(unittest.TestCase):
@@ -104,6 +106,22 @@ class FontProfileTests(unittest.TestCase):
             run = Presentation(output).slides[0].shapes[0].text_frame.paragraphs[0].runs[0]
             solid = run._r.rPr.find(f'{{{a}}}solidFill')
             self.assertEqual(solid.find(f'{{{a}}}srgbClr').get('val'), 'FFFFFF')
+
+    def test_mac_calibration_prepares_without_claiming_render(self):
+        with tempfile.TemporaryDirectory() as folder:
+            source = Path(folder) / 'sample.pptx'
+            pres = Presentation()
+            slide = pres.slides.add_slide(pres.slide_layouts[6])
+            slide.shapes.add_textbox(Inches(1), Inches(1), Inches(3), Inches(1)).text = 'Mac sample'
+            pres.save(source)
+            available = {'status': 'available', 'profile': resolve('macos'),
+                         'host': 'Darwin', 'font_available': {}, 'missing': [], 'error_code': None}
+            with patch('calibrate_renderer.platform.system', return_value='Darwin'), \
+                 patch('calibrate_renderer.probe', return_value=available):
+                report = calibrate([source], Path(folder) / 'out', 'macos')
+            self.assertEqual(report['status'], 'prepared_pending_mac_powerpoint')
+            self.assertEqual(report['fixtures'][0]['images'], [])
+            self.assertTrue((Path(folder) / 'out' / '01-sample' / 'calibration.pptx').is_file())
 
 
 if __name__ == '__main__':
