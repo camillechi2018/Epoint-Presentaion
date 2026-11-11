@@ -118,7 +118,7 @@ def candidate_counts(root, theme, family):
     return counts
 
 
-def preflight(request, *, library=None, offline=False):
+def preflight(request, *, library=None, offline=False, native_experimental=False):
     theme = request.get('theme', 'blue')
     if theme not in STYLES:
         raise ValueError('theme 仅支持 blue、red、deep-blue-tech')
@@ -141,6 +141,11 @@ def preflight(request, *, library=None, offline=False):
               'library_used': False, 'library_source': None, 'library_commit': None,
               'style_kit': style_assets(theme), 'runtime': capability(),
               'candidate_counts': None, 'warnings': []}
+    if native_experimental:
+        result['assembly_backend'] = 'native_experimental'
+        result['runtime']['can_assemble_pptx'] = result['runtime']['can_fill_pptx']
+        result['runtime']['can_render_in_powerpoint'] = False
+        result['warnings'].append('原生组装为显式实验入口；LibreOffice 预览不等于 PowerPoint 视觉签收')
     root = None
     try:
         if library:
@@ -371,15 +376,20 @@ def execute_plan(request, plan, report, output: Path):
         json.dumps(prefilled, ensure_ascii=False, indent=2), encoding='utf-8')
     manifest_path.write_text(json.dumps(assembly, ensure_ascii=False, indent=2), encoding='utf-8')
     render_dir = work / 'rendered'
-    command = [report['runtime']['powershell'], '-NoProfile', '-File',
-               str(SKILL / 'scripts' / 'assemble_deck.ps1'), '-Manifest', str(manifest_path),
-               '-OutputPath', str(output), '-RenderDirectory', str(render_dir),
-               '-PythonExe', sys.executable,
-               '-FontProfile', report['font_profile']['profile']['id']]
-    completed = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', errors='replace')
-    if completed.returncode:
-        raise RuntimeError('PowerPoint 组装失败：' + (completed.stderr or completed.stdout)[-1000:])
-    finished = check_finished(output, assembly, prefilled)
+    if report.get('assembly_backend') == 'native_experimental':
+        from native_deck_backend import assemble_and_check
+        native = assemble_and_check(assembly, manifest_path, output, prefilled, render_dir)
+        finished = native['finished']
+    else:
+        command = [report['runtime']['powershell'], '-NoProfile', '-File',
+                   str(SKILL / 'scripts' / 'assemble_deck.ps1'), '-Manifest', str(manifest_path),
+                   '-OutputPath', str(output), '-RenderDirectory', str(render_dir),
+                   '-PythonExe', sys.executable,
+                   '-FontProfile', report['font_profile']['profile']['id']]
+        completed = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', errors='replace')
+        if completed.returncode:
+            raise RuntimeError('PowerPoint 组装失败：' + (completed.stderr or completed.stdout)[-1000:])
+        finished = check_finished(output, assembly, prefilled)
     (work / 'final-gate.json').write_text(
         json.dumps(finished, ensure_ascii=False, indent=2), encoding='utf-8')
     audit = audit_deck(manifest_path, output)
@@ -415,11 +425,14 @@ def main():
     ap.add_argument('--execute-out', type=Path, help='所有页面均有 content 时填充并组装完整 PPTX')
     ap.add_argument('--library', type=Path, help='测试或固定版本时指定已下载知识库')
     ap.add_argument('--offline', action='store_true')
+    ap.add_argument('--native-experimental', action='store_true',
+                    help='显式试用非 Windows 原生组装，结果仍须目标编辑器复核')
     args = ap.parse_args()
     if args.out.exists() or args.plan_out and args.plan_out.exists() or args.execute_out and args.execute_out.exists():
         ap.error('输出文件已存在')
     request = json.loads(args.request.read_text(encoding='utf-8-sig'))
-    report = preflight(request, library=args.library, offline=args.offline)
+    report = preflight(request, library=args.library, offline=args.offline,
+                       native_experimental=args.native_experimental)
     default_profile = {'Windows': 'windows', 'Darwin': 'macos', 'Linux': 'linux'}.get(
         platform.system(), 'linux')
     try:
