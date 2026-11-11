@@ -18,6 +18,7 @@ def _load_workflow():
     global resolve, adapt_for_layout, classify_trial_failure, structural_mapping_issue
     global field_source_evidence, capacity_preflight, fill, render_guided_page
     global resolved_variant, validate_page, fallback_type, audit_deck
+    global check_structure, check_prefilled, check_finished
     from plan_deck import resolve
     from content_adapters import (adapt_for_layout, classify_trial_failure,
                                   structural_mapping_issue, field_source_evidence)
@@ -26,6 +27,7 @@ def _load_workflow():
     from render_offline_brand import render as render_guided_page, resolved_variant, validate_page
     from fallback_rules import fallback_type
     from audit_deck import audit as audit_deck
+    from delivery_gate import check_structure, check_prefilled, check_finished
 
 STYLES = {
     'blue': 'legacy-blue-red',
@@ -196,6 +198,8 @@ def execute_plan(request, plan, report, output: Path):
     pages = request.get('pages', [])
     if len(pages) != len(plan['pages']):
         raise ValueError('逐页内容与规划页数不一致')
+    check_structure([dict(choice, role=page.get('role'))
+                     for page, choice in zip(pages, plan['pages'])], complete=True)
     output = output.resolve()
     work = output.parent / (output.stem + '-work')
     work.mkdir(parents=True, exist_ok=True)
@@ -359,6 +363,9 @@ def execute_plan(request, plan, report, output: Path):
                 'require_template_source': all(x['selection_mode'] == 'source_template' for x in plan['pages']),
                 'slides': slides, 'pages': audit_pages}
     manifest_path = work / 'assembly-plan.json'
+    prefilled = check_prefilled(assembly, Path(report['library_path']))
+    (work / 'pre-assembly-gate.json').write_text(
+        json.dumps(prefilled, ensure_ascii=False, indent=2), encoding='utf-8')
     manifest_path.write_text(json.dumps(assembly, ensure_ascii=False, indent=2), encoding='utf-8')
     render_dir = work / 'rendered'
     command = [report['runtime']['powershell'], '-NoProfile', '-File',
@@ -368,6 +375,9 @@ def execute_plan(request, plan, report, output: Path):
     completed = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', errors='replace')
     if completed.returncode:
         raise RuntimeError('PowerPoint 组装失败：' + (completed.stderr or completed.stdout)[-1000:])
+    finished = check_finished(output, assembly, prefilled)
+    (work / 'final-gate.json').write_text(
+        json.dumps(finished, ensure_ascii=False, indent=2), encoding='utf-8')
     audit = audit_deck(manifest_path, output)
     audit_path = work / 'deck-audit.json'
     audit_path.write_text(json.dumps(audit, ensure_ascii=False, indent=2), encoding='utf-8')
@@ -375,13 +385,19 @@ def execute_plan(request, plan, report, output: Path):
         raise RuntimeError('成稿来源或内容验收失败：' + str(audit['issues'][:5]))
     plan['selection_summary'] = {label: sum(row['selection_label'] == label for row in plan['pages'])
                                  for label in ('知识库模板', '技能排版', '自由编排')}
+    rendered = all((render_dir / f'P{index:03d}.png').is_file()
+                   for index in range(1, len(slides) + 1))
     return {'output': str(output.resolve()), 'slides': len(slides),
             'library_used': any(x['selection_mode'] == 'source_template' for x in plan['pages']),
             'source_template_pages': sum(x['selection_mode'] == 'source_template' for x in plan['pages']),
             'guided_pages': sum(x['selection_mode'] == 'guided_composition' for x in plan['pages']),
             'free_pages': sum(x['selection_mode'] == 'free_composition' for x in plan['pages']),
             'selection_summary': plan['selection_summary'],
-            'manifest': str(manifest_path), 'audit': str(audit_path), 'render_directory': str(render_dir)}
+            'manifest': str(manifest_path), 'audit': str(audit_path), 'render_directory': str(render_dir),
+            'pre_assembly_gate': str(work / 'pre-assembly-gate.json'),
+            'final_gate': str(work / 'final-gate.json'),
+            'render_status': 'passed' if rendered else 'pending',
+            'delivery_status': 'pending_visual_review' if rendered else 'pending_render'}
 
 
 def main():
@@ -400,6 +416,7 @@ def main():
         ap.error('输出文件已存在')
     request = json.loads(args.request.read_text(encoding='utf-8-sig'))
     report = preflight(request, library=args.library, offline=args.offline)
+    report['delivery_status'] = 'not_started'
     if report['status'] == 'ready' and (args.plan_out or args.execute_out) and request.get('pages'):
         stage = 'planning'
         try:
@@ -415,6 +432,7 @@ def main():
                 stage = 'execution'
                 report['execution'] = execute_plan(request, plan, report, args.execute_out)
                 report['library_used'] = report['execution']['library_used']
+                report['delivery_status'] = report['execution']['delivery_status']
             report['selection_summary'] = plan['selection_summary']
             if args.plan_out:
                 args.plan_out.parent.mkdir(parents=True, exist_ok=True)
@@ -423,7 +441,15 @@ def main():
         except (ValueError, KeyError, FileNotFoundError, RuntimeError, OSError, ImportError) as exc:
             report['status'] = 'blocked'
             report['can_make_complete_deck'] = False
-            report['error_code'] = ('RUNTIME_DEPENDENCY_MISSING' if isinstance(exc, ImportError)
+            report['delivery_status'] = 'blocked'
+            gate_error = str(exc).split(':', 1)[0]
+            gate_codes = {'COMPLETE_DECK_PAGES_MISSING', 'COMPLETE_DECK_STRUCTURE_MISSING',
+                          'COMPLETE_DECK_STRUCTURE_ORDER', 'STRUCTURE_SOURCE_REQUIRED',
+                          'SECTION_LAYOUT_MIXED', 'SOURCE_STAMP_NOT_CATALOG_BOUND',
+                          'SOURCE_FILE_HASH_MISMATCH', 'RELATION_TARGET_MISSING',
+                          'FINISHED_SOURCE_ASSOCIATION_MISMATCH'}
+            report['error_code'] = (gate_error if gate_error in gate_codes
+                                    else 'RUNTIME_DEPENDENCY_MISSING' if isinstance(exc, ImportError)
                                     else 'PAGE_LAYOUT_UNAVAILABLE' if stage == 'planning'
                                     else 'PPTX_EXECUTION_FAILED')
             report['warnings'].append(safe_message(exc))

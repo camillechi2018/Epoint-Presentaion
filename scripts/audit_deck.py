@@ -68,8 +68,15 @@ def audit(plan_path,pptx_path):
         seen.append(info.get('role'))
     for n in range(3,len(seen)+1):
         if seen[n-3:n]==['data-chart']*3:add('P1',n,'dense_sequence','连续三页数据图，需目视检查节奏')
-    if plan.get('complete_deck') is True and (pages[0].get('role')!='cover' or pages[-1].get('role')!='closing'):
-        add('P0',0,'complete_deck_roles','完整演示稿首尾须分别为知识库封面与封底')
+    if plan.get('complete_deck') is True:
+        if (pages[0].get('role')!='cover' or pages[-1].get('role')!='closing'
+                or 'directory' not in seen or 'section' not in seen):
+            add('P0',0,'complete_deck_roles','完整演示稿须包含封面、目录、章节、封底')
+        elif seen.index('directory')>=seen.index('section'):
+            add('P0',0,'complete_deck_order','目录须位于首张章节页之前')
+        section_layouts={page.get('layout_id') for page in pages if page.get('role')=='section'}
+        if len(section_layouts)!=1 or None in section_layouts:
+            add('P0',0,'section_layout_mixed','同一完整演示稿的章节页须使用同一组件版式')
     return {'schema_version':'1.0','slide_count':len(p.slides),'planned_count':len(pages),'issues':issues,'p0_passed':not any(x['severity']=='P0' for x in issues),'checks':(['template_source'] if require_templates or has_mandatory else [])+['page_count','new_drawn_background','placeholder_or_source_example','chart_source','image_source','repeated_layout','dense_sequence'],'manual_review_required':['PowerPoint实际文字边界与箭头碰撞','中文断行、字号、底部留白与相邻页面疏密','图片裁切及图表编辑数据','事实、术语与品牌核对']}
 def main():
     p=argparse.ArgumentParser();p.add_argument('--plan',type=Path,required=True);p.add_argument('--input',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args()
