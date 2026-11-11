@@ -11,7 +11,7 @@ metadata:
 
 ## 跨平台统一入口
 
-跨系统安装与故障诊断见[运行环境说明](references/cross-platform-runtime.md)。环境自检使用 `scripts/run_presentation.py --doctor --out <诊断.json>`，无需先安装 PPTX 依赖；安装后可用 `scripts/run.py` 转调已锁定的虚拟环境解释器。自检通过仅代表所选目标的环境检查通过，当前非 Windows 完整组装后端仍待实现，不能因此绘制结构页绕过原有阻断。
+跨系统安装与故障诊断见[运行环境说明](references/cross-platform-runtime.md)。环境自检使用 `scripts/run_presentation.py --doctor --out <诊断.json>`，无需先安装 PPTX 依赖；安装后可用 `scripts/run.py` 转调已锁定的虚拟环境解释器。自检通过仅代表所选目标的环境检查通过。非 Windows 原生组装已有 S2 代表性技术验收，但仍是隔离的 `--experimental` 入口，未接入正式整稿流程；不得因此绘制结构页绕过原有阻断或宣称跨平台完整交付已通过。
 
 收到 `.xls`、`.xlsx`、`.docx` 原始材料时，先用 `scripts/read_material.py --input <文件> --out <事实清单.json>` 做只读提取，保留有效行、合并区域、公式缓存状态和图片引用；根据清单再制定逐页内容。对无法可靠读取的 `.xls` 公式来源与内嵌图片、缺失的 `.xlsx` 公式缓存，以及尚未安放的 Word 图片，应明确记录，不能按空值或猜测内容生成事实。该提取步骤不代表内容已完整入稿。
 
