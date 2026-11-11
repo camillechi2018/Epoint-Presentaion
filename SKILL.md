@@ -2,10 +2,12 @@
 name: epoint-presentation
 description: 制作新点品牌可编辑 PPTX；Skill 自带 Logo、锁定色系、字体、三风格资料包和已校验结构页最小包。优先读取 Git 知识库，断网时使用本地已校验模板；正文可灵活编排。
 metadata:
-  version: "1.0.30"
+  version: "1.0.31"
 ---
 
 # 新点企业演示文稿：新模板方案
+
+分发完整性故障不得降格成交付：出现清单哈希错误时，保留具体错误文件、期望哈希、实际哈希及来源提交，先检查安装包与缓存；不得跳过校验、现场重算清单或将完整稿静默改为品牌重绘。发布前在暂存拟发布文件后运行 `scripts/prepare_distribution.py --root <技能根目录> --manifest-root <最小包目录> --write`，统一文本字节后重建清单，并对 Git 归档和 LF/CRLF 检出分别验收。不带 `--write` 仅校验；运行期始终比较原始字节。
 
 ## 跨平台统一入口
 
