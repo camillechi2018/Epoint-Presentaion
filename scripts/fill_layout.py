@@ -582,7 +582,7 @@ def fill(lib,layout,content,out,allow_draft=False,internal=False,logo_config=Non
     if commit is not None:
         if not isinstance(commit,str) or not re.fullmatch(r'[0-9a-f]{40}',commit):
             raise ValueError('library_commit 须为完整 Git 提交号')
-        if (lib/'.git').is_dir():
+        if (lib/'.git').exists():
             actual=subprocess.check_output(['git','-C',str(lib),'rev-parse','HEAD'],text=True).strip()
         else:
             manifest=json.loads((lib/'knowledge-manifest.json').read_text(encoding='utf-8'))

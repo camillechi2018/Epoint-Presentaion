@@ -128,7 +128,7 @@ def resolve_library(override=None, *, allow_verified_cache=True, cache_only=Fals
     if override is not None:
         root = Path(override).resolve()
         manifest = validate_manifest(root, cfg)
-        commit = _git(['rev-parse', 'HEAD'], root) if (root / '.git').is_dir() else manifest.get('source_commit')
+        commit = _git(['rev-parse', 'HEAD'], root) if (root / '.git').exists() else manifest.get('source_commit')
         return root, 'explicit_verified', commit, None
     if cfg.get('mode') != 'git':
         root = (SKILL / cfg['local_path']).resolve()

@@ -73,6 +73,14 @@ class FullCacheTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'full_cache_dirty'):
             lib.verified_full_cache(self.cfg, self.marker)
 
+    def test_explicit_worktree_retains_actual_commit(self):
+        worktree = self.root / 'linked-worktree'
+        lib._git(['worktree', 'add', '--detach', str(worktree), self.commit], self.repo)
+        self.assertTrue((worktree / '.git').is_file())
+        with patch.object(lib, 'config', return_value=self.cfg):
+            resolved = lib.resolve_library(worktree)
+        self.assertEqual(resolved[1:3], ('explicit_verified', self.commit))
+
     def test_corrupted_manifest_is_rejected(self):
         self.marker.write_text(self.marker.read_text(encoding='utf-8').replace(self.commit, '0' * 40), encoding='utf-8')
         with self.assertRaisesRegex(RuntimeError, 'full_cache_commit_mismatch'):

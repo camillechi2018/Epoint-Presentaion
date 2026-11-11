@@ -58,7 +58,8 @@ def main():
         versions = capture([python, '-c', 'import importlib.metadata,json; print(json.dumps({p:importlib.metadata.version(p) for p in ["python-pptx","Pillow","lxml","XlsxWriter","typing_extensions"]}))'])
         if versions['returncode'] != 0:
             raise RuntimeError('DEPENDENCY_VERSION_REPORT_FAILED')
-        record = {'schema_version': '1.0', 'python': str(python.resolve()),
+        # Do not resolve a POSIX venv symlink to /usr/bin/python: it loses venv discovery.
+        record = {'schema_version': '1.0', 'python': str(python.absolute()),
                   'requirements_sha256': hashlib.sha256(requirements.read_bytes()).hexdigest(),
                   'versions': json.loads(versions['stdout']), 'previous_python': None}
         active = root / 'runtime.json'

@@ -13,6 +13,7 @@ SCRIPTS = Path(__file__).resolve().parents[1] / 'scripts'
 sys.path.insert(0, str(SCRIPTS))
 from distribution import canonical_bytes, normalize_files, refresh_manifest, verify_manifest, write_json
 from runtime_paths import state_root
+import install_runtime
 
 
 class DistributionRuntimeTests(unittest.TestCase):
@@ -75,6 +76,32 @@ class DistributionRuntimeTests(unittest.TestCase):
             target = state_root()
             self.assertEqual(target, (self.root / '中文 state').resolve())
             self.assertFalse(target.exists())
+
+    @unittest.skipIf(os.name == 'nt', 'POSIX virtualenv interpreter symlink')
+    def test_installer_retains_virtualenv_symlink_path(self):
+        target = self.root / 'venvs' / 'test' / 'bin' / 'python'
+        target.parent.mkdir(parents=True)
+        target.symlink_to(sys.executable)
+        success = {'returncode': 0, 'stdout': '{}', 'stderr': '', 'error': None}
+        def fake_capture(args, **kwargs):
+            if 'doctor.py' in str(args[1]):
+                return {**success, 'stdout': '{"blockers":[]}'}
+            return success
+        # Freeze the package hash and platform path to point at the symlink fixture.
+        with patch.object(install_runtime, 'state_root', return_value=self.root), \
+             patch.object(install_runtime.hashlib, 'sha256') as digest, \
+             patch.object(install_runtime.platform, 'system', return_value='X'), \
+             patch.object(install_runtime.platform, 'machine', return_value='Y'), \
+             patch.object(install_runtime, 'capture', side_effect=fake_capture), \
+             patch.object(sys, 'argv', ['install_runtime.py']):
+            digest.return_value.hexdigest.return_value = 'fixture'
+            expected = self.root / 'venvs' / f'X-Y-{sys.version_info.major}.{sys.version_info.minor}-fixture' / 'bin' / 'python'
+            expected.parent.mkdir(parents=True)
+            expected.symlink_to(sys.executable)
+            self.assertEqual(install_runtime.main(), 0)
+            record = json.loads((self.root / 'runtime.json').read_text(encoding='utf-8'))
+            self.assertEqual(record['python'], str(expected.absolute()))
+            self.assertNotEqual(record['python'], str(expected.resolve()))
 
 
 if __name__ == '__main__':
