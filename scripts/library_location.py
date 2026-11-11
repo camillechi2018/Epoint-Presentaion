@@ -1,19 +1,14 @@
-"""Resolve the configured knowledge base, updating the Git checkout when used."""
+"""Resolve verified knowledge snapshots without modifying the installation directory."""
 from pathlib import Path
 import json
 import os
 import subprocess
 from hashlib import sha256
-import tempfile
 import time
+import re
 
 from distribution import verify_manifest
-
-
-def build_minimal_pack(library, target):
-    # Cache verification must work before optional PPTX dependencies are installed.
-    from build_minimal_pack import build
-    return build(library, target)
+from managed_library_cache import online as managed_online, cached as managed_cached
 
 SKILL = Path(__file__).resolve().parents[1]
 
@@ -22,25 +17,35 @@ def config():
     return json.loads((SKILL / 'knowledge-base.json').read_text(encoding='utf-8-sig'))
 
 
-def _git(args, cwd=None):
-    attempts = 2 if args and args[0] in ('fetch', 'clone') else 1
+def _git(args, cwd=None, timeout=35):
+    attempts = 2 if args and args[0] in ('fetch', 'ls-remote') else 1
     for attempt in range(attempts):
         try:
             result = subprocess.run(
                 ['git', *args], cwd=cwd, capture_output=True, text=True,
-                encoding='utf-8', errors='replace', timeout=35,
-                env={**os.environ, 'GIT_TERMINAL_PROMPT': '0', 'GCM_INTERACTIVE': 'never'},
+                encoding='utf-8', errors='strict', timeout=timeout,
+                env={**os.environ, 'GIT_TERMINAL_PROMPT': '0', 'GCM_INTERACTIVE': 'never',
+                     'GIT_OPTIONAL_LOCKS': '0'},
             )
         except subprocess.TimeoutExpired as exc:
             error = 'git_timeout: ' + ' '.join(args[:2])
+        except UnicodeDecodeError:
+            error = 'git_output_encoding'
+        except FileNotFoundError:
+            raise RuntimeError('git_not_installed')
         else:
             if result.returncode == 0:
                 return result.stdout.strip()
             detail = result.stderr.strip() or result.stdout.strip()
+            detail = re.sub(r'https?://[^\s/@]+:[^\s/@]+@', 'https://[REDACTED]@', detail)
             lowered = detail.lower()
             if any(x in lowered for x in ('403', '401', 'authentication', 'permission denied', 'repository not found')):
                 category = 'git_permission'
-            elif any(x in lowered for x in ('proxy', '502', '503', 'timed out', 'could not resolve', 'connection')):
+            elif 'proxy' in lowered or 'connect tunnel' in lowered:
+                category = 'git_proxy'
+            elif any(x in lowered for x in ('ssl certificate', 'certificate verify', 'server certificate')):
+                category = 'git_tls'
+            elif any(x in lowered for x in ('502', '503', 'timed out', 'could not resolve', 'connection')):
                 category = 'git_network'
             else:
                 category = 'git_command'
@@ -56,6 +61,8 @@ def verified_full_cache(cfg, marker):
     if not marker.is_file() or not (checkout / '.git').exists():
         raise RuntimeError('full_cache_missing')
     record = json.loads(marker.read_text(encoding='utf-8'))
+    if not isinstance(record, dict):
+        raise ValueError('full_cache_record_invalid')
     if record.get('root') != str((checkout / cfg.get('git_repository_directory', '.')).resolve()):
         raise RuntimeError('full_cache_origin_mismatch: root')
     if _git(['remote', 'get-url', 'origin'], checkout) != cfg['git_url']:
@@ -76,39 +83,7 @@ def verified_full_cache(cfg, marker):
 
 
 def git_library(cfg):
-    url = cfg.get('git_url')
-    branch = cfg.get('git_branch', 'main')
-    checkout = (SKILL / cfg['git_checkout_path']).resolve()
-    if not url or not url.startswith('https://'):
-        raise ValueError('Git 知识库需要 HTTPS git_url')
-    if not (checkout / '.git').exists():
-        checkout.parent.mkdir(parents=True, exist_ok=True)
-        _git(['-c', 'core.autocrlf=false', 'clone', '--depth', '1', '--filter=blob:none', '--single-branch',
-              '--branch', branch, url, str(checkout)])
-    if _git(['remote', 'get-url', 'origin'], checkout) != url:
-        raise RuntimeError('知识库缓存的 origin 与配置不符：' + str(checkout))
-    _git(['config', 'core.autocrlf', 'false'], checkout)
-    if _git(['branch', '--show-current'], checkout) != branch:
-        raise RuntimeError('知识库缓存不在指定分支：' + str(checkout))
-    if _git(['status', '--porcelain'], checkout):
-        raise RuntimeError('知识库缓存有本地改动，无法安全更新：' + str(checkout))
-    _git(['fetch', 'origin', branch], checkout)
-    remote_head = _git(['rev-parse', 'FETCH_HEAD'], checkout)
-    local_head = _git(['rev-parse', 'HEAD'], checkout)
-    if local_head != remote_head:
-        # Check the incoming tree before changing the last known good checkout.
-        with tempfile.TemporaryDirectory(prefix='epoint-candidate-', dir=checkout.parent) as temporary:
-            _git(['worktree', 'add', '--detach', temporary, remote_head], checkout)
-            try:
-                validate_manifest(Path(temporary) / cfg.get('git_repository_directory', '.'), cfg)
-            finally:
-                _git(['worktree', 'remove', '--force', temporary], checkout)
-        _git(['merge', '--ff-only', 'FETCH_HEAD'], checkout)
-    directory = cfg.get('git_repository_directory', '.')
-    root = (checkout / directory).resolve()
-    if not root.is_relative_to(checkout):
-        raise ValueError('非法 Git 知识库子目录：' + directory)
-    return root
+    return managed_online(cfg, _git, validate_manifest)
 
 
 def validate_manifest(root, cfg):
@@ -134,7 +109,6 @@ def resolve_library(override=None, *, allow_verified_cache=True, cache_only=Fals
         root = (SKILL / cfg['local_path']).resolve()
         validate_manifest(root, cfg)
         return root, 'local_verified_template', None, None
-    marker = (SKILL / cfg['cache_path']).resolve() / 'last-good.json'
     pack = (SKILL / cfg['offline_pack_path']).resolve()
     try:
         if cache_only:
@@ -142,35 +116,33 @@ def resolve_library(override=None, *, allow_verified_cache=True, cache_only=Fals
         root = git_library(cfg)
         validate_manifest(root, cfg)
         commit = _git(['rev-parse', 'HEAD'], root)
-        pack_manifest = pack / cfg.get('manifest', 'knowledge-manifest.json')
-        needs_pack = True
-        if pack_manifest.is_file():
-            try:
-                needs_pack = validate_manifest(pack, cfg).get('source_commit') != commit
-            except (RuntimeError, FileNotFoundError, ValueError):
-                needs_pack = True
-        if needs_pack:
-            build_minimal_pack(root, pack)
-            if validate_manifest(pack, cfg).get('source_commit') != commit:
-                raise RuntimeError('离线模板包版本与远端知识库不一致')
-        marker.parent.mkdir(parents=True, exist_ok=True)
-        marker.write_text(json.dumps({'commit': commit,
-                                      'manifest_sha256': sha256((root / cfg.get('manifest', 'knowledge-manifest.json')).read_bytes()).hexdigest(),
-                                      'root': str(root)}, ensure_ascii=False, indent=2), encoding='utf-8')
+        # Full snapshots already provide offline access. Never regenerate the bundled
+        # minimum package or write last-good state into an installation directory.
         return root, 'remote_template', commit, None
-    except (RuntimeError, FileNotFoundError, ValueError) as exc:
+    except (RuntimeError, OSError, ValueError) as exc:
+        failures = [] if cache_only else [str(exc)]
         if allow_verified_cache:
             try:
+                root, commit, recovery = managed_cached(cfg, _git, validate_manifest)
+                if recovery:
+                    failures.append('recovered_previous_snapshot: ' + recovery)
+                return root, 'verified_full_cache', commit, '; '.join(failures) or None
+            except (RuntimeError, OSError, ValueError) as cache_exc:
+                failures.append(str(cache_exc))
+            # Compatibility only: validate old last-good records but never update or
+            # modify the old checkout. New successful downloads use managed snapshots.
+            try:
+                marker = (SKILL / cfg['cache_path']).resolve() / 'last-good.json'
                 root, commit = verified_full_cache(cfg, marker)
-                return root, 'verified_full_cache', commit, None if cache_only else str(exc)
-            except (RuntimeError, FileNotFoundError, ValueError) as cache_exc:
-                cache_warning = str(exc) + '; ' + str(cache_exc)
-        else:
-            cache_warning = str(exc)
-        if not allow_verified_cache or not pack.is_dir():
-            raise RuntimeError(cache_warning) from exc
+                return root, 'verified_full_cache', commit, '; '.join(failures + ['legacy_cache_read_only'])
+            except (RuntimeError, OSError, ValueError, KeyError) as legacy_exc:
+                failures.append(str(legacy_exc))
+        if not allow_verified_cache:
+            raise RuntimeError('; '.join(failures)) from exc
+        if not pack.is_dir():
+            raise RuntimeError('; '.join(failures)) from exc
         manifest = validate_manifest(pack, cfg)
-        return pack, 'local_verified_template', manifest['source_commit'], None if cache_only else cache_warning
+        return pack, 'local_verified_template', manifest['source_commit'], '; '.join(failures) or None
 
 
 def get_library(override=None):

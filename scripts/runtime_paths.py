@@ -1,6 +1,8 @@
 """Platform-aware locations, without creating directories at import time."""
 import os
 import sys
+import hashlib
+import json
 from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
@@ -24,3 +26,11 @@ def locations(override=None):
     return {'skill': str(SKILL_ROOT), 'state': str(state),
             'cache': str(Path(os.environ.get('EPOINT_CACHE_DIR', state / 'cache')).expanduser().resolve()),
             'venv': str(state / 'venv')}
+
+
+def library_paths(cfg):
+    identity = {key: cfg.get(key) for key in ('git_url', 'git_branch', 'git_repository_directory', 'version')}
+    key = hashlib.sha256(json.dumps(identity, sort_keys=True).encode('utf-8')).hexdigest()[:24]
+    root = Path(locations()['cache']) / 'libraries' / key
+    return {'root': root, 'snapshots': root / 'snapshots', 'marker': root / 'last-good.json',
+            'lock': root / 'update.lock'}

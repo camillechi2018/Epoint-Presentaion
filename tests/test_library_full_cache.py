@@ -1,6 +1,7 @@
 """The network fallback must not silently accept a dirty or corrupted checkout."""
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -17,6 +18,9 @@ class FullCacheTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
+        self.env_patch = patch.dict(os.environ, {'EPOINT_CACHE_DIR': str(self.root / 'user-cache')})
+        self.env_patch.start()
+        self.addCleanup(self.env_patch.stop)
         self.repo = self.root / 'checkout'
         self.repo.mkdir()
         self.cfg = {'version': 'test', 'mode': 'git', 'git_url': 'https://example.com/library.git',
@@ -60,13 +64,15 @@ class FullCacheTests(unittest.TestCase):
             'version': 'test', 'source_commit': self.commit, 'files': {'catalog.json': digest}}), encoding='utf-8')
         return pack
 
-    def test_online_checkout_pins_commit_and_marker(self):
+    def test_resolver_leaves_legacy_marker_unchanged(self):
         self.make_minimal_pack()
+        before = self.marker.read_bytes()
         with patch.object(lib, 'config', return_value=self.cfg), patch.object(
                 lib, 'git_library', return_value=self.repo.resolve()):
             resolved = lib.resolve_library()
         self.assertEqual(resolved[1:3], ('remote_template', self.commit))
         self.assertEqual(json.loads(self.marker.read_text(encoding='utf-8'))['commit'], self.commit)
+        self.assertEqual(self.marker.read_bytes(), before)
 
     def test_dirty_cache_is_rejected(self):
         (self.repo / 'catalog.json').write_text('{"layouts":[1]}', encoding='utf-8')

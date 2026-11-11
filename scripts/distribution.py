@@ -52,6 +52,8 @@ def safe_file(root, relative):
 def verify_manifest(root, manifest_name='knowledge-manifest.json', version=None):
     root = Path(root).resolve()
     manifest = json.loads(safe_file(root, manifest_name).read_text(encoding='utf-8'))
+    if not isinstance(manifest, dict):
+        raise ValueError('manifest_invalid_object')
     if version is not None and manifest.get('version') != version:
         raise ValueError('manifest_version_mismatch')
     files = manifest.get('files')
