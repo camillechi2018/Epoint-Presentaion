@@ -43,7 +43,7 @@ def audit(path: Path, require_every_slide: bool = False, theme: str | None = Non
                     return
                 with Image.open(io.BytesIO(archive.read(media))) as image:
                     pixels = image.convert("RGBA")
-                    visible = [pixel for pixel in pixels.get_flattened_data() if pixel[3] >= 64]
+                    visible = [pixel for pixel in pixels.getdata() if pixel[3] >= 64]
                 if visible and sum(max(pixel[:3]) - min(pixel[:3]) > 12 for pixel in visible) / len(visible) > .005:
                     issues.append({"slide": number, "code": "red_logo_not_monochrome", "shape": label, "media": media})
             logo_count = 0

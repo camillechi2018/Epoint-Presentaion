@@ -76,6 +76,11 @@ def assemble(first, second, output):
     def copy_part(old):
         if old in copied:
             return copied[old]
+        if old.startswith('ppt/notesMasters/') and old.endswith('.xml'):
+            existing = sorted(name for name in out if name.startswith('ppt/notesMasters/') and name.endswith('.xml'))
+            if existing:
+                copied[old] = existing[0]
+                return existing[0]
         if old not in source:
             raise ValueError('SOURCE_RELATION_MISSING: ' + old)
         folder, name = posixpath.split(old)
@@ -138,12 +143,24 @@ def assemble(first, second, output):
     if masters is None:
         masters = ET.Element('{' + P + '}sldMasterIdLst')
         presentation.insert(0, masters)
-    master_id = max([int(x.attrib['id']) for x in masters] or [2147483647]) + 1
+    # Master and layout identifiers share a presentation-wide namespace in
+    # PowerPoint. A cloned master may repeat layout IDs from the first deck.
+    numeric_ids = {int(x.attrib['id']) for x in masters}
+    for part in out:
+        if part.startswith('ppt/slideMasters/') and part.endswith('.xml') and part not in copied.values():
+            root = xml(out[part])
+            numeric_ids.update(int(x.attrib['id']) for x in root.iter('{' + P + '}sldLayoutId'))
+    master_id = max(numeric_ids or {2147483647}) + 1
     for old, new in copied.items():
         if old.startswith('ppt/slideMasters/') and old.endswith('.xml'):
+            master_root = xml(out[new])
+            for layout_id in master_root.iter('{' + P + '}sldLayoutId'):
+                master_id += 1
+                layout_id.attrib['id'] = str(master_id)
+            out[new] = bytes_xml(master_root)
+            master_id += 1
             ET.SubElement(masters, '{' + P + '}sldMasterId',
                           {'id': str(master_id), '{' + R + '}id': add_link(new, 'slideMaster')})
-            master_id += 1
     # Filled source decks may register many unused masters. PowerPoint rejects
     # the merged package when all source masters remain registered. Determine
     # the actual master from each visible slide's layout and keep only those.
