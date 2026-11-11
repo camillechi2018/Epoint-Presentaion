@@ -9,6 +9,8 @@ metadata:
 
 ## 跨平台统一入口
 
+跨系统安装与故障诊断见[运行环境说明](references/cross-platform-runtime.md)。环境自检使用 `scripts/run_presentation.py --doctor --out <诊断.json>`，无需先安装 PPTX 依赖；安装后可用 `scripts/run.py` 转调已锁定的虚拟环境解释器。自检通过仅代表所选目标的环境检查通过，当前非 Windows 完整组装后端仍待实现，不能因此绘制结构页绕过原有阻断。
+
 **整稿章节页版式锁定。** 同一份演示稿的所有 `section` 页使用同一个知识库 `layout_id`，只替换章节编号、标题与该版式允许的文字字段。第一张章节页实际填充成功后锁定其版式；后续章节页不得因换封面、随机种子、相邻去重或候选排序而改用另一款。若该版式容纳不了后续章节文字，应调整该章节文案或重新为整稿选择一款能容纳全部章节的版式；不得只把这一页换版。最终检查全部章节页的实际 `layout_id` 一致。
 
 整套出稿先调用 `scripts/run_presentation.py --request <逐页请求.json> --out <预检报告.json> --plan-out <逐页计划.json>`；具备每页 `content` 时再加 `--execute-out <成稿.pptx>`。在无网络环境加 `--offline`。入口统一返回 `ready`、`partial_draft` 或 `blocked`、错误代码、知识库来源与提交号、三风格本地样本状态、逐页选版和未复用原因。远端可达时固定经清单校验的提交；远端失败或显式离线时，先验证上次成功提交的完整、干净缓存及其来源和清单哈希，再使用 12 页最小包。完整缓存来源标为 `verified_full_cache`，最小包标为 `local_verified_template`；首次离线没有完整缓存会降低正文候选覆盖，须在报告中说明。只在 `ready` 时组装完整 PPTX；组装后核对结构页来源及颜色独立性。`library_used` 只按实际填充源模板页记录。

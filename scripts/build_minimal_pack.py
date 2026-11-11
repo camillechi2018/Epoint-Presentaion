@@ -13,6 +13,7 @@ from zipfile import ZipFile
 
 from lxml import etree
 from pptx import Presentation
+from distribution import normalize_files, write_json
 
 SKILL = Path(__file__).resolve().parents[1]
 SELECTION = {
@@ -147,11 +148,13 @@ def build(library: Path, target: Path):
         mini_catalog = {key: value for key, value in catalog.items() if key != 'layouts'}
         mini_catalog['layouts'] = selected
         mini_catalog['component_entries'] = len(selected)
-        (staging / 'catalog.json').write_text(json.dumps(mini_catalog, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        write_json(staging / 'catalog.json', mini_catalog)
+        normalize_files(staging, [p.relative_to(staging).as_posix()
+                                  for p in staging.rglob('*') if p.is_file()])
         hashes = {p.relative_to(staging).as_posix(): digest(p) for p in sorted(staging.rglob('*')) if p.is_file()}
         manifest = {'schema_version': '1.0', 'version': catalog['version'], 'source_commit': commit,
                     'status': 'draft_pending_review', 'file_count': len(hashes), 'files': hashes}
-        (staging / 'knowledge-manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        write_json(staging / 'knowledge-manifest.json', manifest)
         previous = target.with_name(target.name + '.previous')
         if previous.exists():
             shutil.rmtree(previous)

@@ -13,14 +13,19 @@ import sys
 from pathlib import Path
 
 from library_location import SKILL, resolve_library
-from plan_deck import resolve
-from content_adapters import (adapt_for_layout, classify_trial_failure,
-                              structural_mapping_issue, field_source_evidence)
-from capacity_preflight import preflight as capacity_preflight
-from fill_layout import fill
-from render_offline_brand import render as render_guided_page, resolved_variant, validate_page
-from fallback_rules import fallback_type
-from audit_deck import audit as audit_deck
+def _load_workflow():
+    # Environment inspection and library preflight must not require rendering packages.
+    global resolve, adapt_for_layout, classify_trial_failure, structural_mapping_issue
+    global field_source_evidence, capacity_preflight, fill, render_guided_page
+    global resolved_variant, validate_page, fallback_type, audit_deck
+    from plan_deck import resolve
+    from content_adapters import (adapt_for_layout, classify_trial_failure,
+                                  structural_mapping_issue, field_source_evidence)
+    from capacity_preflight import preflight as capacity_preflight
+    from fill_layout import fill
+    from render_offline_brand import render as render_guided_page, resolved_variant, validate_page
+    from fallback_rules import fallback_type
+    from audit_deck import audit as audit_deck
 
 STYLES = {
     'blue': 'legacy-blue-red',
@@ -182,6 +187,7 @@ def _skill_version():
 
 
 def execute_plan(request, plan, report, output: Path):
+    _load_workflow()
     """Fill each planned page, assemble it and audit mandatory source pages."""
     if not report['can_make_complete_deck'] or request.get('format', 'pptx') != 'pptx':
         raise ValueError('预检未通过完整 PPTX 出稿门槛')
@@ -379,6 +385,9 @@ def execute_plan(request, plan, report, output: Path):
 
 
 def main():
+    if '--doctor' in sys.argv[1:]:
+        from doctor import main as doctor_main
+        return doctor_main([arg for arg in sys.argv[1:] if arg != '--doctor'])
     ap = argparse.ArgumentParser(description='知识库预检与逐页规划的统一入口')
     ap.add_argument('--request', type=Path, required=True)
     ap.add_argument('--out', type=Path, required=True)
@@ -394,6 +403,7 @@ def main():
     if report['status'] == 'ready' and (args.plan_out or args.execute_out) and request.get('pages'):
         stage = 'planning'
         try:
+            _load_workflow()
             plan_request = dict(request)
             plan_request['allow_draft'] = request.get('asset_policy', 'verified_draft') != 'approved_only'
             plan_request['allow_provisional'] = request.get('asset_policy') == 'provisional_manual'
@@ -410,10 +420,12 @@ def main():
                 args.plan_out.parent.mkdir(parents=True, exist_ok=True)
                 args.plan_out.write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding='utf-8')
                 report['plan_path'] = str(args.plan_out.resolve())
-        except (ValueError, KeyError, FileNotFoundError, RuntimeError, OSError) as exc:
+        except (ValueError, KeyError, FileNotFoundError, RuntimeError, OSError, ImportError) as exc:
             report['status'] = 'blocked'
             report['can_make_complete_deck'] = False
-            report['error_code'] = 'PAGE_LAYOUT_UNAVAILABLE' if stage == 'planning' else 'PPTX_EXECUTION_FAILED'
+            report['error_code'] = ('RUNTIME_DEPENDENCY_MISSING' if isinstance(exc, ImportError)
+                                    else 'PAGE_LAYOUT_UNAVAILABLE' if stage == 'planning'
+                                    else 'PPTX_EXECUTION_FAILED')
             report['warnings'].append(safe_message(exc))
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')

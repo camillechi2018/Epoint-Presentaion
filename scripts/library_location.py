@@ -7,7 +7,13 @@ from hashlib import sha256
 import tempfile
 import time
 
-from build_minimal_pack import build as build_minimal_pack
+from distribution import verify_manifest
+
+
+def build_minimal_pack(library, target):
+    # Cache verification must work before optional PPTX dependencies are installed.
+    from build_minimal_pack import build
+    return build(library, target)
 
 SKILL = Path(__file__).resolve().parents[1]
 
@@ -113,16 +119,7 @@ def validate_manifest(root, cfg):
     manifest = root / cfg.get('manifest', 'knowledge-manifest.json')
     if not manifest.is_file():
         raise FileNotFoundError('知识库目录缺少清单：' + str(manifest))
-    data = json.loads(manifest.read_text(encoding='utf-8'))
-    if data.get('version') != cfg['version']:
-        raise RuntimeError(f'知识库版本 {data.get("version")} 与 Skill 配置 {cfg["version"]} 不一致')
-    for relative, expected in data.get('files', {}).items():
-        file = (root / relative).resolve()
-        if not file.is_relative_to(root) or not file.is_file():
-            raise RuntimeError('知识库清单缺失或非法文件：' + relative)
-        if sha256(file.read_bytes()).hexdigest() != expected:
-            raise RuntimeError('知识库文件哈希不匹配：' + relative)
-    return data
+    return verify_manifest(root, cfg.get('manifest', 'knowledge-manifest.json'), cfg['version'])
 
 
 def resolve_library(override=None, *, allow_verified_cache=True, cache_only=False):
