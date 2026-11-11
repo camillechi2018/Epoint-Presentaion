@@ -14,7 +14,10 @@ from distribution import verify_manifest, write_json
 from runtime_paths import SKILL_ROOT, locations
 from runtime_process import capture
 
-IMPORTS = {'pptx': 'python-pptx', 'PIL': 'Pillow', 'lxml': 'lxml'}
+IMPORTS = {'pptx': 'python-pptx', 'PIL': 'Pillow', 'lxml': 'lxml',
+           'openpyxl': 'openpyxl', 'xlrd': 'xlrd', 'docx': 'python-docx'}
+PPTX_IMPORTS = ('pptx', 'PIL', 'lxml')
+MATERIAL_IMPORTS = ('openpyxl', 'xlrd', 'docx')
 
 
 def probe_import(module):
@@ -99,7 +102,8 @@ def report(*, library=None, state_dir=None, goal='inspect', deep=False):
         blockers.append('PYTHON_VERSION_UNSUPPORTED')
     if library_check['status'] != 'available':
         blockers.append(library_check['error_code'])
-    if goal in {'fill', 'assemble'} and any(x['status'] != 'available' for x in dependencies.values()):
+    required = MATERIAL_IMPORTS if goal == 'read' else PPTX_IMPORTS if goal in {'fill', 'assemble'} else ()
+    if any(dependencies[name]['status'] != 'available' for name in required):
         blockers.append('DEPENDENCY_IMPORT_FAILED')
     if goal == 'assemble' and assembly['status'] != 'available':
         blockers.append(assembly['error_code'])
@@ -127,7 +131,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--library', type=Path)
     parser.add_argument('--state-dir', type=Path)
-    parser.add_argument('--goal', choices=['inspect', 'fill', 'assemble'], default='inspect')
+    parser.add_argument('--goal', choices=['inspect', 'read', 'fill', 'assemble'], default='inspect')
     parser.add_argument('--out', type=Path)
     parser.add_argument('--deep', action='store_true')
     args = parser.parse_args(argv)

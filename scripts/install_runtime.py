@@ -47,6 +47,9 @@ def main():
         result = capture(command, timeout=240)
         if result['returncode'] != 0:
             # Avoid printing proxy credentials or index URLs from pip output.
+            if args.wheelhouse and ('No matching distribution found' in result['stderr'] or
+                                    'Could not find a version' in result['stderr']):
+                raise RuntimeError('OFFLINE_WHEEL_INCOMPATIBLE: provide wheels matching this Python version and OS/architecture')
             raise RuntimeError(result['error'] or 'DEPENDENCY_INSTALL_FAILED: check package source/network or use --wheelhouse')
         stage = 'verify_environment'
         result = capture([python, SKILL_ROOT / 'scripts' / 'doctor.py', '--goal', 'fill'], timeout=45)
@@ -55,7 +58,10 @@ def main():
         doctor = json.loads(result['stdout'])
         if doctor['blockers']:
             raise RuntimeError('INSTALLED_RUNTIME_VALIDATION_FAILED')
-        versions = capture([python, '-c', 'import importlib.metadata,json; print(json.dumps({p:importlib.metadata.version(p) for p in ["python-pptx","Pillow","lxml","XlsxWriter","typing_extensions"]}))'])
+        material_check = capture([python, SKILL_ROOT / 'scripts' / 'doctor.py', '--goal', 'read'], timeout=45)
+        if material_check['returncode'] != 0 or json.loads(material_check['stdout'])['blockers']:
+            raise RuntimeError('MATERIAL_RUNTIME_VALIDATION_FAILED: run doctor.py --goal read for details')
+        versions = capture([python, '-c', 'import importlib.metadata,json; print(json.dumps({p:importlib.metadata.version(p) for p in ["python-pptx","Pillow","lxml","openpyxl","xlrd","python-docx","et-xmlfile","XlsxWriter","typing_extensions"]}))'])
         if versions['returncode'] != 0:
             raise RuntimeError('DEPENDENCY_VERSION_REPORT_FAILED')
         # Do not resolve a POSIX venv symlink to /usr/bin/python: it loses venv discovery.
