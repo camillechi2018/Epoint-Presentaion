@@ -1,6 +1,6 @@
 # 跨系统运行：S1 候选实现
 
-本轮解决发布字节校验、隔离依赖安装、独立自检及知识库缓存迁移。S2 原生组装已完成 Windows/Linux 代表性技术验收；正式入口集成和真实材料整稿仍待 S3/S4，不得把安装成功或自检通过当成 Mac/Linux 整稿支持。
+本轮解决发布字节校验、隔离依赖安装、独立自检及知识库缓存迁移。S2 原生组装和 S3 必要交付门槛已完成代表性验证；S4 字体与渲染校准进行中。安装成功或自检通过不等于 Mac/Linux 整稿交付通过。
 
 ## 安装与运行
 
@@ -29,7 +29,7 @@
 
 显式添加 `--deep` 时，在指定用户状态目录及缓存目录写入并读取临时文件，并用当前 Python 创建一页含中文可编辑文本的 PPTX，保存后重开核对。`--state-dir` 与 `EPOINT_CACHE_DIR` 可指定这些检查使用的目录；检查报告的 `deep_checks` 记录结果。此检查验证写入与 PPTX 基础往返，不代表已有模板的合并、目标 Office 打开、导出或视觉验收。
 
-结果区分 available、unavailable、untested，stdout 仅输出 ASCII 安全的机器 JSON；报告文件为 UTF-8。基础自检不会启动 Office、自动上传材料、安装依赖或调整网络设置。字体、实际渲染、应用打开与导出、网络连通性主动探测仍待后续补齐。
+结果区分 available、unavailable、untested，stdout 仅输出 ASCII 安全的机器 JSON；报告文件为 UTF-8。基础自检不会启动 Office、自动上传材料、安装依赖或调整网络设置。S4 起 `--font-profile windows|macos|linux` 探测任务字体是否安装；`fill`/`assemble` 缺字体现为 `FONT_PROFILE_RESOURCE_MISSING`。探测不证明字体在目标渲染器内的字形、换行或版面正确；应用打开与导出仍需校准。
 
 ## 分发与校验
 
@@ -73,3 +73,13 @@ S2 代表性签收另覆盖四图表与表格混合包、含 PNG/SVG/WDP 和嵌�
 ## S3 必要交付门槛
 
 正式完整稿要求封面、目录、至少一张章节页和封底，且章节使用同一 `layout_id`。组装前 `delivery_gate.py` 复验固定知识库清单、源文件哈希、组件来源页、填充单页哈希与标记；组装后检查包关系、页数和最终页关联。正常样本及缺目录、章节混用、伪造来源、坏包反例各跑一次即可，不重新验收知识库全部组件。`run_presentation.py` 的 `status=ready` 仍只表示预检通过；成稿另报告 `delivery_status`，未做人工视觉复核时保持 `pending_visual_review`。Mac PowerPoint 与真实材料三风格整稿另在 S4 验证。
+
+## S4 字体配置与渲染校准
+
+完整出稿请求可设置 `font_profile` 为 `windows`、`macos` 或 `linux`。省略时按当前系统选择；整个任务的填充、技能新绘、组装归一、字体审计和报告使用同一配置。当前配置为 Windows 微软雅黑／Arial、macOS 苹方／Helvetica Neue、Linux Noto Sans CJK SC／Noto Sans。缺少字体时完整出稿阻断并指出缺失字体，不静默回退。不同系统原生字体须分别生成和验收 PPTX，不能期待同一文件自动切换字体。源知识库不改写；仅处理任务副本。对已通过 Windows 字体容量验收的组件，换字体后仍须复核窄槽、表格及接近容量上限的文案。
+
+`scripts/font_profile.py --profile <配置> --out <诊断.json>` 只检查字体资源。`scripts/calibrate_renderer.py --profile <配置> --fixture <已知正常样本.pptx> --out-dir <目录>` 先复制样本、归一与审计字体，再用本机 PowerPoint 或 Linux LibreOffice 导出逐页图，并记录源文件哈希、渲染应用版本、页数、用时和失败页。每次可重复指定 `--fixture`。报告的 `rendered_pending_visual_review` 只代表导出完成；需打开生成的 PNG 做文字边界、缺字、重叠、Logo、背景、图表及透明素材的人工检查。LibreOffice 的图形效果结果不能替代 PowerPoint 的打开或渲染结论，Quick Look 只能作预览。
+
+Linux 任务副本中，LibreOffice 不能正确显示的可编辑文字渐变会转换成其最亮可见色标的纯色；转换次数写入 `font_normalization.gradient_text_fallbacks`。此适配只处理 Linux 输出，不修改知识库原稿，也不改变 Windows/Mac 文件。其视觉颜色仍须与目标应用逐页复核；渐变效果本身不会在 Linux 版本中保留。
+
+Mac 实机先运行字体探测与校准脚本；若不能自动导出，逐页用 PowerPoint 打开并导出 PNG，记录应用版本、缺字或溢出页、原 PPTX 和预览图哈希。未收到 Mac 实机记录前保持待验收。

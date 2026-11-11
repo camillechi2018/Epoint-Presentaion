@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import platform
 import re
 import shutil
 import subprocess
@@ -13,6 +14,7 @@ import sys
 from pathlib import Path
 
 from library_location import SKILL, resolve_library
+from font_profile import probe as probe_font_profile
 def _load_workflow():
     # Environment inspection and library preflight must not require rendering packages.
     global resolve, adapt_for_layout, classify_trial_failure, structural_mapping_issue
@@ -360,6 +362,7 @@ def execute_plan(request, plan, report, output: Path):
                             'image_sources': page.get('image_sources') or free_images or ([content['image_path']] if content.get('image_path') else None)})
     assembly = {'theme': report['theme'], 'library_commit': report['library_commit'],
                 'library_source': report['library_source'], 'complete_deck': True,
+                'font_profile': report['font_profile']['profile']['id'],
                 'require_template_source': all(x['selection_mode'] == 'source_template' for x in plan['pages']),
                 'slides': slides, 'pages': audit_pages}
     manifest_path = work / 'assembly-plan.json'
@@ -371,7 +374,8 @@ def execute_plan(request, plan, report, output: Path):
     command = [report['runtime']['powershell'], '-NoProfile', '-File',
                str(SKILL / 'scripts' / 'assemble_deck.ps1'), '-Manifest', str(manifest_path),
                '-OutputPath', str(output), '-RenderDirectory', str(render_dir),
-               '-PythonExe', sys.executable]
+               '-PythonExe', sys.executable,
+               '-FontProfile', report['font_profile']['profile']['id']]
     completed = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', errors='replace')
     if completed.returncode:
         raise RuntimeError('PowerPoint 组装失败：' + (completed.stderr or completed.stdout)[-1000:])
@@ -416,7 +420,29 @@ def main():
         ap.error('输出文件已存在')
     request = json.loads(args.request.read_text(encoding='utf-8-sig'))
     report = preflight(request, library=args.library, offline=args.offline)
+    default_profile = {'Windows': 'windows', 'Darwin': 'macos', 'Linux': 'linux'}.get(
+        platform.system(), 'linux')
+    try:
+        font_check = probe_font_profile(request.get('font_profile') or default_profile)
+    except ValueError as exc:
+        report['status'] = 'blocked'
+        report['error_code'] = 'FONT_PROFILE_UNKNOWN'
+        report['can_make_complete_deck'] = False
+        report['delivery_status'] = 'blocked'
+        report['warnings'].append(safe_message(exc))
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+        print(json.dumps({'status': 'blocked', 'error_code': 'FONT_PROFILE_UNKNOWN',
+                          'report': str(args.out)}, ensure_ascii=False))
+        return 2
+    report['font_profile'] = font_check
     report['delivery_status'] = 'not_started'
+    if args.execute_out and font_check['status'] != 'available':
+        report['status'] = 'blocked'
+        report['error_code'] = font_check['error_code']
+        report['can_make_complete_deck'] = False
+        report['delivery_status'] = 'blocked'
+        report['warnings'].append('任务字体缺失：' + ', '.join(font_check['missing']))
     if report['status'] == 'ready' and (args.plan_out or args.execute_out) and request.get('pages'):
         stage = 'planning'
         try:
@@ -430,7 +456,15 @@ def main():
             plan['complete_deck'] = request.get('complete_deck', True)
             if args.execute_out:
                 stage = 'execution'
-                report['execution'] = execute_plan(request, plan, report, args.execute_out)
+                previous_profile = os.environ.get('EPOINT_FONT_PROFILE')
+                os.environ['EPOINT_FONT_PROFILE'] = font_check['profile']['id']
+                try:
+                    report['execution'] = execute_plan(request, plan, report, args.execute_out)
+                finally:
+                    if previous_profile is None:
+                        os.environ.pop('EPOINT_FONT_PROFILE', None)
+                    else:
+                        os.environ['EPOINT_FONT_PROFILE'] = previous_profile
                 report['library_used'] = report['execution']['library_used']
                 report['delivery_status'] = report['execution']['delivery_status']
             report['selection_summary'] = plan['selection_summary']

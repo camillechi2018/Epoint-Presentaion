@@ -16,4 +16,4 @@ SVG 保留原件，PPTX 默认用兼容 PNG 实体；如嵌入 SVG，必须有 P
 
 科技风专属 `color-inventory-tech.json` 已按 85 个来源页逐对象记录颜色引用、渐变、图片、SVG 和原生图表。清单状态为 `inventory_only_no_recolor_claim`；对象角色仍为 `unmapped_pending_review`，因此不能据此提供跨色系换色。下一步逐对象确认语义角色，并分别验证原生形状、渐变、SVG、图表和封面栅格背景。
 
-`deep-blue-tech` 使用独立的 `themes/new-template-deep-blue-tech.json` 和 `typography/deep-blue-tech.json`。颜色槽与字体角色是首轮提炼，PPTX 中的显式色、渐变、图表和 SVG 仍须逐对象映射和渲染审核。与蓝红简约版相同，可编辑中文展示、标题和正文统一用微软雅黑，拉丁字母与数字用 Arial；字号、字重和行距仍按信息层级设置并复查换行。Logo 原色锁定，不受主题换色影响。调用时显式传入 `style_family=deep-blue-tech`，避免与旧三源混排。
+`deep-blue-tech` 使用独立的 `themes/new-template-deep-blue-tech.json` 和 `typography/deep-blue-tech.json`。颜色槽与字体角色是首轮提炼，PPTX 中的显式色、渐变、图表和 SVG 仍须逐对象映射和渲染审核。与蓝红简约版相同，可编辑中文展示、标题和正文按任务 `font_profile` 分配中西文字体；字号、字重和行距仍按信息层级设置并复查换行。Logo 原色锁定，不受主题换色影响。调用时显式传入 `style_family=deep-blue-tech`，避免与旧三源混排。

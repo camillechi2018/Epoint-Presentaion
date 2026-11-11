@@ -27,6 +27,7 @@ from audit_component_color_independence import audit as audit_color_independence
 from audit_logo import audit as audit_logo
 from materialize_component_colors import freeze_uniform_deck
 from normalize_fonts import normalize
+from font_profile import resolve as resolve_font_profile
 from fallback_rules import fallback_type, fallback_catalog
 from free_composition import render_free_page
 
@@ -1424,7 +1425,7 @@ def render(plan: dict, output: Path):
     freeze_uniform_deck(output, output, role_overrides=role_overrides)
     # All editable slides use the same CJK/Latin typefaces, including guided
     # pages that are later inserted beside knowledge-base template pages.
-    normalize(output, output)
+    font_normalization = normalize(output, output)
     color_report = audit_color_independence(output)
     if not color_report["passed"]:
         raise RuntimeError("新绘页面仍引用母版颜色槽")
@@ -1501,6 +1502,8 @@ def render(plan: dict, output: Path):
     return {"schema_version": "1.0", "mode": "skill_offline_brand",
             "status": "draft_pending_review", "theme": theme_name,
             "brand_profile": "brand-baseline", "layout_profile": layout["id"],
+            "font_profile": resolve_font_profile(),
+            "font_normalization": font_normalization,
             "shadow_policy": "none",
             "palette_policy": "brand_variables_only",
             "auto_added": auto_added,

@@ -13,6 +13,7 @@ from pathlib import Path
 from distribution import verify_manifest, write_json
 from runtime_paths import SKILL_ROOT, locations
 from runtime_process import capture
+from font_profile import probe as probe_font_profile
 
 IMPORTS = {'pptx': 'python-pptx', 'PIL': 'Pillow', 'lxml': 'lxml',
            'openpyxl': 'openpyxl', 'xlrd': 'xlrd', 'docx': 'python-docx'}
@@ -71,7 +72,7 @@ def deep_probe(paths):
     return outcome
 
 
-def report(*, library=None, state_dir=None, goal='inspect', deep=False):
+def report(*, library=None, state_dir=None, goal='inspect', deep=False, font_profile=None):
     paths = locations(state_dir)
     root = Path(library).resolve() if library else SKILL_ROOT / 'assets' / 'minimal-template-pack'
     dependencies = {name: probe_import(name) for name in IMPORTS}
@@ -114,7 +115,15 @@ def report(*, library=None, state_dir=None, goal='inspect', deep=False):
         for name in ('state_write', 'cache_write'):
             if deep_checks[name]['status'] != 'available':
                 blockers.append(deep_checks[name]['error_code'])
-    # Basic detection never claims fonts, Office opening or rendering have been tested.
+    # Presence is a resource probe, not proof of glyph rendering or layout fit.
+    font_check = probe_font_profile(font_profile or {'Windows': 'windows',
+        'Darwin': 'macos', 'Linux': 'linux'}.get(platform.system(), 'linux'))
+    if goal in {'fill', 'assemble'} and font_check['status'] != 'available':
+        blockers.append(font_check['error_code'])
+    renderer = ({'status': 'detected_unverified', 'application': 'LibreOffice Impress',
+                 'probe': probe_command('soffice')}
+                if platform.system() == 'Linux' and shutil.which('soffice')
+                else {'status': 'untested'})
     return {'schema_version': '1.0', 'status': 'blocked' if blockers else 'passed',
             'scope': 'local_pptx_roundtrip_only' if deep else 'environment_inspection_only',
             'goal': goal, 'blockers': blockers, 'deep_checks': deep_checks,
@@ -122,7 +131,7 @@ def report(*, library=None, state_dir=None, goal='inspect', deep=False):
                         'python': platform.python_version(), 'executable': sys.executable,
                         'site_packages_enabled': not bool(sys.flags.no_site)},
             'paths': paths, 'dependencies': dependencies, 'git': git, 'library': library_check,
-            'assembly': assembly, 'rendering': {'status': 'untested'}, 'fonts': {'status': 'untested'},
+            'assembly': assembly, 'rendering': renderer, 'fonts': font_check,
             'guidance': ['Use the dedicated environment installer for missing Python dependencies.',
                          'An available package or registered application is not a rendered-deck acceptance.']}
 
@@ -134,8 +143,10 @@ def main(argv=None):
     parser.add_argument('--goal', choices=['inspect', 'read', 'fill', 'assemble'], default='inspect')
     parser.add_argument('--out', type=Path)
     parser.add_argument('--deep', action='store_true')
+    parser.add_argument('--font-profile', choices=('windows', 'macos', 'linux'))
     args = parser.parse_args(argv)
-    result = report(library=args.library, state_dir=args.state_dir, goal=args.goal, deep=args.deep)
+    result = report(library=args.library, state_dir=args.state_dir, goal=args.goal,
+                    deep=args.deep, font_profile=args.font_profile)
     if args.out:
         args.out.parent.mkdir(parents=True, exist_ok=True)
         write_json(args.out, result)

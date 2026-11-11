@@ -2,7 +2,8 @@
  [Parameter(Mandatory=$true)][string]$Manifest,
  [Parameter(Mandatory=$true)][string]$OutputPath,
  [string]$RenderDirectory='',
- [string]$PythonExe='python'
+ [string]$PythonExe='python',
+ [string]$FontProfile='windows'
 )
 $ErrorActionPreference='Stop'
 $mf=(Resolve-Path -LiteralPath $Manifest).Path;$base=Split-Path $mf -Parent
@@ -114,7 +115,7 @@ try{
 }finally{if($result){$result.Close()};if($baseline -eq 0){$app.Quit()}}
 & $PythonExe (Join-Path $PSScriptRoot 'restore_recovered_geometry.py') --input $dest --manifest $mf
 if($LASTEXITCODE -ne 0){throw '合并后占位框文字位置恢复失败'}
-& $PythonExe (Join-Path $PSScriptRoot 'normalize_fonts.py') --input $dest --out $dest
+& $PythonExe (Join-Path $PSScriptRoot 'normalize_fonts.py') --input $dest --out $dest --profile $FontProfile
 if($LASTEXITCODE -ne 0){throw '合并后字体归一失败'}
 $themeReport=[IO.Path]::ChangeExtension($dest,'theme.json')
 & $PythonExe (Join-Path $PSScriptRoot 'audit_theme_integrity.py') --input $dest --manifest $mf --report $themeReport
@@ -128,8 +129,8 @@ $mediaReport=[IO.Path]::ChangeExtension($dest,'media.json')
 if($LASTEXITCODE -ne 0){throw '合并后图片主引用修复失败；请查看媒体检查报告'}
 $media=Get-Content -LiteralPath $mediaReport -Raw -Encoding utf8|ConvertFrom-Json
 $fontReport=[IO.Path]::ChangeExtension($dest,'fonts.json')
-& $PythonExe (Join-Path $PSScriptRoot 'audit_fonts.py') --input $dest --report $fontReport
-if($LASTEXITCODE -ne 0){throw "成稿字体不符合中文微软雅黑、英文及数字 Arial 的规则；详见 $fontReport"}
+& $PythonExe (Join-Path $PSScriptRoot 'audit_fonts.py') --input $dest --report $fontReport --profile $FontProfile
+if($LASTEXITCODE -ne 0){throw "成稿字体不符合任务字体配置 $FontProfile；详见 $fontReport"}
 $logoReport=[IO.Path]::ChangeExtension($dest,'logo.json')
 & $PythonExe (Join-Path $PSScriptRoot 'audit_logo.py') --input $dest --theme $plan.theme --require-every-slide --report $logoReport
 if($LASTEXITCODE -ne 0){throw "成稿 Logo 数量或所选风格外观不合格；详见 $logoReport"}
@@ -140,7 +141,7 @@ if($RenderDirectory){
   try{foreach($slide in $renderDeck.Slides){$slide.Export((Join-Path $RenderDirectory ('P{0:D3}.png' -f $slide.SlideIndex)),'PNG',1280,720)}}finally{$renderDeck.Close()}
  }finally{$renderApp.Quit()}
 }
-$report=@{manifest=$mf;output=$dest;slides=$records;slide_count=$records.Count;editable_pptx=$true;rendered=[bool]$RenderDirectory;theme_integrity_report=$themeReport;theme_source_consistent=$themeSourceConsistent;color_independence_report=$colorReport;media_fallback_report=$mediaReport;font_report=$fontReport;logo_report=$logoReport;restored_image_references=$media.restored;visual_qa='not_run';collision_qa='not_run';limitations=@('合并不代表内容与排版验收通过；还需检查文字、关系、数据和配图')}
+$report=@{manifest=$mf;output=$dest;slides=$records;slide_count=$records.Count;editable_pptx=$true;rendered=[bool]$RenderDirectory;font_profile=$FontProfile;theme_integrity_report=$themeReport;theme_source_consistent=$themeSourceConsistent;color_independence_report=$colorReport;media_fallback_report=$mediaReport;font_report=$fontReport;logo_report=$logoReport;restored_image_references=$media.restored;visual_qa='not_run';collision_qa='not_run';limitations=@('合并不代表内容与排版验收通过；还需检查文字、关系、数据和配图')}
 $report|ConvertTo-Json -Depth 8|Set-Content -LiteralPath ([IO.Path]::ChangeExtension($dest,'assembly.json')) -Encoding utf8
 Write-Output ('Assembled '+$records.Count+' editable slides')
 

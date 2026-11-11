@@ -1,6 +1,7 @@
 """Fill one editable template; fail before writing on missing facts or capacity errors."""
 from library_location import get_library
 from normalize_fonts import normalize
+from font_profile import resolve as resolve_font_profile
 from pathlib import Path
 from copy import deepcopy
 import argparse,json,math,unicodedata,re,subprocess
@@ -432,8 +433,9 @@ def apply_project_schedule(slide,rules,tasks):
             passed+=months
     return {'rows':6,'phases_per_row':3,'geometry_bound_to_durations':True}
 def apply_tech_font_roles(path,binding_data):
-    role_fonts={'chinese_display':'Microsoft YaHei','chinese_heading':'Microsoft YaHei',
-                'chinese_body':'Microsoft YaHei','latin_numeric':'Arial'}
+    selected=resolve_font_profile()
+    role_fonts={'chinese_display':selected['east_asian'],'chinese_heading':selected['east_asian'],
+                'chinese_body':selected['east_asian'],'latin_numeric':selected['latin']}
     roles={x['shape_id']:x.get('typography_role') for x in binding_data.get('fields',[])}
     p=Presentation(path);changed=0
     for shape in walk(p.slides[0].shapes):
@@ -1240,7 +1242,7 @@ def fill(lib,layout,content,out,allow_draft=False,internal=False,logo_config=Non
         logo_result=add_logo(p,s,logo_layout,lib,logo_config,logo_override,brand_slot,theme=theme)
     if source_stamp:
         s._element.cSld.set('name',source_stamp)
-    out.parent.mkdir(parents=True,exist_ok=True);p.save(out);normalize(out,out)
+    out.parent.mkdir(parents=True,exist_ok=True);p.save(out);font_normalization=normalize(out,out)
     font_result=apply_tech_font_roles(out,binding_data) if m.get('style_family')=='deep-blue-tech' else None
     if m.get('style_family')=='deep-blue-tech':
         font_result.update(apply_tech_size_overrides(out,rules))
@@ -1250,7 +1252,7 @@ def fill(lib,layout,content,out,allow_draft=False,internal=False,logo_config=Non
         logo_audit=audit_logo(out,require_every_slide=True,theme='red')
         if not logo_audit['passed']:
             raise ValueError('红色风格 Logo 必须是黑白灰单色：'+str(logo_audit['issues']))
-    report=dict(layout_id=layout,source_stamp=source_stamp,asset_version=m['version'],asset_status=m['status'],internal_draft=internal,output=str(out),structure_filled=True,layout_constraints=layout_changes,normal_body_weight=normal_body_weight_result,page_background=page_background_result,cardinality=cardinality_result,schedule=schedule_result,logo=logo_result,fonts=font_result,colors={'materialized_references':sum(color_result['materialized_by_part'].values()),'remaining_chart_style_placeholders':sum(color_result['remaining_chart_style_placeholders'].values()),'rendering_depends_on_master_theme_slots':color_result['rendering_depends_on_master_theme_slots'],'chart_visual_review_required':color_result['chart_visual_review_required']},visual_qa='not_run',powerpoint_open='not_run',collision_qa='not_run')
+    report=dict(layout_id=layout,source_stamp=source_stamp,asset_version=m['version'],asset_status=m['status'],internal_draft=internal,output=str(out),structure_filled=True,layout_constraints=layout_changes,normal_body_weight=normal_body_weight_result,page_background=page_background_result,cardinality=cardinality_result,schedule=schedule_result,logo=logo_result,fonts=font_result,font_profile=resolve_font_profile(),font_normalization=font_normalization,colors={'materialized_references':sum(color_result['materialized_by_part'].values()),'remaining_chart_style_placeholders':sum(color_result['remaining_chart_style_placeholders'].values()),'rendering_depends_on_master_theme_slots':color_result['rendering_depends_on_master_theme_slots'],'chart_visual_review_required':color_result['chart_visual_review_required']},visual_qa='not_run',powerpoint_open='not_run',collision_qa='not_run')
     out.with_suffix('.qa.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8');return report
 def main():
     p=argparse.ArgumentParser();p.add_argument('--library',type=Path);p.add_argument('--layout',required=True);p.add_argument('--content',type=Path,required=True);p.add_argument('--out',type=Path,required=True);p.add_argument('--allow-draft',action='store_true');p.add_argument('--internal-draft',action='store_true');p.add_argument('--logo-config',type=Path);p.add_argument('--no-logo',action='store_true');a=p.parse_args()
