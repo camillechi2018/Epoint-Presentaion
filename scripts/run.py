@@ -17,7 +17,11 @@ def main():
         print(json.dumps({'status': 'blocked', 'error_code': 'RUNTIME_NOT_INSTALLED',
                           'hint': 'Run install_runtime.py or install.ps1/install.sh first.'}))
         return 2
-    return subprocess.call([str(python), str(SKILL_ROOT / 'scripts' / 'run_presentation.py'), *sys.argv[1:]])
+    args = sys.argv[1:]
+    entry = 'read_material.py' if args[:1] == ['--read-material'] else 'run_presentation.py'
+    if entry == 'read_material.py':
+        args = args[1:]
+    return subprocess.call([str(python), str(SKILL_ROOT / 'scripts' / entry), *args])
 
 
 if __name__ == '__main__':

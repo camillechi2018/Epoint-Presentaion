@@ -1,4 +1,4 @@
-"""Read supplied Excel/Word facts without Office automation or silent fill-ins.
+"""Read supplied material facts without Office automation or silent fill-ins.
 
 The JSON records source coordinates and missing formula caches. It is an input
 inventory, not a slide plan or a claim that every item has been used.
@@ -7,9 +7,18 @@ import argparse
 import datetime as dt
 import hashlib
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 from zipfile import ZipFile
+
+
+def file_sha256(path):
+    digest = hashlib.sha256()
+    with path.open('rb') as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def scalar(value):
@@ -137,40 +146,152 @@ def read_docx(path):
                           'detail': 'Media parts and body block references are inventoried; geometry and slide use are not inferred.'}] if media else []}
 
 
-def read(path):
+def read_plain_text(path, encoding='utf-8-sig'):
+    try:
+        content = path.read_text(encoding=encoding)
+    except (UnicodeError, LookupError) as exc:
+        raise ValueError('MATERIAL_ENCODING_UNREADABLE: specify the source encoding') from exc
+    if not content.strip():
+        raise ValueError('EMPTY_MATERIAL: no readable text')
+    blocks = []
+    for number, line in enumerate(content.splitlines(), 1):
+        if not line.strip():
+            continue
+        block = {'type': 'line', 'line': number, 'text': line}
+        if path.suffix.lower() == '.md':
+            heading = re.match(r'^ {0,3}(#{1,6})\s+(.+?)\s*#*\s*$', line)
+            if heading:
+                block.update(type='heading', level=len(heading.group(1)))
+        blocks.append(block)
+    return {'kind': path.suffix.lower().lstrip('.'), 'encoding': encoding,
+            'blocks': blocks, 'warnings': []}
+
+
+def read_platform_extraction(path, extraction, source_hash):
+    if extraction is None:
+        raise ValueError('EXTRACTION_TOOL_UNAVAILABLE' if path.suffix.lower() == '.pdf' else 'OCR_REQUIRED')
+    try:
+        data = json.loads(Path(extraction).read_text(encoding='utf-8-sig'))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError('EXTRACTION_INVALID_JSON') from exc
+    if not isinstance(data, dict) or type(data.get('schema_version')) is not int or data['schema_version'] != 1:
+        raise ValueError('EXTRACTION_SCHEMA_INVALID: schema_version must be 1')
+    source = data.get('source', {})
+    if not isinstance(source, dict):
+        raise ValueError('EXTRACTION_SCHEMA_INVALID: source must be an object')
+    if source.get('path') is not None and not isinstance(source['path'], str):
+        raise ValueError('EXTRACTION_SCHEMA_INVALID: source.path must be a string')
+    if source.get('sha256') is not None and not isinstance(source['sha256'], str):
+        raise ValueError('EXTRACTION_SCHEMA_INVALID: source.sha256 must be a string')
+    if source.get('path') and Path(source['path']).expanduser().resolve() != path:
+        raise ValueError('EXTRACTION_SOURCE_MISMATCH: source.path differs from --input')
+    if source.get('sha256') and source['sha256'].lower() != source_hash:
+        raise ValueError('EXTRACTION_SOURCE_HASH_MISMATCH')
+    image = path.suffix.lower() in {'.png', '.jpg', '.jpeg'}
+    purpose = source.get('material_use', 'text_facts')
+    if purpose not in {'text_facts', 'visual_asset'} or purpose == 'visual_asset' and not image:
+        raise ValueError('EXTRACTION_SCHEMA_INVALID: invalid material_use')
+    extraction_info = data.get('extraction', {})
+    if not isinstance(extraction_info, dict):
+        raise ValueError('EXTRACTION_SCHEMA_INVALID: extraction must be an object')
+    raw_items = data.get('items')
+    if not isinstance(raw_items, list):
+        raise ValueError('EXTRACTION_SCHEMA_INVALID: items must be an array')
+    raw_warnings = data.get('warnings', [])
+    if not isinstance(raw_warnings, list) or any(not isinstance(w, dict) or not isinstance(w.get('code'), str)
+                                                 for w in raw_warnings):
+        raise ValueError('EXTRACTION_SCHEMA_INVALID: warnings must contain coded objects')
+    warnings = list(raw_warnings)
+    items = []
+    for raw in raw_items:
+        if not isinstance(raw, dict) or not isinstance(raw.get('text'), str):
+            raise ValueError('EXTRACTION_SCHEMA_INVALID: each item needs text')
+        locator = raw.get('locator') or {}
+        if not isinstance(locator, dict):
+            raise ValueError('EXTRACTION_SCHEMA_INVALID: locator must be an object')
+        key = 'image' if image else 'page'
+        position = locator.get(key)
+        if position is not None and (isinstance(position, bool) or not isinstance(position, int) or position < 1):
+            raise ValueError('EXTRACTION_SCHEMA_INVALID: page/image must be a positive integer')
+        if position is None:
+            warnings.append({'code': 'SOURCE_LOCATION_UNVERIFIED', 'item': len(items) + 1})
+            locator = {'scope': 'file'}
+        item = {'locator': locator, 'text': raw['text'], 'method': raw.get('method') or extraction_info.get('method') or 'platform_tool'}
+        if 'confidence' in raw:
+            item['confidence'] = raw['confidence']
+        items.append(item)
+        if not raw['text'].strip() and not image:
+            warnings.append({'code': 'PDF_PAGE_TEXT_EMPTY', 'item': len(items), 'locator': locator})
+    if purpose == 'text_facts' and not any(item['text'].strip() for item in items):
+        raise ValueError('OCR_REQUIRED' if image or raw_items else 'EXTRACTION_TEXT_MISSING')
+    return {'kind': path.suffix.lower().lstrip('.'), 'material_use': purpose,
+            'extraction': extraction_info, 'items': items, 'warnings': warnings,
+            'image_path': str(path) if image else None}
+
+
+def read(path, extraction=None, encoding='utf-8-sig'):
     path = Path(path).resolve(strict=True)
     suffix = path.suffix.lower()
     readers = {'.xlsx': read_xlsx, '.xls': read_xls, '.docx': read_docx}
-    if suffix not in readers:
+    if suffix not in {*readers, '.txt', '.md', '.pdf', '.png', '.jpg', '.jpeg'}:
         raise ValueError('UNSUPPORTED_MATERIAL_TYPE: ' + suffix)
-    before = hashlib.sha256(path.read_bytes()).hexdigest()
-    result = readers[suffix](path)
-    after = hashlib.sha256(path.read_bytes()).hexdigest()
+    before = file_sha256(path)
+    if suffix in readers:
+        result = readers[suffix](path)
+    elif suffix in {'.txt', '.md'}:
+        result = read_plain_text(path, encoding=encoding)
+    else:
+        result = read_platform_extraction(path, extraction, before)
+    after = file_sha256(path)
     if before != after:
         raise RuntimeError('SOURCE_CHANGED_DURING_READ')
+    prefix = before[:12]
+    for block in result.get('blocks', []):
+        if 'line' in block:
+            block['source_ref'] = f'{prefix}#line={block["line"]}'
+    for item in result.get('items', []):
+        locator = item['locator']
+        label = ('image=' + str(locator['image']) if 'image' in locator else
+                 'page=' + str(locator['page']) if 'page' in locator else 'file')
+        item['source_ref'] = f'{prefix}#{label}'
     result['source'] = str(path)
     result['sha256'] = before
     result['status'] = 'read_with_warnings' if result['warnings'] else 'read'
     return result
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
-    args = parser.parse_args()
-    result = read(args.input)
+    parser.add_argument('--extraction', type=Path, help='Platform PDF/OCR result in schema_version 1 JSON')
+    parser.add_argument('--encoding', default='utf-8-sig', help='Text/Markdown source encoding')
+    args = parser.parse_args(argv)
+    try:
+        result = read(args.input, extraction=args.extraction, encoding=args.encoding)
+    except (OSError, ValueError, RuntimeError) as exc:
+        code = str(exc).split(':', 1)[0]
+        if isinstance(exc, FileNotFoundError):
+            code = 'SOURCE_FILE_MISSING'
+        elif isinstance(exc, OSError) and not isinstance(exc, (ValueError, RuntimeError)):
+            code = 'MATERIAL_READ_FAILED'
+        print(json.dumps({'status': 'blocked', 'error_code': code,
+                          'detail': str(exc)[:400]}, ensure_ascii=True))
+        return 2
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     summary = {'status': result['status'], 'kind': result['kind'],
                'sha256': result['sha256'], 'warnings': [x['code'] for x in result['warnings']]}
     if 'sheets' in result:
         summary['effective_rows'] = {s['name']: s['effective_row_count'] for s in result['sheets']}
-    else:
+    elif 'blocks' in result:
         summary['blocks'] = len(result['blocks'])
-        summary['embedded_media'] = len(result['embedded_media'])
+        summary['embedded_media'] = len(result.get('embedded_media', []))
+    else:
+        summary['items'] = len(result['items'])
     print(json.dumps(summary, ensure_ascii=True))
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())
