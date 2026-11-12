@@ -2,7 +2,7 @@
 name: epoint-presentation
 description: 制作新点品牌可编辑 PPTX；Skill 自带 Logo、锁定色系、字体、三风格资料包和已校验结构页最小包。优先读取 Git 知识库，断网时使用本地已校验模板；正文可灵活编排。
 metadata:
-  version: "1.0.31"
+  version: "1.0.32-dev"
 ---
 
 # 新点企业演示文稿：新模板方案
