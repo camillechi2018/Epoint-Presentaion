@@ -9,6 +9,7 @@ import hashlib
 import json
 import re
 from collections import defaultdict
+from html.parser import HTMLParser
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -167,6 +168,90 @@ def read_plain_text(path, encoding='utf-8-sig'):
             'blocks': blocks, 'warnings': []}
 
 
+def read_pptx(path):
+    from pptx import Presentation
+    from pptx.enum.shapes import MSO_SHAPE_TYPE
+
+    deck = Presentation(path)
+    slides = []
+    warnings = []
+    for slide_number, slide in enumerate(deck.slides, 1):
+        blocks = []
+        media = []
+        def visit(shapes):
+            for shape in shapes:
+                if shape.shape_type == MSO_SHAPE_TYPE.GROUP:
+                    visit(shape.shapes)
+                    continue
+                if shape.has_text_frame and shape.text.strip():
+                    blocks.append({'type': 'text', 'shape_id': shape.shape_id,
+                                   'text': shape.text})
+                if shape.has_table:
+                    rows = [[cell.text for cell in row.cells if not cell.is_spanned]
+                            for row in shape.table.rows]
+                    if any(any(value.strip() for value in row) for row in rows):
+                        blocks.append({'type': 'table', 'shape_id': shape.shape_id, 'rows': rows})
+                if shape.shape_type == MSO_SHAPE_TYPE.PICTURE:
+                    media.append({'shape_id': shape.shape_id,
+                                  'sha256': hashlib.sha256(shape.image.blob).hexdigest(),
+                                  'extension': shape.image.ext})
+                if shape.has_chart:
+                    warnings.append({'code': 'PPTX_CHART_DATA_NOT_EXTRACTED', 'slide': slide_number,
+                                     'shape_id': shape.shape_id})
+        visit(slide.shapes)
+        if not blocks:
+            warnings.append({'code': 'PPTX_SLIDE_TEXT_EMPTY', 'slide': slide_number,
+                             'detail': 'Check images or embedded objects with the platform tool if their text is needed.'})
+        slides.append({'slide': slide_number, 'blocks': blocks, 'embedded_media': media})
+    return {'kind': 'pptx', 'slides': slides, 'warnings': warnings}
+
+
+class VisibleHtmlParser(HTMLParser):
+    SKIP = {'script', 'style', 'template', 'noscript', 'svg'}
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.hidden_depth = 0
+        self.blocks = []
+        self.images = []
+
+    def handle_starttag(self, tag, attrs):
+        tag = tag.lower()
+        values = dict(attrs)
+        if tag in self.SKIP:
+            self.hidden_depth += 1
+        if tag == 'img' and not self.hidden_depth:
+            self.images.append({'line': self.getpos()[0], 'src': values.get('src', ''),
+                                'alt': values.get('alt', '')})
+
+    def handle_endtag(self, tag):
+        if tag.lower() in self.SKIP and self.hidden_depth:
+            self.hidden_depth -= 1
+
+    def handle_data(self, data):
+        if self.hidden_depth or not data.strip():
+            return
+        self.blocks.append({'type': 'text', 'line': self.getpos()[0], 'text': data.strip()})
+
+
+def read_html(path, encoding='utf-8-sig'):
+    try:
+        content = path.read_text(encoding=encoding)
+    except (UnicodeError, LookupError) as exc:
+        raise ValueError('MATERIAL_ENCODING_UNREADABLE: specify the source encoding') from exc
+    parser = VisibleHtmlParser()
+    parser.feed(content)
+    parser.close()
+    if not parser.blocks and not parser.images:
+        raise ValueError('EMPTY_MATERIAL: no readable HTML text or images')
+    warnings = [{'code': 'HTML_RENDERED_CONTENT_UNVERIFIED',
+                 'detail': 'CSS visibility, generated text, iframes and script-rendered content are not evaluated.'}]
+    if not parser.blocks:
+        warnings.append({'code': 'HTML_TEXT_EMPTY', 'detail': 'Use platform OCR if image text is needed.'})
+    return {'kind': 'html', 'encoding': encoding, 'blocks': parser.blocks,
+            'image_references': parser.images, 'warnings': warnings}
+
+
 def read_platform_extraction(path, extraction, source_hash):
     if extraction is None:
         raise ValueError('EXTRACTION_TOOL_UNAVAILABLE' if path.suffix.lower() == '.pdf' else 'OCR_REQUIRED')
@@ -233,15 +318,23 @@ def read(path, extraction=None, encoding='utf-8-sig'):
     path = Path(path).resolve(strict=True)
     suffix = path.suffix.lower()
     readers = {'.xlsx': read_xlsx, '.xls': read_xls, '.docx': read_docx}
-    if suffix not in {*readers, '.txt', '.md', '.pdf', '.png', '.jpg', '.jpeg'}:
+    if suffix not in {*readers, '.txt', '.md', '.pdf', '.png', '.jpg', '.jpeg', '.pptx', '.html', '.htm'}:
         raise ValueError('UNSUPPORTED_MATERIAL_TYPE: ' + suffix)
     before = file_sha256(path)
     if suffix in readers:
         result = readers[suffix](path)
     elif suffix in {'.txt', '.md'}:
         result = read_plain_text(path, encoding=encoding)
+    elif suffix == '.pptx':
+        result = read_pptx(path)
+    elif suffix in {'.html', '.htm'}:
+        result = read_html(path, encoding=encoding)
     else:
         result = read_platform_extraction(path, extraction, before)
+    if extraction is not None and suffix in {'.pptx', '.html', '.htm'}:
+        supplemental = read_platform_extraction(path, extraction, before)
+        result['platform_items'] = supplemental['items']
+        result['warnings'].extend(supplemental['warnings'])
     after = file_sha256(path)
     if before != after:
         raise RuntimeError('SOURCE_CHANGED_DURING_READ')
@@ -249,11 +342,19 @@ def read(path, extraction=None, encoding='utf-8-sig'):
     for block in result.get('blocks', []):
         if 'line' in block:
             block['source_ref'] = f'{prefix}#line={block["line"]}'
+    for slide in result.get('slides', []):
+        slide['source_ref'] = f'{prefix}#slide={slide["slide"]}'
+        for block in slide['blocks']:
+            block['source_ref'] = f'{prefix}#slide={slide["slide"]}/shape={block["shape_id"]}'
     for item in result.get('items', []):
         locator = item['locator']
         label = ('image=' + str(locator['image']) if 'image' in locator else
                  'page=' + str(locator['page']) if 'page' in locator else 'file')
         item['source_ref'] = f'{prefix}#{label}'
+    for item in result.get('platform_items', []):
+        locator = item['locator']
+        label = 'slide' if suffix == '.pptx' else 'page'
+        item['source_ref'] = f'{prefix}#{label}={locator["page"]}' if 'page' in locator else f'{prefix}#file'
     result['source'] = str(path)
     result['sha256'] = before
     result['status'] = 'read_with_warnings' if result['warnings'] else 'read'
@@ -287,6 +388,9 @@ def main(argv=None):
     elif 'blocks' in result:
         summary['blocks'] = len(result['blocks'])
         summary['embedded_media'] = len(result.get('embedded_media', []))
+    elif 'slides' in result:
+        summary['slides'] = len(result['slides'])
+        summary['blocks'] = sum(len(slide['blocks']) for slide in result['slides'])
     else:
         summary['items'] = len(result['items'])
     print(json.dumps(summary, ensure_ascii=True))

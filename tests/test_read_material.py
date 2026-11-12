@@ -12,6 +12,8 @@ from docx import Document
 from openpyxl import Workbook
 from openpyxl.styles import Font
 from PIL import Image
+from pptx import Presentation
+from pptx.util import Inches
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 from read_material import read, main as read_main
@@ -19,6 +21,46 @@ import run as skill_run
 
 
 class MaterialReaderTests(unittest.TestCase):
+    def test_pptx_keeps_slide_text_table_and_image_reference(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            photo = root / 'photo.png'
+            Image.new('RGB', (4, 4), 'blue').save(photo)
+            deck = Presentation()
+            slide = deck.slides.add_slide(deck.slide_layouts[6])
+            slide.shapes.add_textbox(Inches(1), Inches(1), Inches(4), Inches(1)).text = '项目事实'
+            table = slide.shapes.add_table(1, 2, Inches(1), Inches(2), Inches(4), Inches(1)).table
+            table.cell(0, 0).text = '指标'
+            table.cell(0, 1).text = '20'
+            slide.shapes.add_picture(str(photo), Inches(1), Inches(3))
+            path = root / 'source.pptx'
+            deck.save(path)
+            result = read(path)
+            self.assertEqual(len(result['slides']), 1)
+            self.assertEqual([block['type'] for block in result['slides'][0]['blocks']], ['text', 'table'])
+            self.assertEqual(result['slides'][0]['blocks'][1]['rows'], [['指标', '20']])
+            self.assertEqual(len(result['slides'][0]['embedded_media']), 1)
+            self.assertIn('#slide=1/shape=', result['slides'][0]['blocks'][0]['source_ref'])
+            sidecar = root / 'ocr.json'
+            sidecar.write_text(json.dumps({'schema_version': 1, 'source': {},
+                'items': [{'locator': {'page': 1}, 'text': '图片文字', 'method': 'ocr'}]}), encoding='utf-8')
+            supplemented = read(path, extraction=sidecar)
+            self.assertTrue(supplemented['platform_items'][0]['source_ref'].endswith('#slide=1'))
+
+    def test_html_skips_scripts_and_keeps_text_and_image_address(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'source.html'
+            path.write_text('<html><head><style>.x{color:red}</style></head><body>'
+                            '<h1>项目&amp;计划</h1><script>secret()</script>'
+                            '<p>正文事实</p><img src="images/a.png" alt="项目照片"></body></html>', encoding='utf-8')
+            result = read(path)
+            text = ' '.join(block['text'] for block in result['blocks'])
+            self.assertIn('项目&计划', text)
+            self.assertIn('正文事实', text)
+            self.assertNotIn('secret', text)
+            self.assertEqual(result['image_references'][0]['src'], 'images/a.png')
+            self.assertTrue(result['blocks'][0]['source_ref'].endswith('#line=1'))
+
     def test_launcher_routes_material_to_installed_interpreter(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

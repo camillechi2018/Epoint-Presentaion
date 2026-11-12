@@ -15,10 +15,14 @@
 | 文件 | 材料入口 | 来源定位 |
 | --- | --- | --- |
 | `.txt`、`.md` | 技能直接读取非空原文，Markdown 保留标题级别与表格原文 | 行号、源文件 SHA-256 |
+| `.pptx` | 技能直接读取逐页可编辑文字、表格及图片清单 | 页码、形状 ID、图片哈希；图表数据和图片内文字另行核对 |
+| `.html`、`.htm` | 技能直接读取 HTML 源码中的文本和图片地址，不执行 JavaScript | 源码行号、原文件哈希；实际显示效果另行核对 |
 | `.pdf` | 当前 Agent 平台先提取文字；扫描页由该平台 OCR；结果落盘后传 `--extraction` | 页码可用时记录页码；缺页码时标记文件级待复核 |
 | `.png`、`.jpg`、`.jpeg` | 需引用其中的文字时由平台 OCR；纯照片可登记为 `visual_asset` | 原图路径、哈希、可用的图片编号 |
 
 技能不绑定平台工具名称，也不内置 OCR 或 PDF 解析器。平台没有相应工具时报告 `EXTRACTION_TOOL_UNAVAILABLE`／`OCR_REQUIRED`；文字型 PDF 的提取仍须检查缺页、错序和表格。不能可靠读取的内容不得补写为事实。
+
+旧 PPTX 和 HTML 均作为**内容材料**使用，不自动复用其页面版式、母版、CSS 或脚本，也不因此跳过知识库组件匹配。PPTX 的图表内部数据、图片中文字、备注及母版内容未作为正文事实完整提取；没有可编辑文本的页会标记 `PPTX_SLIDE_TEXT_EMPTY`。HTML 不执行脚本，也不计算 CSS 显隐或伪元素，因此始终标记 `HTML_RENDERED_CONTENT_UNVERIFIED`。若关键事实只出现在截图或动态页面中，先用当前 Agent 平台的视觉／OCR 工具提取，再用 `--extraction` 补入；不能把缺失内容猜成空白。
 
 入口失败时向标准输出返回 `status: blocked` 和 `error_code`，退出码为 2，不写事实清单；成功时退出码为 0。缺页码只生成 `SOURCE_LOCATION_UNVERIFIED` 警告，不阻断知识库选稿。
 
@@ -39,7 +43,7 @@
 }
 ```
 
-图片用 `locator.image` 代替 `locator.page`。纯照片无需 OCR，可使用 `"source":{"material_use":"visual_asset"}` 与空 `items`；仍须保留原图。平台无法给出页码或图片编号时，项目可省略 `locator`：技能保留原文并标记 `SOURCE_LOCATION_UNVERIFIED`，后续按文件级来源复核，不因此缩小知识库候选。OCR 置信度可选；平台不提供就不要伪造。
+图片用 `locator.image` 代替 `locator.page`。PPTX 中补充的 OCR 以 `locator.page` 表示幻灯片页码；HTML 截图可用页码或省略定位。纯照片无需 OCR，可使用 `"source":{"material_use":"visual_asset"}` 与空 `items`；仍须保留原图。平台无法给出页码或图片编号时，项目可省略 `locator`：技能保留原文并标记 `SOURCE_LOCATION_UNVERIFIED`，后续按文件级来源复核，不因此缩小知识库候选。OCR 置信度可选；平台不提供就不要伪造。
 
 交接 JSON 是**内容证据**，不负责模板匹配。原始文件不存在、已提供的来源哈希与原件不符、格式无法解析、或需要文字事实却没有可读文字时，材料入口才阻断。空白 PDF 页标记 `PDF_PAGE_TEXT_EMPTY`；若整份 PDF 没有可用文字，应补做平台 OCR 后再规划。正文中的数字、名称、表格顺序和 OCR 警告须对照原件复核。
 

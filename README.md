@@ -77,7 +77,7 @@ sh ./install.sh
 
 安装器先复验并复用已登记的有效运行环境，避免 PATH 中的 Agent 内嵌 Python 触发重复安装；首次安装仍会选用可执行的 Python。需要指定解释器时，先设置 `EPOINT_PYTHON` 为 Python 3.10+ 的完整路径。断网安装可提供兼容的 `--wheelhouse <目录>`。不同系统的字体、Office 渲染和整稿交付仍须按目标环境复核。[查看跨系统安装与验证说明](references/cross-platform-runtime.md)。
 
-材料入口支持 `.xlsx`、`.xls`、`.docx`、`.txt`、`.md`，安装后通过 `scripts/run.py --read-material` 读取。PDF 和 PNG/JPEG 的文字由当前 Agent 平台提取或 OCR，再以统一 JSON 交给材料入口；没有可用平台工具时明确报告，技能不会猜写。[查看多格式材料接入方法](references/material-ingestion.md)。
+材料入口直接读取 `.xlsx`、`.xls`、`.docx`、`.txt`、`.md`、`.pptx` 和 `.html`，安装后通过 `scripts/run.py --read-material` 使用。PDF 和 PNG/JPEG 的文字由当前 Agent 平台提取或 OCR，再以统一 JSON 交给材料入口；没有可用平台工具时明确报告，技能不会猜写。旧 PPT/HTML 仅作为内容来源，不自动复用原页面设计。[查看多格式材料接入方法](references/material-ingestion.md)。
 
 然后在支持技能的 Agent 中附上材料，例如：
 
