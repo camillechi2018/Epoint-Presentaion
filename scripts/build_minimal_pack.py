@@ -4,16 +4,14 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from zipfile import ZipFile
 
-from lxml import etree
 from pptx import Presentation
 from distribution import normalize_files, write_json
+from embedded_fonts import strip as strip_embedded_fonts
 
 SKILL = Path(__file__).resolve().parents[1]
 SELECTION = {
@@ -26,47 +24,9 @@ ROLES = ('cover', 'directory', 'section', 'closing')
 
 def remove_embedded_fonts(source: Path):
     """Keep the editable slide, but omit source-only embedded fonts in the offline copy."""
-    presentation_ns = 'http://schemas.openxmlformats.org/presentationml/2006/main'
-    content_ns = 'http://schemas.openxmlformats.org/package/2006/content-types'
-    with tempfile.NamedTemporaryFile(prefix='epoint-no-fonts-', suffix='.pptx',
-                                     dir=source.parent, delete=False) as temporary:
-        candidate = Path(temporary.name)
-    try:
-        with ZipFile(source) as original, ZipFile(candidate, 'w') as rewritten:
-            font_parts = {name for name in original.namelist() if name.startswith('ppt/fonts/')}
-            if not font_parts:
-                candidate.unlink()
-                return
-            for item in original.infolist():
-                name = item.filename
-                if name in font_parts:
-                    continue
-                data = original.read(name)
-                if name == 'ppt/presentation.xml':
-                    root = etree.fromstring(data)
-                    for node in root.findall(f'{{{presentation_ns}}}embeddedFontLst'):
-                        root.remove(node)
-                    data = etree.tostring(root, xml_declaration=True, encoding='UTF-8', standalone=True)
-                elif name == 'ppt/_rels/presentation.xml.rels':
-                    root = etree.fromstring(data)
-                    for node in list(root):
-                        if node.get('Type', '').endswith('/font'):
-                            root.remove(node)
-                    data = etree.tostring(root, xml_declaration=True, encoding='UTF-8', standalone=True)
-                elif name == '[Content_Types].xml':
-                    root = etree.fromstring(data)
-                    for node in list(root):
-                        if (node.tag == f'{{{content_ns}}}Default'
-                                and node.get('Extension') == 'fntdata'):
-                            root.remove(node)
-                    data = etree.tostring(root, xml_declaration=True, encoding='UTF-8', standalone=True)
-                rewritten.writestr(item, data)
-        if len(Presentation(candidate).slides) != 1:
-            raise RuntimeError(f'去嵌入字体后单页模板不可打开：{candidate}')
-        os.replace(candidate, source)
-    finally:
-        if candidate.exists():
-            candidate.unlink()
+    result = strip_embedded_fonts(source, source)
+    if result['after']['slides'] != 1:
+        raise RuntimeError(f'去嵌入字体后单页模板不可打开：{source}')
 
 
 def digest(path):

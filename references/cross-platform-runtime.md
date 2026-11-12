@@ -84,7 +84,7 @@ Linux 任务副本中，LibreOffice 不能正确显示的可编辑文字渐变�
 
 Mac 实机已在字体检测修复后完成安装和 `doctor --goal fill`，并生成可由 Keynote 打开的 22 页候选 PPTX。此结果不代表 PowerPoint 视觉验收。后续仍用安装器记录的解释器执行 `scripts/font_profile.py --profile macos --out <字体诊断.json>` 和 `scripts/doctor.py --goal fill --font-profile macos --out <环境诊断.json>`，用目标 PowerPoint 逐页打开并导出预览，记录应用版本、缺字或溢出页、原 PPTX 和预览图哈希。不得手写运行时记录或改用系统默认 Python 绕过门禁。
 
-这份 Mac 候选文件为 96.84 MiB，压缩后的嵌入字体部件占 78.86 MiB，是体积的主要来源。任务副本可研究去嵌入字体，但在 Mac 目标应用核对字形、换行、可编辑性和版面之前，不自动清理字体；知识库原稿和本地最小包保持各自已校验的状态。
+旧 Mac 候选文件为 96.84 MiB，压缩后的嵌入字体部件占 78.86 MiB，是体积的主要来源。知识库 `sources/cover.pptx` 已移除旧字体部件并更新哈希；任务副本归一字体时也会清除旧嵌入，避免历史缓存继续放大成稿。旧 22 页稿的副本实测降至 17.98 MiB，字体审计 195 个文本运行项通过，在本机 Windows PowerPoint 导出的 22 页逐像素一致。此结果不替代 Mac 目标应用复核，仍须检查字形、换行、柔边和可编辑性。旧源稿 SHA-256 保留在知识库 `source-manifest.json`，运行时不得绕过当前清单校验。
 
 ## S5 显式实验整稿入口
 

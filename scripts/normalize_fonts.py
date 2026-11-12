@@ -7,6 +7,7 @@ import argparse,json
 import re
 import copy
 from font_profile import resolve
+from embedded_fonts import clean_metadata, font_parts
 A='http://schemas.openxmlformats.org/drawingml/2006/main'
 P='http://schemas.openxmlformats.org/presentationml/2006/main'
 NS={'a':A,'p':P}
@@ -26,7 +27,10 @@ def normalize(src,out=None,check=False,profile=None):
     fonts={'latin':selected['latin'],'ea':selected['east_asian'],'cs':selected['latin']}
     issues=[];changed=0;gradient_fallbacks=0;buffer=BytesIO()
     with ZipFile(src) as zin, ZipFile(buffer,'w') as zout:
+        embedded = font_parts(zin.namelist()) if not check else set()
         for info in zin.infolist():
+            if info.filename in embedded:
+                continue
             data=zin.read(info.filename)
             if info.filename.startswith('ppt/') and info.filename.endswith('.xml'):
                 root=etree.fromstring(data)
@@ -86,13 +90,16 @@ def normalize(src,out=None,check=False,profile=None):
                                 props.insert(0,copy.deepcopy(defaults[0]))
                                 gradient_fallbacks+=1
                 data=etree.tostring(root,xml_declaration=True,encoding='UTF-8',standalone=True)
+            if embedded:
+                data=clean_metadata(info.filename,data)
             zout.writestr(info,data)
     if not check:
         if out is None:raise ValueError('Output path required')
         Path(out).write_bytes(buffer.getvalue())
     return {'passed':not issues if check else True,'font_assignments_changed':changed,
             'issues':len(issues),'font_profile':selected,
-            'gradient_text_fallbacks':gradient_fallbacks}
+            'gradient_text_fallbacks':gradient_fallbacks,
+            'embedded_font_parts_removed':len(embedded)}
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--input',required=True,type=Path);p.add_argument('--out',type=Path);p.add_argument('--check',action='store_true');p.add_argument('--profile');a=p.parse_args()

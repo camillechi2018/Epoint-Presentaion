@@ -8,6 +8,7 @@ from pathlib import Path
 from zipfile import ZipFile
 
 from lxml import etree
+from embedded_fonts import inspect as inspect_embedded_fonts
 from font_profile import resolve
 
 
@@ -50,9 +51,15 @@ def audit(path: Path, profile=None) -> dict:
                         violations.append({'page': number, 'script': script,
                                            'expected': expected, 'actual': actual,
                                            'text_sample': text[:24]})
+    embedded = inspect_embedded_fonts(path)
+    if any(embedded[key] for key in ('font_parts', 'font_entries',
+                                     'font_relationships', 'font_content_types')):
+        violations.append({'type': 'embedded_font_payload_remains',
+                           'font_parts': embedded['font_parts']})
     return {'passed': not violations, 'slide_count': len(slides),
             'checked_runs': checked_runs, 'violations': violations,
-            'font_policy': expected_fonts, 'font_profile': selected}
+            'font_policy': expected_fonts, 'font_profile': selected,
+            'embedded_fonts': embedded}
 
 
 def main() -> None:
