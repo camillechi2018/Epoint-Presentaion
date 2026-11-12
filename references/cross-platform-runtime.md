@@ -29,7 +29,7 @@
 
 显式添加 `--deep` 时，在指定用户状态目录及缓存目录写入并读取临时文件，并用当前 Python 创建一页含中文可编辑文本的 PPTX，保存后重开核对。`--state-dir` 与 `EPOINT_CACHE_DIR` 可指定这些检查使用的目录；检查报告的 `deep_checks` 记录结果。此检查验证写入与 PPTX 基础往返，不代表已有模板的合并、目标 Office 打开、导出或视觉验收。
 
-结果区分 available、unavailable、untested，stdout 仅输出 ASCII 安全的机器 JSON；报告文件为 UTF-8。基础自检不会启动 Office、自动上传材料、安装依赖或调整网络设置。S4 起 `--font-profile windows|macos|linux` 探测任务字体是否安装；`fill`/`assemble` 缺字体现为 `FONT_PROFILE_RESOURCE_MISSING`。探测不证明字体在目标渲染器内的字形、换行或版面正确；应用打开与导出仍需校准。
+结果区分 available、unavailable、untested，stdout 仅输出 ASCII 安全的机器 JSON；报告文件为 UTF-8。基础自检不会启动 Office、自动上传材料、安装依赖或调整网络设置。S4 起 `--font-profile windows|macos|linux` 探测任务字体是否安装；`fill`/`assemble` 缺字体现为 `FONT_PROFILE_RESOURCE_MISSING`。macOS 优先通过 CoreText 查询已注册字体族，覆盖系统动态字体资产；仅在系统 API 查询失败时使用字体枚举和文件路径兜底，报告 `fonts.detection` 说明检测路径。字体文件存在、资源探测通过均不证明字体在目标渲染器内的字形、换行或版面正确；应用打开与导出仍需校准。`PingFang SC`／`Helvetica Neue` 是本技能的 macOS 排版配置，不表示两者都是 macOS 系统界面的默认字体。
 
 ## 分发与校验
 
@@ -82,7 +82,7 @@ S2 代表性签收另覆盖四图表与表格混合包、含 PNG/SVG/WDP 和嵌�
 
 Linux 任务副本中，LibreOffice 不能正确显示的可编辑文字渐变会转换成其最亮可见色标的纯色；转换次数写入 `font_normalization.gradient_text_fallbacks`。此适配只处理 Linux 输出，不修改知识库原稿，也不改变 Windows/Mac 文件。其视觉颜色仍须与目标应用逐页复核；渐变效果本身不会在 Linux 版本中保留。
 
-Mac 实机先运行字体探测与校准脚本；若不能自动导出，逐页用 PowerPoint 打开并导出 PNG，记录应用版本、缺字或溢出页、原 PPTX 和预览图哈希。未收到 Mac 实机记录前保持待验收。
+Mac 实机先重试 `sh ./install.sh`，让安装器自行完成 `doctor --goal fill` 并原子激活 `runtime.json`；不要手写运行时记录或改用系统默认 Python 绕过门禁。安装成功后用安装器报告中的解释器执行 `scripts/font_profile.py --profile macos --out <字体诊断.json>` 和 `scripts/doctor.py --goal fill --font-profile macos --out <环境诊断.json>`。随后运行校准脚本；若不能自动导出，逐页用 PowerPoint 打开并导出 PNG，记录应用版本、缺字或溢出页、原 PPTX 和预览图哈希。未收到修订版 Mac 实机记录前保持待验收。
 
 ## S5 显式实验整稿入口
 

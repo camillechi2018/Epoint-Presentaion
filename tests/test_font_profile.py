@@ -43,6 +43,31 @@ class FontProfileTests(unittest.TestCase):
         self.assertIn(report['status'], ('available', 'unavailable'))
         self.assertEqual(report['error_code'] is None, report['status'] == 'available')
 
+    def test_macos_uses_coretext_registered_dynamic_families(self):
+        with patch('font_profile.platform.system', return_value='Darwin'), \
+             patch('font_profile._coretext_font_families',
+                   return_value={'PingFang SC', 'Helvetica Neue'}), \
+             patch('font_profile._font_families', return_value=set()), \
+             patch('font_profile._mac_font_file_exists', return_value=False):
+            report = probe('macos')
+        self.assertEqual(report['status'], 'available')
+        self.assertEqual(report['detection'], 'macos_coretext')
+        self.assertEqual(report['font_available'],
+                         {'PingFang SC': True, 'Helvetica Neue': True})
+
+    def test_macos_fallback_only_when_coretext_query_fails(self):
+        with patch('font_profile.platform.system', return_value='Darwin'), \
+             patch('font_profile._coretext_font_families', return_value=set()), \
+             patch('font_profile._mac_font_file_exists', return_value=True):
+            self.assertEqual(probe('macos')['error_code'], 'FONT_PROFILE_RESOURCE_MISSING')
+        with patch('font_profile.platform.system', return_value='Darwin'), \
+             patch('font_profile._coretext_font_families', return_value=None), \
+             patch('font_profile._font_families', return_value=set()), \
+             patch('font_profile._mac_font_file_exists', return_value=True):
+            fallback = probe('macos')
+            self.assertEqual(fallback['status'], 'available')
+            self.assertEqual(fallback['detection'], 'fontconfig_or_font_file_fallback')
+
     def test_private_use_symbol_font_is_preserved(self):
         with tempfile.TemporaryDirectory() as folder:
             source = Path(folder) / 'symbol.pptx'
