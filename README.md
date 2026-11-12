@@ -2,7 +2,7 @@
 
 把材料整理成符合新点品牌风格、可继续编辑的企业演示文稿。先选 **蓝色系、红色系或科技风格**，再由 Agent 梳理内容与信息关系，优先试用知识库组件；正文不适配时使用技能内的排版规则，仍保持同一套色彩、字体和 Logo。
 
-**当前技能版本：1.0.30。** [查看技能入口](SKILL.md) · [查看完整模板知识库](https://github.com/camillechi2018/Epoint-Presentation-KnowledgeBase)
+**当前技能版本：1.0.31。** [查看技能入口](SKILL.md) · [查看本次发布](https://github.com/camillechi2018/Epoint-Presentation/releases/tag/v1.0.31) · [查看完整模板知识库](https://github.com/camillechi2018/Epoint-Presentation-KnowledgeBase)
 
 ## 先看三种风格
 
@@ -37,7 +37,7 @@
 ## 使用优势
 
 - **品牌规范：** 每页默认放置独立 Logo。浅色背景按风格使用适合的彩色或单色版本，深色背景使用白色版本；Logo 的品牌颜色不跟随正文主题色任意改变。
-- **字体统一：** 中文采用微软雅黑，英文和数字采用 Arial；正文、表格、图表及母版都纳入字体检查。跨设备打开仍需确认字体可用，并复核实际换行。
+- **字体适配：** 按 Windows、macOS、Linux 的已安装字体为任务副本选择明确的中英文字体，并检查正文、表格、图表及母版。跨设备打开仍需复核字形和实际换行。
 - **整稿协调：** 根据封面、目录、章节、流程、对比、数据等页面职责，以及内容关系和容量选择版式；封面配图优先匹配所选主题色。章节页在同一整稿中保持统一。
 - **先规划再组装：** 先梳理每页讲什么、适合什么版式，再逐页填充和组装，方便发现内容与模板不匹配的问题。
 - **交付前检查：** 逐页核对压字、溢出、图片裁切、Logo 位置和 PowerPoint 渲染；数据与案例以用户提供的材料为准，不编造。
@@ -55,14 +55,23 @@
 将本仓库完整克隆到所用 Agent 的技能目录，确保 `SKILL.md`、`assets/`、`references/` 和 `scripts/` 都在同一目录。以 Codex 的用户技能目录为例：
 
 ```powershell
-git clone https://github.com/camillechi2018/Epoint-Presentaion.git "$HOME/.codex/skills/epoint-presentation"
+git clone https://github.com/camillechi2018/Epoint-Presentation.git "$HOME/.codex/skills/epoint-presentation"
 ```
+
+需要 Python 3.10 或更高版本。在技能目录安装隔离的运行环境：
+
+| 系统 | 安装命令 |
+| --- | --- |
+| Windows | `powershell -File .\install.ps1` |
+| macOS、Linux | `sh ./install.sh` |
+
+安装器检查依赖和本地模板包后记录可用的 Python；断网安装可提供兼容的 `--wheelhouse <目录>`。不同系统的字体、Office 渲染和整稿交付仍须按目标环境复核。[查看跨系统安装与验证说明](references/cross-platform-runtime.md)。
 
 然后在支持技能的 Agent 中附上材料，例如：
 
 > 调用 epoint-presentation，用这份报告制作一套可编辑 PPTX。先给我蓝色系、红色系、科技风格的预览供选择；保留材料中的事实和数字。
 
-如果已指定风格，可直接说“用蓝色系制作”，不需要再次选择。完整模板知识库由 [`knowledge-base.json`](knowledge-base.json) 指向独立 Git 仓库；首次使用远端模板需要能够访问 GitHub。字体使用 Microsoft YaHei 和 Arial，实际文字换行仍需在生成环境中检查。
+如果已指定风格，可直接说“用蓝色系制作”，不需要再次选择。完整模板知识库由 [`knowledge-base.json`](knowledge-base.json) 指向独立 Git 仓库；首次使用远端模板需要能够访问 GitHub，离线时按校验结果使用本地缓存或最小模板包。
 
 ## 它怎样组织一份 PPT
 
@@ -82,6 +91,7 @@ git clone https://github.com/camillechi2018/Epoint-Presentaion.git "$HOME/.codex
 | 三种风格 | 技能自带颜色、字体、Logo 规则和预览；科技风格独立于简约蓝红版。 |
 | 目录变项数 | 依据具体目录组件的已验证项数和文字容量选版。 |
 | 知识库暂不可达 | 可检查已校验的本地结构页最小包；无合格结构页时停止完整出稿。仅制作正文局部草稿可使用离线品牌排版。 |
+| 跨系统安装 | Windows、macOS、Linux 使用对应安装入口；成功安装不等于目标 PowerPoint、WPS 或 Keynote 中的整稿视觉验收。 |
 | HTML 与动效 | 按具体组件的独立验收状态判断，不能从静态 PPTX 可用推断其已可用。 |
 
 技能默认添加 Logo，并锁定主题变量；具体页面仍须用本次材料试填。模板和品牌素材目前标记为 `draft_pending_review`，这是审阅状态，不是正式品牌授权或交付质量保证。
@@ -89,17 +99,18 @@ git clone https://github.com/camillechi2018/Epoint-Presentaion.git "$HOME/.codex
 ## 仓库结构
 
 ```text
-Epoint-Presentaion/
+Epoint-Presentation/
 ├── SKILL.md                 Agent 的调用规则
 ├── knowledge-base.json      完整知识库的 Git 地址与本地回退配置
 ├── assets/
 │   ├── brand/               Logo、颜色与字体变量
 │   ├── style-kits/          蓝、红、科技三套风格资料
-│   ├── style-previews/      三张风格预览
+│   ├── style-previews/      风格和正文组件预览
 │   ├── layouts/             正文托底排版规则
 │   └── minimal-template-pack/  离线结构页最小包
 ├── references/              按任务读取的细则
 ├── scripts/                 选版、填充、组装及审计工具
+├── install.ps1 / install.sh 跨系统运行环境安装入口
 └── tests/                   局部回归测试
 ```
 
