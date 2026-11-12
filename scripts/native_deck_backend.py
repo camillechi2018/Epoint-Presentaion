@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import platform
 import posixpath
 import shutil
 import subprocess
@@ -65,11 +66,15 @@ def _basic_package_audit(path: Path) -> dict:
     return {'passed': True, 'parts': len(names), 'xml_parts': xml_count}
 
 
-def _render(path: Path, directory: Path) -> bool:
+def _render(path: Path, directory: Path) -> dict:
+    if platform.system() == 'Darwin':
+        return {'status': 'pending_manual', 'error_code': 'MAC_RENDERER_MANUAL_REQUIRED',
+                'detail': '请在目标编辑器中打开候选 PPTX 并逐页导出预览；不以 LibreOffice 替代 Mac 目标应用验收'}
     office = shutil.which('libreoffice') or shutil.which('soffice')
     ppm = shutil.which('pdftoppm')
     if not office or not ppm:
-        return False
+        return {'status': 'pending', 'error_code': 'RENDERER_UNAVAILABLE',
+                'detail': '缺少 LibreOffice 或 pdftoppm；候选 PPTX 和静态审计仍可核查'}
     directory.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='epoint-lo-') as profile:
         command = [office, '-env:UserInstallation=' + Path(profile).as_uri(), '--headless',
@@ -87,7 +92,7 @@ def _render(path: Path, directory: Path) -> bool:
         raise RuntimeError('PDF_RENDER_EMPTY')
     for number, image in enumerate(images, 1):
         image.rename(directory / f'P{number:03d}.png')
-    return True
+    return {'status': 'passed', 'error_code': None, 'application': 'LibreOffice'}
 
 
 def assemble_and_check(assembly: dict, manifest: Path, output: Path,
@@ -117,5 +122,10 @@ def assemble_and_check(assembly: dict, manifest: Path, output: Path,
     if not logos['passed']:
         raise ValueError('LOGO_AUDIT_FAILED')
     finished = check_finished(output, assembly, prefilled)
-    rendered = _render(output, render_directory)
-    return dict(result, finished=finished, rendered=rendered)
+    try:
+        render = _render(output, render_directory)
+    except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError) as exc:
+        render = {'status': 'failed', 'error_code': 'RENDER_FAILED',
+                  'detail': str(exc)[-600:]}
+    _write(output.with_suffix('.render.json'), render)
+    return dict(result, finished=finished, render=render)

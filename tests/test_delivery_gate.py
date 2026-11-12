@@ -85,6 +85,15 @@ class DeliveryGateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'SECTION_LAYOUT_MIXED'):
             check_structure(mixed)
 
+    def test_directory_entries_need_matching_section_pages(self):
+        mismatch = [dict(page) for page in self.pages]
+        mismatch[1]['directory_item_count'] = 4
+        with self.assertRaisesRegex(ValueError, 'DIRECTORY_SECTION_COUNT_MISMATCH'):
+            check_structure(mismatch)
+        matching = [dict(page) for page in self.pages]
+        matching[1]['directory_item_count'] = 1
+        self.assertEqual(check_structure(matching)['status'], 'passed')
+
     def test_catalog_mismatch_is_rejected_before_assembly(self):
         forged = dict(self.assembly, pages=[dict(page) for page in self.pages],
                       slides=[dict(slide) for slide in self.slides])

@@ -19,6 +19,30 @@ STRUCTURAL = ('cover', 'directory', 'section', 'closing')
 REL = 'http://schemas.openxmlformats.org/package/2006/relationships'
 
 
+def directory_item_count(page):
+    if isinstance(page.get('directory_item_count'), int):
+        return page['directory_item_count']
+    if isinstance(page.get('items'), list):
+        return len(page['items'])
+    content = page.get('content')
+    if isinstance(content, dict):
+        if isinstance(content.get('items'), list):
+            return len(content['items'])
+        if isinstance(content.get('item_count'), int):
+            return content['item_count']
+    return None
+
+
+def check_directory_section_count(pages):
+    directories = [page for page in pages if page.get('role') == 'directory']
+    counts = [directory_item_count(page) for page in directories]
+    if counts and all(count is not None for count in counts):
+        listed = sum(counts)
+        actual = sum(page.get('role') == 'section' for page in pages)
+        if listed != actual:
+            raise ValueError(f'DIRECTORY_SECTION_COUNT_MISMATCH: 目录 {listed} 项，章节页 {actual} 张')
+
+
 def check_structure(pages, *, complete=True):
     if not complete:
         return {'status': 'partial_draft', 'complete_deck': False}
@@ -29,6 +53,7 @@ def check_structure(pages, *, complete=True):
         raise ValueError('COMPLETE_DECK_STRUCTURE_MISSING')
     if roles.index('directory') >= roles.index('section') or roles.index('section') >= len(roles) - 1:
         raise ValueError('COMPLETE_DECK_STRUCTURE_ORDER')
+    check_directory_section_count(pages)
     sections = set()
     for page in pages:
         if page.get('role') not in STRUCTURAL:

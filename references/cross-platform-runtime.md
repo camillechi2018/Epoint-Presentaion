@@ -1,6 +1,6 @@
 # 跨系统运行：S5 候选实现
 
-本轮已完成发布字节校验、隔离依赖安装、独立自检、知识库缓存迁移和 S2/S3 代表性验收。S4 已完成 Windows/Linux 字体与渲染定点验证；S5 正在用三份真实材料回归完整流程。macOS 实机由用户后续统一检测。安装成功或自检通过不等于整稿交付通过。
+本轮已完成发布字节校验、隔离依赖安装、独立自检、知识库缓存迁移和 S2/S3 代表性验收。S4 已完成 Windows/Linux 字体与渲染定点验证。macOS 实机已验证安装、字体、可编辑 PPTX 生成及 Keynote 打开；自动预览和目标 PowerPoint 视觉验收仍待完成。安装成功或自检通过不等于整稿交付通过。
 
 ## 安装与运行
 
@@ -72,7 +72,7 @@ S2 代表性签收另覆盖四图表与表格混合包、含 PNG/SVG/WDP 和嵌�
 
 ## S3 必要交付门槛
 
-正式完整稿要求封面、目录、至少一张章节页和封底，且章节使用同一 `layout_id`。组装前 `delivery_gate.py` 复验固定知识库清单、源文件哈希、组件来源页、填充单页哈希与标记；组装后检查包关系、页数和最终页关联。正常样本及缺目录、章节混用、伪造来源、坏包反例各跑一次即可，不重新验收知识库全部组件。`run_presentation.py` 的 `status=ready` 仍只表示预检通过；成稿另报告 `delivery_status`，未做人工视觉复核时保持 `pending_visual_review`。Mac PowerPoint 与真实材料三风格整稿另在 S4 验证。
+正式完整稿要求封面、目录、至少一张章节页和封底，且章节使用同一 `layout_id`。目录条目数可读取时，必须与章节页数一致；目录四项只生成一张章节页会报 `DIRECTORY_SECTION_COUNT_MISMATCH`。组装前 `delivery_gate.py` 复验固定知识库清单、源文件哈希、组件来源页、填充单页哈希与标记；组装后检查包关系、页数和最终页关联。正常样本及缺目录、章节混用、伪造来源、坏包反例各跑一次即可，不重新验收知识库全部组件。`run_presentation.py` 的 `status=ready` 只表示候选生成；成稿另报告 `delivery_status`，未做人工视觉复核时保持 `pending_visual_review`。Mac PowerPoint 与真实材料三风格整稿仍待验证。
 
 ## S4 字体配置与渲染校准
 
@@ -92,6 +92,6 @@ Linux 安装并自检后，可在已校验的知识库快照上运行：
 <Python> scripts/run_presentation.py --request <逐页请求.json> --library <知识库目录> --out <报告.json> --plan-out <计划.json> --execute-out <成稿.pptx> --native-experimental
 ```
 
-此参数只切换组装后端；候选筛选、真实字段试填、结构页完整性、来源校验、任务字体归一和最终审计仍执行。输出报告中的 `assembly_backend=native_experimental`、`execution.render_status` 与 `delivery_status` 要分别读取。LibreOffice 逐页渲染成功后仍为 `pending_visual_review`；应检查实际 PNG，并用目标 PowerPoint/WPS 打开或导出。找不到 LibreOffice 时，包检查可以完成，但渲染及视觉状态不得标为通过。缺结构页、缺字体或未显式启用后端时继续阻断完整稿。
+此参数只切换组装后端；候选筛选、真实字段试填、结构页完整性、来源校验、任务字体归一和最终审计仍执行。输出报告中的 `assembly_backend=native_experimental`、`execution.assembly_status`、`execution.static_audit_status`、`execution.render_status` 与 `delivery_status` 要分别读取。LibreOffice 逐页渲染成功后仍为 `pending_visual_review`；应检查实际 PNG，并用目标 PowerPoint/WPS 打开或导出。macOS 自动预览当前标为 `pending_manual`，需在目标编辑器中逐页导出和检查。渲染失败时保留已通过组装及静态审计的候选 PPTX，交付状态为 `pending_render`，不能报已完成。找不到渲染器时同样不能把视觉状态标为通过。缺结构页、缺字体或未显式启用后端时继续阻断完整稿。
 
 该入口尚未作为 macOS 或 Linux 的正式发布能力签收；S5 真实材料及用户 macOS 实测结论以对应验收记录为准。

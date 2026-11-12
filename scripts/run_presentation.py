@@ -20,7 +20,7 @@ def _load_workflow():
     global resolve, adapt_for_layout, classify_trial_failure, structural_mapping_issue
     global field_source_evidence, capacity_preflight, fill, render_guided_page
     global resolved_variant, validate_page, fallback_type, audit_deck
-    global check_structure, check_prefilled, check_finished
+    global check_structure, check_directory_section_count, directory_item_count, check_prefilled, check_finished
     from plan_deck import resolve
     from content_adapters import (adapt_for_layout, classify_trial_failure,
                                   structural_mapping_issue, field_source_evidence)
@@ -29,7 +29,8 @@ def _load_workflow():
     from render_offline_brand import render as render_guided_page, resolved_variant, validate_page
     from fallback_rules import fallback_type
     from audit_deck import audit as audit_deck
-    from delivery_gate import check_structure, check_prefilled, check_finished
+    from delivery_gate import (check_structure, check_directory_section_count,
+                               directory_item_count, check_prefilled, check_finished)
 
 STYLES = {
     'blue': 'legacy-blue-red',
@@ -205,6 +206,7 @@ def execute_plan(request, plan, report, output: Path):
     pages = request.get('pages', [])
     if len(pages) != len(plan['pages']):
         raise ValueError('逐页内容与规划页数不一致')
+    check_directory_section_count(pages)
     check_structure([dict(choice, role=page.get('role'))
                      for page, choice in zip(pages, plan['pages'])], complete=True)
     output = output.resolve()
@@ -361,6 +363,8 @@ def execute_plan(request, plan, report, output: Path):
                        if isinstance(element, dict) and element.get('kind') == 'image' and element.get('source_path')] \
             if isinstance(content.get('free_layout'), dict) else []
         audit_pages.append({'role': page.get('role', 'body'), 'layout_id': choice.get('layout_id'),
+                            'directory_item_count': directory_item_count(page)
+                            if page.get('role') == 'directory' else None,
                             'selection_mode': choice['selection_mode'], 'selection_label': choice['selection_label'],
                             'source_stamp': stamp,
                             'data_source': page.get('data_source') or content.get('data_source'),
@@ -376,10 +380,12 @@ def execute_plan(request, plan, report, output: Path):
         json.dumps(prefilled, ensure_ascii=False, indent=2), encoding='utf-8')
     manifest_path.write_text(json.dumps(assembly, ensure_ascii=False, indent=2), encoding='utf-8')
     render_dir = work / 'rendered'
+    native_render = None
     if report.get('assembly_backend') == 'native_experimental':
         from native_deck_backend import assemble_and_check
         native = assemble_and_check(assembly, manifest_path, output, prefilled, render_dir)
         finished = native['finished']
+        native_render = native['render']
     else:
         command = [report['runtime']['powershell'], '-NoProfile', '-File',
                    str(SKILL / 'scripts' / 'assemble_deck.ps1'), '-Manifest', str(manifest_path),
@@ -401,6 +407,12 @@ def execute_plan(request, plan, report, output: Path):
                                  for label in ('知识库模板', '技能排版', '自由编排')}
     rendered = all((render_dir / f'P{index:03d}.png').is_file()
                    for index in range(1, len(slides) + 1))
+    render_status = ('passed' if rendered else 'failed'
+                     if native_render and native_render['status'] == 'passed' else
+                     native_render['status'] if native_render else 'pending')
+    render_error = ('RENDER_OUTPUT_INCOMPLETE' if native_render and not rendered
+                    and native_render['status'] == 'passed' else
+                    native_render.get('error_code') if native_render and not rendered else None)
     return {'output': str(output.resolve()), 'slides': len(slides),
             'library_used': any(x['selection_mode'] == 'source_template' for x in plan['pages']),
             'source_template_pages': sum(x['selection_mode'] == 'source_template' for x in plan['pages']),
@@ -410,7 +422,10 @@ def execute_plan(request, plan, report, output: Path):
             'manifest': str(manifest_path), 'audit': str(audit_path), 'render_directory': str(render_dir),
             'pre_assembly_gate': str(work / 'pre-assembly-gate.json'),
             'final_gate': str(work / 'final-gate.json'),
-            'render_status': 'passed' if rendered else 'pending',
+            'assembly_status': 'passed', 'static_audit_status': 'passed',
+            'render_status': render_status,
+            'render_error_code': render_error,
+            'render_detail': native_render.get('detail') if native_render and not rendered else None,
             'delivery_status': 'pending_visual_review' if rendered else 'pending_render'}
 
 
@@ -480,6 +495,9 @@ def main():
                         os.environ['EPOINT_FONT_PROFILE'] = previous_profile
                 report['library_used'] = report['execution']['library_used']
                 report['delivery_status'] = report['execution']['delivery_status']
+                if report['execution'].get('render_error_code'):
+                    report['warnings'].append('候选 PPTX 已生成并通过静态审计；渲染待处理：'
+                                              + report['execution']['render_error_code'])
             report['selection_summary'] = plan['selection_summary']
             if args.plan_out:
                 args.plan_out.parent.mkdir(parents=True, exist_ok=True)
@@ -492,7 +510,8 @@ def main():
             gate_error = str(exc).split(':', 1)[0]
             gate_codes = {'COMPLETE_DECK_PAGES_MISSING', 'COMPLETE_DECK_STRUCTURE_MISSING',
                           'COMPLETE_DECK_STRUCTURE_ORDER', 'STRUCTURE_SOURCE_REQUIRED',
-                          'SECTION_LAYOUT_MIXED', 'SOURCE_STAMP_NOT_CATALOG_BOUND',
+                          'SECTION_LAYOUT_MIXED', 'DIRECTORY_SECTION_COUNT_MISMATCH',
+                          'SOURCE_STAMP_NOT_CATALOG_BOUND',
                           'SOURCE_FILE_HASH_MISMATCH', 'RELATION_TARGET_MISSING',
                           'FINISHED_SOURCE_ASSOCIATION_MISMATCH'}
             report['error_code'] = (gate_error if gate_error in gate_codes
