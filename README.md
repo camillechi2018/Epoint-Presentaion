@@ -58,6 +58,16 @@
 git clone https://github.com/camillechi2018/Epoint-Presentation.git "$HOME/.codex/skills/epoint-presentation"
 ```
 
+WorkBuddy 的 macOS/Linux 用户可改为：
+
+```sh
+git clone https://github.com/camillechi2018/Epoint-Presentation.git "$HOME/.workbuddy/skills/epoint-presentation"
+cd "$HOME/.workbuddy/skills/epoint-presentation"
+sh ./install.sh
+```
+
+安装后新开 WorkBuddy 会话或刷新技能列表，再确认 `epoint-presentation` 已出现；技能文件安装成功与当前会话立即发现是两项检查。
+
 需要 Python 3.10 或更高版本。在技能目录安装隔离的运行环境：
 
 | 系统 | 安装命令 |
@@ -65,7 +75,7 @@ git clone https://github.com/camillechi2018/Epoint-Presentation.git "$HOME/.code
 | Windows | `powershell -File .\install.ps1` |
 | macOS、Linux | `sh ./install.sh` |
 
-安装器检查依赖和本地模板包后记录可用的 Python；断网安装可提供兼容的 `--wheelhouse <目录>`。不同系统的字体、Office 渲染和整稿交付仍须按目标环境复核。[查看跨系统安装与验证说明](references/cross-platform-runtime.md)。
+安装器先复验并复用已登记的有效运行环境，避免 PATH 中的 Agent 内嵌 Python 触发重复安装；首次安装仍会选用可执行的 Python。需要指定解释器时，先设置 `EPOINT_PYTHON` 为 Python 3.10+ 的完整路径。断网安装可提供兼容的 `--wheelhouse <目录>`。不同系统的字体、Office 渲染和整稿交付仍须按目标环境复核。[查看跨系统安装与验证说明](references/cross-platform-runtime.md)。
 
 然后在支持技能的 Agent 中附上材料，例如：
 

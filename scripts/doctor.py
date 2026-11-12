@@ -43,6 +43,17 @@ def probe_command(name):
             'error_code': None if ok else result['error'] or 'COMMAND_PROBE_FAILED'}
 
 
+def probe_native_backend():
+    """Import-only check for the explicitly selected experimental assembler."""
+    code = ('import sys; sys.path.insert(0, ' + repr(str(SKILL_ROOT / 'scripts')) + '); '
+            'from assemble_native import assemble_many; assert callable(assemble_many)')
+    result = capture([sys.executable, '-c', code], timeout=25)
+    ok = result['returncode'] == 0
+    return {'status': 'available' if ok else 'unavailable', 'backend': 'native_experimental',
+            'validation': 'import_only',
+            'error_code': None if ok else result['error'] or 'NATIVE_BACKEND_IMPORT_FAILED'}
+
+
 def deep_probe(paths):
     """Explicit local writes and editable PPTX roundtrip; no Office UI is launched."""
     outcome = {}
@@ -87,7 +98,9 @@ def report(*, library=None, state_dir=None, goal='inspect', deep=False, font_pro
     git = probe_command('git')
     assembly = {'status': 'unavailable', 'backend': None,
                 'error_code': 'PPTX_BACKEND_UNAVAILABLE'}
-    if os.name == 'nt':
+    if goal == 'native-assemble':
+        assembly = probe_native_backend()
+    elif os.name == 'nt':
         try:
             import winreg
             with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, 'PowerPoint.Application'):
@@ -103,14 +116,14 @@ def report(*, library=None, state_dir=None, goal='inspect', deep=False, font_pro
         blockers.append('PYTHON_VERSION_UNSUPPORTED')
     if library_check['status'] != 'available':
         blockers.append(library_check['error_code'])
-    required = MATERIAL_IMPORTS if goal == 'read' else PPTX_IMPORTS if goal in {'fill', 'assemble'} else ()
+    required = MATERIAL_IMPORTS if goal == 'read' else PPTX_IMPORTS if goal in {'fill', 'assemble', 'native-assemble'} else ()
     if any(dependencies[name]['status'] != 'available' for name in required):
         blockers.append('DEPENDENCY_IMPORT_FAILED')
-    if goal == 'assemble' and assembly['status'] != 'available':
+    if goal in {'assemble', 'native-assemble'} and assembly['status'] != 'available':
         blockers.append(assembly['error_code'])
     deep_checks = deep_probe(paths) if deep else None
     if deep_checks:
-        if goal in {'fill', 'assemble'} and deep_checks['pptx_roundtrip']['status'] != 'available':
+        if goal in {'fill', 'assemble', 'native-assemble'} and deep_checks['pptx_roundtrip']['status'] != 'available':
             blockers.append(deep_checks['pptx_roundtrip']['error_code'])
         for name in ('state_write', 'cache_write'):
             if deep_checks[name]['status'] != 'available':
@@ -118,7 +131,7 @@ def report(*, library=None, state_dir=None, goal='inspect', deep=False, font_pro
     # Presence is a resource probe, not proof of glyph rendering or layout fit.
     font_check = probe_font_profile(font_profile or {'Windows': 'windows',
         'Darwin': 'macos', 'Linux': 'linux'}.get(platform.system(), 'linux'))
-    if goal in {'fill', 'assemble'} and font_check['status'] != 'available':
+    if goal in {'fill', 'assemble', 'native-assemble'} and font_check['status'] != 'available':
         blockers.append(font_check['error_code'])
     renderer = ({'status': 'detected_unverified', 'application': 'LibreOffice Impress',
                  'probe': probe_command('soffice')}
@@ -133,14 +146,15 @@ def report(*, library=None, state_dir=None, goal='inspect', deep=False, font_pro
             'paths': paths, 'dependencies': dependencies, 'git': git, 'library': library_check,
             'assembly': assembly, 'rendering': renderer, 'fonts': font_check,
             'guidance': ['Use the dedicated environment installer for missing Python dependencies.',
-                         'An available package or registered application is not a rendered-deck acceptance.']}
+                         'An available package or registered application is not a rendered-deck acceptance.',
+                         'native-assemble checks only experimental backend import; a real deck still needs assembly, rendering and visual review.']}
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--library', type=Path)
     parser.add_argument('--state-dir', type=Path)
-    parser.add_argument('--goal', choices=['inspect', 'read', 'fill', 'assemble'], default='inspect')
+    parser.add_argument('--goal', choices=['inspect', 'read', 'fill', 'assemble', 'native-assemble'], default='inspect')
     parser.add_argument('--out', type=Path)
     parser.add_argument('--deep', action='store_true')
     parser.add_argument('--font-profile', choices=('windows', 'macos', 'linux'))

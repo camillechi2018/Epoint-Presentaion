@@ -1,11 +1,13 @@
 """Cross-platform release integrity and diagnostics when optional packages are absent."""
 import hashlib
+import io
 import json
 import os
 import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
@@ -76,6 +78,50 @@ class DistributionRuntimeTests(unittest.TestCase):
             target = state_root()
             self.assertEqual(target, (self.root / '中文 state').resolve())
             self.assertFalse(target.exists())
+
+    def test_installer_reuses_valid_active_runtime_before_bootstrap_python(self):
+        state = self.root / 'state'
+        python = state / 'venvs' / 'Darwin-arm64-3.14-fixture' / 'bin' / 'python'
+        python.parent.mkdir(parents=True)
+        python.write_bytes(b'fixture')
+        requirements = (SCRIPTS.parent / 'requirements-core.txt').read_bytes()
+        versions = {name: '1.0' for name in install_runtime.PACKAGES}
+        record = {'python': str(python), 'requirements_sha256': hashlib.sha256(requirements).hexdigest(),
+                  'versions': versions, 'previous_python': None}
+        marker = state / 'runtime.json'
+        marker.write_text(json.dumps(record), encoding='utf-8')
+        before = marker.read_bytes()
+
+        def fake_capture(args, **_kwargs):
+            self.assertNotIn('venv', args, 'A valid active runtime must not create a second environment')
+            stdout = json.dumps(versions) if '-c' in args else '{"blockers": []}'
+            return {'returncode': 0, 'stdout': stdout, 'stderr': '', 'error': None}
+
+        output = io.StringIO()
+        with patch.object(install_runtime, 'state_root', return_value=state), \
+             patch.object(install_runtime, 'capture', side_effect=fake_capture), \
+             patch.object(sys, 'argv', ['install_runtime.py']), redirect_stdout(output):
+            self.assertEqual(install_runtime.main(), 0)
+        self.assertTrue(json.loads(output.getvalue())['reused_active_runtime'])
+        self.assertEqual(marker.read_bytes(), before)
+
+    def test_venv_failure_keeps_specific_redacted_diagnostic(self):
+        state = self.root / 'fresh state'
+        failure = {'returncode': 1, 'stdout': '',
+                   'stderr': 'Permission denied deleting pip/__pycache__/temp.pyc; https://user:secret@example.com',
+                   'error': None}
+        output = io.StringIO()
+        with patch.object(install_runtime, 'state_root', return_value=state), \
+             patch.object(install_runtime, 'capture', return_value=failure) as run, \
+             patch.object(sys, 'argv', ['install_runtime.py']), redirect_stdout(output):
+            self.assertEqual(install_runtime.main(), 2)
+        result = json.loads(output.getvalue())
+        self.assertEqual(result['error_code'], 'VENV_CREATE_FAILED')
+        self.assertIn('Permission denied deleting', result['detail'])
+        self.assertNotIn('secret', result['detail'])
+        self.assertNotIn('install the system venv', result['error'])
+        self.assertEqual(run.call_args.kwargs['env']['PYTHONDONTWRITEBYTECODE'], '1')
+        self.assertIn('-B', run.call_args.args[0])
 
     @unittest.skipIf(os.name == 'nt', 'POSIX virtualenv interpreter symlink')
     def test_installer_retains_virtualenv_symlink_path(self):

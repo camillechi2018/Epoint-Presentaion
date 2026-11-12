@@ -57,7 +57,10 @@ def _git(args, cwd=None, timeout=35):
 
 def verified_full_cache(cfg, marker):
     """Use only the previously validated, clean checkout at the marked commit."""
-    checkout = (SKILL / cfg['git_checkout_path']).resolve()
+    legacy_checkout = cfg.get('legacy_git_checkout_path') or cfg.get('git_checkout_path')
+    if not legacy_checkout:
+        raise RuntimeError('full_cache_missing')
+    checkout = (SKILL / legacy_checkout).resolve()
     if not marker.is_file() or not (checkout / '.git').exists():
         raise RuntimeError('full_cache_missing')
     record = json.loads(marker.read_text(encoding='utf-8'))
@@ -132,7 +135,10 @@ def resolve_library(override=None, *, allow_verified_cache=True, cache_only=Fals
             # Compatibility only: validate old last-good records but never update or
             # modify the old checkout. New successful downloads use managed snapshots.
             try:
-                marker = (SKILL / cfg['cache_path']).resolve() / 'last-good.json'
+                legacy_cache = cfg.get('legacy_cache_path') or cfg.get('cache_path')
+                if not legacy_cache:
+                    raise RuntimeError('full_cache_missing')
+                marker = (SKILL / legacy_cache).resolve() / 'last-good.json'
                 root, commit = verified_full_cache(cfg, marker)
                 return root, 'verified_full_cache', commit, '; '.join(failures + ['legacy_cache_read_only'])
             except (RuntimeError, OSError, ValueError, KeyError) as legacy_exc:

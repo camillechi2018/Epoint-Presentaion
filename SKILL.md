@@ -11,7 +11,7 @@ metadata:
 
 ## 跨平台统一入口
 
-跨系统安装与故障诊断见[运行环境说明](references/cross-platform-runtime.md)。环境自检使用 `scripts/run_presentation.py --doctor --out <诊断.json>`，无需先安装 PPTX 依赖；安装后可用 `scripts/run.py` 转调已锁定的虚拟环境解释器。自检通过仅代表所选目标的环境检查通过。macOS/Linux 可显式传入 `--native-experimental` 运行 S5 原生组装整稿候选；该入口须使用真实、已校验的结构页和同一知识库快照，继续执行组装前后来源、包、字体、颜色、媒体与 Logo 检查。它仍属实验入口，不把 LibreOffice 导出或 `status=ready` 当作目标应用视觉签收；未传此参数时缺 PowerPoint 后端仍阻断完整出稿。S4/S5 请求可通过 `font_profile` 锁定 Windows、macOS 或 Linux 字体；省略时按运行系统选择。完整出稿前检查字体资源，同一任务的填充、归一、审计和报告共用该配置。Linux LibreOffice 预览与 Mac PowerPoint 实机结果分别登记，不以一方结果代替另一方。
+跨系统安装与故障诊断见[运行环境说明](references/cross-platform-runtime.md)。环境自检使用 `scripts/run_presentation.py --doctor --out <诊断.json>`，无需先安装 PPTX 依赖；安装器先复验并复用已登记的有效环境，安装后用 `scripts/run.py` 转调已锁定的解释器。`--goal assemble` 检查正式后端，macOS 实验组装可另用 `--goal native-assemble` 做导入检查；两者都不代替真实成稿与视觉验收。macOS/Linux 可显式传入 `--native-experimental` 运行 S5 原生组装整稿候选；该入口须使用真实、已校验的结构页和同一知识库快照，继续执行组装前后来源、包、字体、颜色、媒体与 Logo 检查。它仍属实验入口，不把 LibreOffice 导出或 `status=ready` 当作目标应用视觉签收；未传此参数时缺 PowerPoint 后端仍阻断完整出稿。S4/S5 请求可通过 `font_profile` 锁定 Windows、macOS 或 Linux 字体；省略时按运行系统选择。完整出稿前检查字体资源，同一任务的填充、归一、审计和报告共用该配置。Linux LibreOffice 预览与 Mac PowerPoint 实机结果分别登记，不以一方结果代替另一方。
 
 收到 `.xls`、`.xlsx`、`.docx` 原始材料时，先用 `scripts/read_material.py --input <文件> --out <事实清单.json>` 做只读提取，保留有效行、合并区域、公式缓存状态和图片引用；根据清单再制定逐页内容。对无法可靠读取的 `.xls` 公式来源与内嵌图片、缺失的 `.xlsx` 公式缓存，以及尚未安放的 Word 图片，应明确记录，不能按空值或猜测内容生成事实。该提取步骤不代表内容已完整入稿。
 
