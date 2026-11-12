@@ -16,8 +16,8 @@
   },
   "colors": {
     "source": "new-template-deep-blue-tech.json",
-    "canvas": "05193A",
-    "surface": "031634",
+    "canvas": "031634",
+    "surface": "05193A",
     "text": "FFFFFF",
     "muted": "D4DBE4",
     "primary": "0F96FF",
@@ -38,14 +38,14 @@
   },
   "visual_rules": {
     "name": "深蓝科技",
-    "background": "新绘正文固定使用 #05193A 画布；顶部使用本地知识库提取的科技标题栏图形组，不叠加弥散椭圆",
+    "background": "新绘正文固定使用 #031634 画布，卡片表面使用原 #05193A 保持层次；顶部使用本地知识库提取的科技标题栏图形组，不叠加弥散椭圆",
     "title": "正文页采用 content-tech-021 原稿顶部标题栏，28 pt 白色可编辑标题居中，右上角白色 Logo；不绘制简约版横线",
     "structure": "用原稿中的发光线、几何网格、科技感层级作为参考；新绘正文使用可编辑矢量图形",
     "visual_rhythm": "深底保持连贯，以蓝青强调关键数据和路径；避免简约版白卡直接混入",
     "image": "图片与光效必须来自已登记科技风素材；不得自行生成锁外霓虹色"
   },
   "layout_principles": {
-    "canvas": "16:9；科技风新绘正文使用 #05193A 画布及 offline-core.json.tech_content_header 原稿图形组，正文关系排版沿用现有规则",
+    "canvas": "16:9；科技风新绘正文使用 #031634 画布及 offline-core.json.tech_content_header 原稿图形组，正文关系排版沿用现有规则",
     "logo": "浅底彩色、深底白色；避开标题和图形，不改变 Logo 内部色",
     "shadows": "none",
     "background_effect": "科技风新绘正文不叠加弥散椭圆；顶部图形组来自技能本地已提取的知识库原稿",

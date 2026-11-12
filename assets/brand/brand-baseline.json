@@ -46,8 +46,8 @@
     },
     "deep-blue-tech": {
       "source": "new-template-deep-blue-tech.json",
-      "canvas": "05193A",
-      "surface": "031634",
+      "canvas": "031634",
+      "surface": "05193A",
       "text": "FFFFFF",
       "muted": "D4DBE4",
       "primary": "0F96FF",

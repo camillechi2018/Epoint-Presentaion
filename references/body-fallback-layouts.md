@@ -6,7 +6,7 @@
 
 本规则是知识库的**结构补充**。借鉴花叔 Design 的信息组织方法，用新点锁定主题颜色、字体和 Logo 在 PowerPoint 中重绘为可编辑对象。不开阴影，不使用参考样例里的业务文字或数据。各版式的适用关系和来源见 `assets/layouts/fallback-layouts.json`。
 
-蓝红简约托底正文共用 `assets/layouts/offline-core.json.content_header`：标题、横线和 Logo 的尺寸与位置按知识库简约正文页实测锁定。科技风使用 `tech_content_header` 和技能自带的原生科技标题栏图形组：居中可编辑白色标题、右上角白色 Logo、`#05193A` 画布。自由编排也按风格使用对应页眉；正文信息关系排版保持不变。
+蓝红简约托底正文共用 `assets/layouts/offline-core.json.content_header`：标题、横线和 Logo 的尺寸与位置按知识库简约正文页实测锁定。科技风使用 `tech_content_header` 和技能自带的原生科技标题栏图形组：居中可编辑白色标题、右上角白色 Logo、`#031634` 画布；卡片表面使用 `#05193A`。自由编排也按风格使用对应页眉；正文信息关系排版保持不变。
 
 蓝红简约托底正文继续使用 `offline-core.json.content_atmosphere` 中的可编辑弥散衬底。科技风不叠加椭圆，仅保留锁定深蓝画布及原稿科技标题栏；知识库原页不追加衬底。
 

@@ -56,7 +56,7 @@ RULES = {
         'image': '只使用红色系标签及已验证的来源图片，不把暖金或蓝色素材当作红色背景',
     },
     'deep-blue-tech': {
-        'name': '深蓝科技', 'background': '新绘正文固定使用 #05193A 画布；顶部使用本地知识库提取的科技标题栏图形组，不叠加弥散椭圆',
+        'name': '深蓝科技', 'background': '新绘正文固定使用 #031634 画布，卡片表面使用原 #05193A 保持层次；顶部使用本地知识库提取的科技标题栏图形组，不叠加弥散椭圆',
         'title': '正文页采用 content-tech-021 原稿顶部标题栏，28 pt 白色可编辑标题居中，右上角白色 Logo；不绘制简约版横线',
         'structure': '用原稿中的发光线、几何网格、科技感层级作为参考；新绘正文使用可编辑矢量图形',
         'visual_rhythm': '深底保持连贯，以蓝青强调关键数据和路径；避免简约版白卡直接混入',
@@ -94,7 +94,7 @@ def build(library: Path):
             'typography': {**baseline['typography'], 'title_pt': 28 if theme == 'deep-blue-tech' else 24}, 'colors': baseline['themes'][theme],
             'visual_rules': RULES[theme],
             'layout_principles': {
-                'canvas': ('16:9；科技风新绘正文使用 #05193A 画布及 offline-core.json.tech_content_header 原稿图形组，正文关系排版沿用现有规则' if theme == 'deep-blue-tech' else '16:9；正文标题、分隔线和 Logo 固定读取 offline-core.json.content_header，仅横线下方的内容按信息关系弹性排布'),
+                'canvas': ('16:9；科技风新绘正文使用 #031634 画布及 offline-core.json.tech_content_header 原稿图形组，正文关系排版沿用现有规则' if theme == 'deep-blue-tech' else '16:9；正文标题、分隔线和 Logo 固定读取 offline-core.json.content_header，仅横线下方的内容按信息关系弹性排布'),
                 'logo': '浅底彩色、深底白色；避开标题和图形，不改变 Logo 内部色',
                 'shadows': 'none',
                 'background_effect': ('科技风新绘正文不叠加弥散椭圆；顶部图形组来自技能本地已提取的知识库原稿' if theme == 'deep-blue-tech' else '蓝红新绘正文读取 offline-core.json.content_atmosphere；可编辑椭圆、主题锁色、预设透明度、220 pt 柔边，知识库来源页不叠加'),

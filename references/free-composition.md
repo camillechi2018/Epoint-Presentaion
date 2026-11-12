@@ -42,4 +42,4 @@
 
 元素坐标为英寸，16:9 画布上的正文安全区为 `x=0.65–12.70`、`y=1.32–6.90`。支持可编辑的 `text`、`rect`、`ellipse`、`line`，以及有真实来源的 `image`。图片必须提供本地 `source_path`，仅接受 PNG/JPEG；没有来源时不得画图片占位框。文本字体用 `font_role=body|heading|latin_numeric`：前两者对应任务 `font_profile.east_asian`，拉丁字母与数字对应 `font_profile.latin`；字体层级由字号和字重建立。颜色只用品牌变量角色，如 `primary`、`text`、`muted`、`surface`、`border`、`neutral.white`。不得写 RGB 或新增颜色。文本字号限 14–32 pt；至少保留一段可编辑正文。文字框不得互相重叠。每页最多 30 个元素；超出安全容量时拆页。
 
-绘制器统一添加所选风格的背景、标题、Logo 和页码。蓝红简约读取 `offline-core.json.content_header` 与 `content_atmosphere`；科技风读取 `tech_content_header`，使用本地原生科技顶部图形组、居中白色标题、右上白色 Logo 和 `#05193A` 画布，不加简约横线或弥散椭圆。模型只编排正文安全区，不改页眉。绘制器清除阴影，校验主题色与母版颜色独立性。最终仍须用 PowerPoint 复核实际文字边界、视觉节奏和内容依据。自由编排的 `library_used=false`，并在计划与验收报告中保留 `rationale`、进入该层的原因和图片来源。
+绘制器统一添加所选风格的背景、标题、Logo 和页码。蓝红简约读取 `offline-core.json.content_header` 与 `content_atmosphere`；科技风读取 `tech_content_header`，使用本地原生科技顶部图形组、居中白色标题、右上白色 Logo 和 `#031634` 画布，卡片表面使用 `#05193A`，不加简约横线或弥散椭圆。模型只编排正文安全区，不改页眉。绘制器清除阴影，校验主题色与母版颜色独立性。最终仍须用 PowerPoint 复核实际文字边界、视觉节奏和内容依据。自由编排的 `library_used=false`，并在计划与验收报告中保留 `rationale`、进入该层的原因和图片来源。
