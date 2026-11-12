@@ -82,7 +82,9 @@ S2 代表性签收另覆盖四图表与表格混合包、含 PNG/SVG/WDP 和嵌�
 
 Linux 任务副本中，LibreOffice 不能正确显示的可编辑文字渐变会转换成其最亮可见色标的纯色；转换次数写入 `font_normalization.gradient_text_fallbacks`。此适配只处理 Linux 输出，不修改知识库原稿，也不改变 Windows/Mac 文件。其视觉颜色仍须与目标应用逐页复核；渐变效果本身不会在 Linux 版本中保留。
 
-Mac 实机先重试 `sh ./install.sh`，让安装器自行完成 `doctor --goal fill` 并原子激活 `runtime.json`；不要手写运行时记录或改用系统默认 Python 绕过门禁。安装成功后用安装器报告中的解释器执行 `scripts/font_profile.py --profile macos --out <字体诊断.json>` 和 `scripts/doctor.py --goal fill --font-profile macos --out <环境诊断.json>`。随后运行校准脚本；若不能自动导出，逐页用 PowerPoint 打开并导出 PNG，记录应用版本、缺字或溢出页、原 PPTX 和预览图哈希。未收到修订版 Mac 实机记录前保持待验收。
+Mac 实机已在字体检测修复后完成安装和 `doctor --goal fill`，并生成可由 Keynote 打开的 22 页候选 PPTX。此结果不代表 PowerPoint 视觉验收。后续仍用安装器记录的解释器执行 `scripts/font_profile.py --profile macos --out <字体诊断.json>` 和 `scripts/doctor.py --goal fill --font-profile macos --out <环境诊断.json>`，用目标 PowerPoint 逐页打开并导出预览，记录应用版本、缺字或溢出页、原 PPTX 和预览图哈希。不得手写运行时记录或改用系统默认 Python 绕过门禁。
+
+这份 Mac 候选文件为 96.84 MiB，压缩后的嵌入字体部件占 78.86 MiB，是体积的主要来源。任务副本可研究去嵌入字体，但在 Mac 目标应用核对字形、换行、可编辑性和版面之前，不自动清理字体；知识库原稿和本地最小包保持各自已校验的状态。
 
 ## S5 显式实验整稿入口
 
