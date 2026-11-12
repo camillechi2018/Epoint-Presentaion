@@ -11,6 +11,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 from library_location import SKILL, resolve_library
@@ -210,8 +211,10 @@ def execute_plan(request, plan, report, output: Path):
     check_structure([dict(choice, role=page.get('role'))
                      for page, choice in zip(pages, plan['pages'])], complete=True)
     output = output.resolve()
-    work = output.parent / (output.stem + '-work')
-    work.mkdir(parents=True, exist_ok=True)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    # Keep failed-run evidence, but never reuse its partial page files on retry.
+    work = Path(tempfile.mkdtemp(prefix=output.stem + '-work-', dir=output.parent))
+    report['execution_work_dir'] = str(work)
     slides = []
     audit_pages = []
     used_guided_variants = {}

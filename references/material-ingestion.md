@@ -22,6 +22,8 @@
 
 技能不绑定平台工具名称，也不内置 OCR 或 PDF 解析器。平台没有相应工具时报告 `EXTRACTION_TOOL_UNAVAILABLE`／`OCR_REQUIRED`；文字型 PDF 的提取仍须检查缺页、错序和表格。不能可靠读取的内容不得补写为事实。
 
+对纯扫描 PDF，可由当前平台把页面渲染成图片，再用其视觉识别能力逐页提取文字，按页号写入交接 JSON；重点复核数字、表格和跨页顺序。渲染工具只负责产生图像，不代表已经完成文字识别。
+
 旧 PPTX 和 HTML 均作为**内容材料**使用，不自动复用其页面版式、母版、CSS 或脚本，也不因此跳过知识库组件匹配。PPTX 的图表内部数据、图片中文字、备注及母版内容未作为正文事实完整提取；没有可编辑文本的页会标记 `PPTX_SLIDE_TEXT_EMPTY`。HTML 不执行脚本，也不计算 CSS 显隐或伪元素，因此始终标记 `HTML_RENDERED_CONTENT_UNVERIFIED`。若关键事实只出现在截图或动态页面中，先用当前 Agent 平台的视觉／OCR 工具提取，再用 `--extraction` 补入；不能把缺失内容猜成空白。
 
 入口失败时向标准输出返回 `status: blocked` 和 `error_code`，退出码为 2，不写事实清单；成功时退出码为 0。缺页码只生成 `SOURCE_LOCATION_UNVERIFIED` 警告，不阻断知识库选稿。

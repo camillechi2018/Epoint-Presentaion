@@ -11,6 +11,8 @@ metadata:
 
 ## 跨平台统一入口
 
+升级安装时先检查本地改动。远端 Git 历史若发生强制更新，保留旧副本并移到 Agent 的 `skills/` 目录外，再重新克隆；不要让 `.bak-*` 备份留在技能扫描目录中，以免调用解析到旧版。开发自检用标准库 `unittest`，运行环境不包含 `pytest`；Windows 的 Git Bash 调用 Windows Python 时，用该 Python 的 `tempfile` 或 Windows 绝对路径，不把 Bash `/tmp` 直接传给它。
+
 跨系统安装与故障诊断见[运行环境说明](references/cross-platform-runtime.md)。安装前可用 `scripts/run_presentation.py --doctor --out <诊断.json>` 检查基础环境；安装依赖后统一用 `scripts/run.py --doctor --out <诊断.json>` 转调已锁定的解释器，避免把 Agent 自带 Python 缺包误判为安装失败。安装器先复验并复用已登记的有效环境。`--goal assemble` 检查正式后端，macOS 实验组装可另用 `--goal native-assemble` 做导入检查；两者都不代替真实成稿与视觉验收。macOS/Linux 可显式传入 `--native-experimental` 运行 S5 原生组装整稿候选；该入口须使用真实、已校验的结构页和同一知识库快照，继续执行组装前后来源、包、字体、颜色、媒体与 Logo 检查。它仍属实验入口，不把 LibreOffice 导出或 `status=ready` 当作目标应用视觉签收；未传此参数时缺 PowerPoint 后端仍阻断完整出稿。S4/S5 请求可通过 `font_profile` 锁定 Windows、macOS 或 Linux 字体；省略时按运行系统选择。完整出稿前检查字体资源，同一任务的填充、归一、审计和报告共用该配置。Linux LibreOffice 预览与 Mac PowerPoint 实机结果分别登记，不以一方结果代替另一方。
 
 收到原始材料时，按[多格式材料接入](references/material-ingestion.md)先生成事实清单，再制定逐页内容。安装后统一用 `scripts/run.py --read-material --input <文件> --out <事实清单.json>` 读取 `.xls`、`.xlsx`、`.docx`、`.txt`、`.md`、`.pptx`、`.html`／`.htm`；旧 PPTX/HTML 只作内容来源，不自动复用其母版、CSS 或页面视觉。`.pdf` 和 PNG/JPEG 的文字先由当前 Agent 平台的 PDF 提取／OCR 工具取得，再用 `--extraction <平台提取.json>` 交给同一入口。技能不绑定某个平台的 OCR，也不把缺页码作为知识库匹配条件；来源不明的项目标记待复核。对无法可靠读取的 `.xls` 公式来源与内嵌图片、缺失的 `.xlsx` 公式缓存、尚未安放的 Word 图片及 OCR 错漏应明确记录，不能猜测事实。事实清单不等于逐页 `request.json`。

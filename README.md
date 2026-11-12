@@ -68,6 +68,8 @@ sh ./install.sh
 
 安装后新开 WorkBuddy 会话或刷新技能列表，再确认 `epoint-presentation` 已出现；技能文件安装成功与当前会话立即发现是两项检查。
 
+升级时先检查技能目录是否有本地修改。若远端历史发生 `forced update`，不要直接 `git pull` 或覆盖有修改的目录；将旧副本移出 `skills/` 后重新克隆，再按需迁移个人配置。备份目录不要放在 Agent 的 `skills/` 下，避免被识别为另一项旧版技能。
+
 需要 Python 3.10 或更高版本。在技能目录安装隔离的运行环境：
 
 | 系统 | 安装命令 |
@@ -78,6 +80,8 @@ sh ./install.sh
 安装器先复验并复用已登记的有效运行环境，避免 PATH 中的 Agent 内嵌 Python 触发重复安装；首次安装仍会选用可执行的 Python。需要指定解释器时，先设置 `EPOINT_PYTHON` 为 Python 3.10+ 的完整路径。断网安装可提供兼容的 `--wheelhouse <目录>`。不同系统的字体、Office 渲染和整稿交付仍须按目标环境复核。[查看跨系统安装与验证说明](references/cross-platform-runtime.md)。
 
 材料入口直接读取 `.xlsx`、`.xls`、`.docx`、`.txt`、`.md`、`.pptx` 和 `.html`，安装后通过 `scripts/run.py --read-material` 使用。PDF 和 PNG/JPEG 的文字由当前 Agent 平台提取或 OCR，再以统一 JSON 交给材料入口；没有可用平台工具时明确报告，技能不会猜写。旧 PPT/HTML 仅作为内容来源，不自动复用原页面设计。[查看多格式材料接入方法](references/material-ingestion.md)。
+
+开发自检使用 Python 标准库 `unittest`，例如 `python -m unittest tests.test_read_material`；隔离运行环境只安装出稿依赖，不包含 `pytest`。在 Windows 的 Git Bash 中调用 Windows Python 时，输入与输出路径使用 Windows Python 能识别的绝对路径；临时目录由 Python `tempfile` 取得，避免把 Bash 的 `/tmp` 当成 Windows 路径。
 
 然后在支持技能的 Agent 中附上材料，例如：
 
