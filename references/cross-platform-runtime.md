@@ -1,6 +1,6 @@
 # 跨系统运行：S5 候选实现
 
-本轮已完成发布字节校验、隔离依赖安装、独立自检、知识库缓存迁移和 S2/S3 代表性验收。S4 已完成 Windows/Linux 字体与渲染定点验证。macOS 实机已验证安装、字体、可编辑 PPTX 生成及 Keynote 打开；自动预览和目标 PowerPoint 视觉验收仍待完成。安装成功或自检通过不等于整稿交付通过。
+本轮已完成发布字节校验、隔离依赖安装、独立自检、知识库缓存迁移和 S2/S3 代表性验收。S4 已完成 Windows/Linux 字体与渲染定点验证。用户确认 macOS 实机使用技能 `23e32c5` 与知识库 `58d4977` 测试，安装及效果通过；目标应用版本和逐页证据尚未归档，不单独宣称 Mac PowerPoint 正式签收。安装成功或自检通过不等于整稿交付通过。
 
 ## 安装与运行
 
@@ -82,7 +82,7 @@ S2 代表性签收另覆盖四图表与表格混合包、含 PNG/SVG/WDP 和嵌�
 
 Linux 任务副本中，LibreOffice 不能正确显示的可编辑文字渐变会转换成其最亮可见色标的纯色；转换次数写入 `font_normalization.gradient_text_fallbacks`。此适配只处理 Linux 输出，不修改知识库原稿，也不改变 Windows/Mac 文件。其视觉颜色仍须与目标应用逐页复核；渐变效果本身不会在 Linux 版本中保留。
 
-Mac 实机已在字体检测修复后完成安装和 `doctor --goal fill`，并生成可由 Keynote 打开的 22 页候选 PPTX。此结果不代表 PowerPoint 视觉验收。后续仍用安装器记录的解释器执行 `scripts/font_profile.py --profile macos --out <字体诊断.json>` 和 `scripts/doctor.py --goal fill --font-profile macos --out <环境诊断.json>`，用目标 PowerPoint 逐页打开并导出预览，记录应用版本、缺字或溢出页、原 PPTX 和预览图哈希。不得手写运行时记录或改用系统默认 Python 绕过门禁。
+Mac 实机已在字体检测修复后完成安装和 `doctor --goal fill`，早期 22 页候选 PPTX 可由 Keynote 打开；随后用户确认最新技能 `23e32c5` 与知识库 `58d4977` 的 macOS 测试效果通过。安装适配和代表性出稿可按用户反馈记为通过。目标应用、版本和逐页导出证据尚未归档时，不将该反馈扩大为 PowerPoint 全量视觉验收。复测应使用安装器记录的解释器，不手写运行时记录或改用系统默认 Python 绕过门禁。
 
 旧 Mac 候选文件为 96.84 MiB，压缩后的嵌入字体部件占 78.86 MiB，是体积的主要来源。知识库 `sources/cover.pptx` 已移除旧字体部件并更新哈希；任务副本归一字体时也会清除旧嵌入，避免历史缓存继续放大成稿。旧 22 页稿的副本实测降至 17.98 MiB，字体审计 195 个文本运行项通过，在本机 Windows PowerPoint 导出的 22 页逐像素一致。此结果不替代 Mac 目标应用复核，仍须检查字形、换行、柔边和可编辑性。旧源稿 SHA-256 保留在知识库 `source-manifest.json`，运行时不得绕过当前清单校验。
 
@@ -96,4 +96,4 @@ Linux 安装并自检后，可在已校验的知识库快照上运行：
 
 此参数只切换组装后端；候选筛选、真实字段试填、结构页完整性、来源校验、任务字体归一和最终审计仍执行。输出报告中的 `assembly_backend=native_experimental`、`execution.assembly_status`、`execution.static_audit_status`、`execution.render_status` 与 `delivery_status` 要分别读取。LibreOffice 逐页渲染成功后仍为 `pending_visual_review`；应检查实际 PNG，并用目标 PowerPoint/WPS 打开或导出。macOS 自动预览当前标为 `pending_manual`，需在目标编辑器中逐页导出和检查。渲染失败时保留已通过组装及静态审计的候选 PPTX，交付状态为 `pending_render`，不能报已完成。找不到渲染器时同样不能把视觉状态标为通过。缺结构页、缺字体或未显式启用后端时继续阻断完整稿。
 
-该入口尚未作为 macOS 或 Linux 的正式发布能力签收；S5 真实材料及用户 macOS 实测结论以对应验收记录为准。
+macOS/Linux 已完成候选入口的代表性实测，仍使用 `--native-experimental`；是否将其转为正式发布能力，要另行确定支持范围、发布归档和目标应用视觉验收口径。S5 真实材料及用户 macOS 实测结论以对应验收记录为准。
