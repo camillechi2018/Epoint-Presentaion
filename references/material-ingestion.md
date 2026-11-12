@@ -52,6 +52,6 @@
 ## 接入出稿
 
 1. 保存平台工具的提取结果并运行材料入口，检查 `status`、`warnings`、每条 `source_ref` 和原图路径。
-2. Agent 将事实清单整理成主题、结论、证据及逐页 `content`，在相应页面保留 `source_refs`。源定位不明的材料使用文件级引用并在交付记录中保留待复核项。
+2. Agent 将事实清单整理成主题、结论、证据及逐页 `content`，在相应页面保留 `source_refs`。按[材料结构化](content-structuring.md)将普通并列内容整理成 title/body，指标与流程按真实结构提供；可先用 `scripts/run.py --structure-content` 检查并完成待办。源定位不明的材料使用文件级引用并在交付记录中保留待复核项。
 3. 用现有 `scripts/run.py --request <逐页请求.json> --out <报告.json> --plan-out <计划.json>` 选稿；内容齐备时再执行和检查成稿。知识库组件仍按信息关系、字段与容量匹配，与原材料扩展名无关。
 4. 图片只有真实来源文件可用于图文排版；OCR 文本不等于图片已放入 PPT。素材真实性、页次、字体和最终视觉检查沿用原有交付规则。

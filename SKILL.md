@@ -2,7 +2,7 @@
 name: epoint-presentation
 description: 制作新点品牌可编辑 PPTX；Skill 自带 Logo、锁定色系、字体、三风格资料包和已校验结构页最小包。优先读取 Git 知识库，断网时使用本地已校验模板；正文可灵活编排。
 metadata:
-  version: "1.0.32"
+  version: "1.0.33-dev"
 ---
 
 # 新点企业演示文稿：新模板方案
@@ -10,6 +10,8 @@ metadata:
 分发完整性故障不得降格成交付：出现清单哈希错误时，保留具体错误文件、期望哈希、实际哈希及来源提交，先检查安装包与缓存；不得跳过校验、现场重算清单或将完整稿静默改为品牌重绘。发布前在暂存拟发布文件后运行 `scripts/prepare_distribution.py --root <技能根目录> --manifest-root <最小包目录> --write`，统一文本字节后重建清单，并对 Git 归档和 LF/CRLF 检出分别验收。不带 `--write` 仅校验；运行期始终比较原始字节。
 
 ## 跨平台统一入口
+
+**材料读取后先整理内容再选稿。** 按[材料结构化](references/content-structuring.md)辨认并列条目、指标、表格、步骤及其真实关系，不把所有页面统一写成字符串 bullets。普通并列列表由当前 Agent 从原文提炼 `content.item_titles`，保留 `content.items` 原文，经 `scripts/run.py --structure-content --request <草稿.json> --out <整理后请求.json> --report <整理报告.json>` 形成 title/body 卡片。处理报告中的 `needs_agent_structure` 待办后再选稿；确需纯文字列表时填写 `keep_bullets_reason`。已结构化输入沿用。此步骤由当前平台 Agent 完成语义判断，脚本保持原正文与来源；不靠猜数字、删事实或改变信息关系提高覆盖。候选与容量反馈用于确认分页，准备完成不等于填充或视觉验收完成。正式入口也执行兼容规范化并报告未整理页，旧请求仍可运行。
 
 升级安装时先检查本地改动。远端 Git 历史若发生强制更新，保留旧副本并移到 Agent 的 `skills/` 目录外，再重新克隆；不要让 `.bak-*` 备份留在技能扫描目录中，以免调用解析到旧版。开发自检用标准库 `unittest`，运行环境不包含 `pytest`；Windows 的 Git Bash 调用 Windows Python 时，用该 Python 的 `tempfile` 或 Windows 绝对路径，不把 Bash `/tmp` 直接传给它。
 

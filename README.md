@@ -2,7 +2,7 @@
 
 把材料整理成符合新点品牌风格、可继续编辑的企业演示文稿。先选 **蓝色系、红色系或科技风格**，再由 Agent 梳理内容与信息关系，优先试用知识库组件；正文不适配时使用技能内的排版规则，仍保持同一套色彩、字体和 Logo。
 
-**最新正式版本：1.0.32。** [查看技能入口](SKILL.md) · [查看 v1.0.32 发布版](https://github.com/camillechi2018/Epoint-Presentation/releases/tag/v1.0.32) · [查看完整模板知识库](https://github.com/camillechi2018/Epoint-Presentation-KnowledgeBase)
+**`main` 当前开发版本：1.0.33-dev；最新正式版本：1.0.32。** [查看技能入口](SKILL.md) · [查看 v1.0.32 发布版](https://github.com/camillechi2018/Epoint-Presentation/releases/tag/v1.0.32) · [查看完整模板知识库](https://github.com/camillechi2018/Epoint-Presentation-KnowledgeBase)
 
 ## 先看三种风格
 
@@ -90,6 +90,8 @@ sh ./install.sh
 如果已指定风格，可直接说“用蓝色系制作”，不需要再次选择。完整模板知识库由 [`knowledge-base.json`](knowledge-base.json) 指向独立 Git 仓库；首次使用远端模板需要能够访问 GitHub，离线时按校验结果使用本地缓存或最小模板包。
 
 ## 它怎样组织一份 PPT
+
+材料提取后，Agent 会先整理标题、正文、指标和真实信息关系，再匹配组件。并列条目可通过 `scripts/run.py --structure-content` 规范为“标题＋原文正文”，保留来源；未完成整理的页面会列出待办。[查看材料结构化流程](references/content-structuring.md)。
 
 1. **理解材料。** 先提炼结论、证据、信息关系和页次，不把模板示例文字当成业务事实。
 2. **锁定风格。** 整稿使用所选色系、字体、Logo 和页面规则；红色系使用单色 Logo。

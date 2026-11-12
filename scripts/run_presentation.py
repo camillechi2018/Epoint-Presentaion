@@ -449,8 +449,14 @@ def main():
     if args.out.exists() or args.plan_out and args.plan_out.exists() or args.execute_out and args.execute_out.exists():
         ap.error('输出文件已存在')
     request = json.loads(args.request.read_text(encoding='utf-8-sig'))
+    from structure_content import prepare
+    request, content_preparation = prepare(request)
     report = preflight(request, library=args.library, offline=args.offline,
                        native_experimental=args.native_experimental)
+    report['content_preparation'] = content_preparation
+    if content_preparation['tasks']:
+        report['warnings'].append('部分正文仍为待整理的要点列表；先完成 content_preparation.tasks '
+                                  '可提高候选发现机会。旧请求继续按原规则试填，不保证模板复用。')
     default_profile = {'Windows': 'windows', 'Darwin': 'macos', 'Linux': 'linux'}.get(
         platform.system(), 'linux')
     try:
