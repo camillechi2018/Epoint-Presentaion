@@ -663,7 +663,8 @@ def unmapped_pilot_input_paths(content: dict, mapped: dict) -> list[str]:
     rendered = [''.join(value.split()) for value in texts.values() if isinstance(value, str)]
     unused = []
     control = {'type', 'structure_type', 'title', 'order', 'theme', 'library_commit',
-               'item_count', 'layout_id', 'source_refs', 'layout_assessment', 'free_layout'}
+               'item_count', 'layout_id', 'source_refs', 'unit_claims',
+               'layout_assessment', 'free_layout'}
     # These are checked against fixed axis/position rules rather than copied
     # into editable fields. The original template renders the category labels.
     positional = {'month', 'quarter'}
@@ -699,7 +700,8 @@ def field_source_evidence(content: dict, mapped: dict) -> dict:
     """Record auditable input-field candidates without claiming unique origins."""
     leaves = []
     control = {'type', 'structure_type', 'order', 'theme', 'library_commit',
-               'item_count', 'layout_id', 'source_refs', 'layout_assessment', 'free_layout'}
+               'item_count', 'layout_id', 'source_refs', 'unit_claims',
+               'layout_assessment', 'free_layout'}
     def walk(value, path=''):
         if isinstance(value, str):
             if value.strip():

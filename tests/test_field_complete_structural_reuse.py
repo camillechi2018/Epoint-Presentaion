@@ -236,6 +236,22 @@ class FieldCompleteStructuralReuseTest(unittest.TestCase):
         _, adapter = adapt_for_layout(entry['id'], content, '业务概览', entry=entry)
         self.assertEqual(adapter, 'declared_structural_fields')
 
+    def test_pilot_cards_ignore_claim_ids_but_reject_unmapped_copy(self):
+        catalog = json.loads((ROOT / 'catalog.json').read_text(encoding='utf-8'))
+        entry = next(x for x in catalog['layouts'] if x['id'] == 'content-blue-112')
+        content = {'type': 'cards', 'unit_claims': ['C01'],
+                   'items': [{'title': f'领域{i}', 'body': f'服务内容{i}'}
+                             for i in range(4)]}
+        mapped, adapter = adapt_for_layout(entry['id'], content, '业务概览', entry=entry)
+        self.assertEqual(adapter, 'four_card_items_to_p112')
+        self.assertEqual(mapped['unit_claims'], ['C01'])
+        content['extra_fact'] = '另一项必须呈现的事实'
+        _, adapter = adapt_for_layout(entry['id'], content, '业务概览', entry=entry)
+        self.assertIsNone(adapter)
+        issue = structural_mapping_issue(entry, content, '业务概览')
+        self.assertEqual(issue['reason_code'], 'INPUT_FACTS_UNMAPPED')
+        self.assertIn('unmapped_input:extra_fact', issue['paths'])
+
 
 if __name__ == '__main__':
     unittest.main()

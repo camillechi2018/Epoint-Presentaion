@@ -33,7 +33,7 @@ def unmapped_binding_paths(library: Path, layout_id: str, content: dict, theme: 
 
 
 def library_commit(library: Path) -> str:
-    if (library / '.git').is_dir():
+    if (library / '.git').exists():
         return subprocess.check_output(['git', '-C', str(library), 'rev-parse', 'HEAD'], text=True).strip()
     manifest = json.loads((library / 'knowledge-manifest.json').read_text(encoding='utf-8-sig'))
     return manifest['source_commit']
